@@ -27,7 +27,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
   const [logoError, setLogoError] = useState(false);
 
-  const processCSV = useCallback((file: File) => {
+  const processCSV = useCallback((file: File, method: 'file_upload' | 'drag_drop' = 'file_upload') => {
     Papa.parse(file, {
       header: false,
       skipEmptyLines: true,
@@ -96,6 +96,14 @@ export default function App() {
 
           setData(parsedRows.sort((a, b) => a.strikePrice - b.strikePrice));
           setError(null);
+
+          // Google Analytics Event
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'analyze_option_chain', {
+              'analysis_method': method,
+              'status': 'success'
+            });
+          }
         } catch (err) {
           setError("Processing error. Ensure input matches NSE India CSV format.");
         }
@@ -117,7 +125,7 @@ export default function App() {
     e.preventDefault();
     setIsHovering(false);
     const file = e.dataTransfer.files[0];
-    if (file) processCSV(file);
+    if (file) processCSV(file, 'drag_drop');
   };
 
   const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
@@ -227,7 +235,7 @@ export default function App() {
                 
                 <label className="px-8 py-4 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 group mb-4">
                   Select CSV File
-                  <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0])} />
+                  <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                 </label>
                 <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-16">
                   or drop it anywhere on this page
