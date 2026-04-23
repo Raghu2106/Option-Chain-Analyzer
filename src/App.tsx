@@ -214,28 +214,9 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center max-w-2xl w-full"
               >
-                <div className="relative mb-8 group">
-                  <div className="w-80 h-48 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 overflow-hidden transition-all group-hover:scale-105">
-                    {logoError ? (
-                      <div className="flex flex-col items-center gap-4 p-6">
-                        <TrendingUp size={64} className="text-[#0f4e5a]" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Option Chain Analyzer</span>
-                      </div>
-                    ) : (
-                      <img 
-                        src="/logo.png" 
-                        alt="NSE India Option Chain Analyzer Support and Resistance Chart Logo" 
-                        className="w-full h-full object-fill animate-in fade-in duration-500" 
-                        referrerPolicy="no-referrer"
-                        onError={() => setLogoError(true)}
-                      />
-                    )}
-                  </div>
-                  <div className="absolute -inset-8 bg-[#0f4e5a]/10 blur-3xl rounded-full -z-10" />
-                </div>
-                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900">Option Chain Analyzer</h2>
-                <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-md text-center">
-                  Drop your NSE Option Chain CSV anywhere to identify Support & Resistance levels using real-time Open Interest and Volume analysis.
+                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900 pt-8">Option Chain Analyzer</h2>
+                <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-lg text-center">
+                  Analyze NSE Option Chain data effortlessly. Upload your desired option chain CSV for <strong>Indices (NIFTY, BANKNIFTY, FINNIFTY)</strong> or <strong>individual Stocks</strong> directly from the NSE website to identify institutional Support & Resistance levels based on real-time OI and Volume clusters.
                 </p>
                 
                 {error && (
@@ -244,10 +225,13 @@ export default function App() {
                   </div>
                 )}
                 
-                <label className="px-8 py-4 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 group mb-16">
+                <label className="px-8 py-4 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 group mb-4">
                   Select CSV File
                   <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0])} />
                 </label>
+                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-16">
+                  or drop it anywhere on this page
+                </p>
 
                 {/* Educational Content for AdSense & SEO */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left w-full border-t border-slate-200 pt-16">
