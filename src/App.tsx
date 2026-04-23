@@ -146,9 +146,9 @@ export default function App() {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setData([])}
-              className="px-3 py-1 bg-slate-100 border border-slate-200 text-[9px] font-black uppercase transition-all hover:bg-rose-500 hover:text-white hover:border-rose-600 rounded shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-700 active:scale-95 rounded-lg shadow-lg shadow-rose-200 flex items-center gap-2 border border-rose-500"
             >
-              <AlertCircle size={10} />
+              <AlertCircle size={14} />
               Reset Map
             </button>
           </div>
