@@ -190,7 +190,7 @@ export default function App() {
               onError={() => setLogoError(true)}
             />
           )}
-          <h1 className="text-sm font-black tracking-widest uppercase text-[#0f4e5a]/90">Option Analyzer</h1>
+          <h1 className="text-sm font-black tracking-widest uppercase text-[#0f4e5a]/90">Option Chain Analyzer</h1>
         </div>
         {data.length > 0 && (
           <div className="flex items-center gap-4">
@@ -215,9 +215,9 @@ export default function App() {
                 className="flex flex-col items-center max-w-2xl w-full"
               >
                 <div className="relative mb-8 group">
-                  <div className="w-56 h-auto min-h-[14rem] bg-white rounded-3xl shadow-2xl flex items-center justify-center p-6 border border-slate-100 overflow-hidden transition-all group-hover:scale-105">
+                  <div className="w-80 h-48 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100 overflow-hidden transition-all group-hover:scale-105">
                     {logoError ? (
-                      <div className="flex flex-col items-center gap-4">
+                      <div className="flex flex-col items-center gap-4 p-6">
                         <TrendingUp size={64} className="text-[#0f4e5a]" />
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Option Chain Analyzer</span>
                       </div>
@@ -225,7 +225,7 @@ export default function App() {
                       <img 
                         src="/logo.png" 
                         alt="NSE India Option Chain Analyzer Support and Resistance Chart Logo" 
-                        className="w-full h-full object-contain" 
+                        className="w-full h-full object-cover" 
                         referrerPolicy="no-referrer"
                         onError={() => setLogoError(true)}
                       />

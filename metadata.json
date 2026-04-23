@@ -1,6 +1,6 @@
 {
-  "name": "NSE Option Chain Analyzer",
-  "description": "Analyze support and resistance levels for NSE stocks and indices. Upload an option chain CSV to identify key trading levels based on Open Interest analysis.",
+  "name": "Option Chain Analyzer",
+  "description": "Professional NSE Option Chain Analyzer for Nifty and Bank Nifty. Identify automated Support & Resistance levels based on PCR/CPR Open Interest and Volume data.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
