@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent } from 'react';
 import Papa from 'papaparse';
-import { Upload, FileSpreadsheet, AlertCircle, TrendingUp } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface OptionChainRow {
@@ -25,6 +25,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   const processCSV = useCallback((file: File) => {
     Papa.parse(file, {
@@ -176,10 +177,20 @@ export default function App() {
       {/* Header */}
       <header className="h-12 border-b bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-30">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 bg-slate-900 rounded flex items-center justify-center">
-            <TrendingUp size={12} className="text-white" />
-          </div>
-          <h1 className="text-xs font-black tracking-widest uppercase opacity-70">NSE Option Map</h1>
+          {logoError ? (
+            <div className="w-9 h-9 bg-slate-100 rounded flex items-center justify-center shadow-sm">
+              <TrendingUp className="text-[#0f4e5a] w-5 h-5" />
+            </div>
+          ) : (
+            <img 
+              src="/logo.png" 
+              alt="Option Chain Analyzer Logo" 
+              className="w-9 h-auto rounded shadow-sm" 
+              referrerPolicy="no-referrer"
+              onError={() => setLogoError(true)}
+            />
+          )}
+          <h1 className="text-sm font-black tracking-widest uppercase text-[#0f4e5a]/90">Option Analyzer</h1>
         </div>
         {data.length > 0 && (
           <div className="flex items-center gap-4">
@@ -203,12 +214,28 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center max-w-2xl w-full"
               >
-                <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center border border-slate-200 mb-8 transition-transform hover:rotate-3">
-                  <FileSpreadsheet size={36} className="text-slate-400" />
+                <div className="relative mb-8 group">
+                  <div className="w-56 h-auto min-h-[14rem] bg-white rounded-3xl shadow-2xl flex items-center justify-center p-6 border border-slate-100 overflow-hidden transition-all group-hover:scale-105">
+                    {logoError ? (
+                      <div className="flex flex-col items-center gap-4">
+                        <TrendingUp size={64} className="text-[#0f4e5a]" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Option Chain Analyzer</span>
+                      </div>
+                    ) : (
+                      <img 
+                        src="/logo.png" 
+                        alt="NSE India Option Chain Analyzer Support and Resistance Chart Logo" 
+                        className="w-full h-full object-contain" 
+                        referrerPolicy="no-referrer"
+                        onError={() => setLogoError(true)}
+                      />
+                    )}
+                  </div>
+                  <div className="absolute -inset-8 bg-[#0f4e5a]/10 blur-3xl rounded-full -z-10" />
                 </div>
-                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900">NSE Option Chain Mapper</h2>
+                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900">Option Chain Analyzer</h2>
                 <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-md text-center">
-                  Drop your NSE Option Chain CSV anywhere to generate an automated Support & Resistance map based on real-time Open Interest and Volume data.
+                  Drop your NSE Option Chain CSV anywhere to identify Support & Resistance levels using real-time Open Interest and Volume analysis.
                 </p>
                 
                 {error && (
@@ -319,11 +346,11 @@ export default function App() {
         <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em]">
           <span className="flex items-center gap-2">
             <span className="text-slate-500">Method:</span> 
-            <span className="text-emerald-400 underline underline-offset-2">DUAL_PCR_CPR_V2</span>
+            <span className="text-[#0f4e5a] underline underline-offset-2">DUAL_PCR_CPR_V2</span>
           </span>
           <span className="flex items-center gap-2">
             <span className="text-slate-500">Mult:</span> 
-            <span className="text-amber-400">6.0x_MIN</span>
+            <span className="text-[#0f4e5a]">6.0x_MIN</span>
           </span>
         </div>
         <div className="text-[8px] text-slate-500 flex items-center gap-4 uppercase tracking-widest font-bold">
