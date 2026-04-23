@@ -183,7 +183,7 @@ export default function App() {
             </div>
           ) : (
             <img 
-              src="/logo.png" 
+              src="logo.png" 
               alt="Option Chain Analyzer Logo" 
               className="w-9 h-auto rounded shadow-sm" 
               referrerPolicy="no-referrer"
@@ -223,9 +223,9 @@ export default function App() {
                       </div>
                     ) : (
                       <img 
-                        src="/logo.png" 
+                        src="logo.png" 
                         alt="NSE India Option Chain Analyzer Support and Resistance Chart Logo" 
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-fill animate-in fade-in duration-500" 
                         referrerPolicy="no-referrer"
                         onError={() => setLogoError(true)}
                       />
