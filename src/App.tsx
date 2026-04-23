@@ -194,26 +194,9 @@ export default function App() {
         )}
       </header>
 
-      {/* TOP AD SLOT */}
-      <div className="w-full bg-slate-200/50 flex shrink-0 items-center justify-center py-2 border-b border-slate-200">
-        <div className="w-[728px] h-[90px] bg-slate-300/30 border border-dashed border-slate-400 rounded flex items-center justify-center text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-          Top Leaderboard Ad (728x90)
-        </div>
-      </div>
-
-      {/* Main Layout with Ad Sidebars */}
-      <div className="flex-1 flex overflow-hidden">
-        
-        {/* LEFT AD SLOT */}
-        <aside className="w-[160px] bg-slate-50 border-r border-slate-200 flex flex-col items-center py-4 shrink-0 overflow-hidden">
-          <div className="flex-1 w-[120px] bg-slate-200/40 border border-dashed border-slate-300 rounded flex items-center justify-center text-[10px] text-slate-400 font-bold uppercase [writing-mode:vertical-lr] tracking-widest leading-none rotate-180">
-            Skyscraper Ad Slot
-          </div>
-        </aside>
-
-        {/* Center Analysis Content */}
-        <main className="flex-1 flex flex-col overflow-hidden bg-white shadow-inner">
-          {data.length === 0 ? (
+      {/* Main Layout */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-white shadow-inner">
+        {data.length === 0 ? (
             <div className="flex-1 flex flex-col items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 bg-slate-50/50 p-6 md:p-12">
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -332,16 +315,6 @@ export default function App() {
           )}
         </main>
 
-        {/* RIGHT AD SLOT */}
-        <aside className="w-[160px] bg-slate-50 border-l border-slate-200 flex flex-col items-center py-4 shrink-0 overflow-hidden">
-          <div className="flex-1 w-[120px] bg-slate-200/40 border border-dashed border-slate-300 rounded flex items-center justify-center text-[10px] text-slate-400 font-bold uppercase [writing-mode:vertical-lr] tracking-widest leading-none">
-            Skyscraper Ad Slot
-          </div>
-        </aside>
-
-      </div>
-
-      {/* Footer / Status Bar */}
       <footer className="h-8 bg-slate-900 border-t border-slate-800 text-white flex items-center px-6 justify-between shrink-0">
         <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em]">
           <span className="flex items-center gap-2">
