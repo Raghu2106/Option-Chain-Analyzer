@@ -244,6 +244,59 @@ export default function App() {
     </div>
   );
 
+  const FooterContent = () => (
+    <div className="w-full bg-slate-900 text-white pt-12 pb-6 px-6 mt-20 rounded-t-[2.5rem]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
+        <div className="space-y-2">
+          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Option Chain Analyzer</h3>
+          <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
+            Institutional-grade NSE data mapping and visualization.
+          </p>
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Direct Links</h3>
+          <div className="flex flex-row flex-wrap justify-center md:justify-start gap-x-4 gap-y-1">
+            <button 
+              onClick={() => setData([])}
+              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+            >
+              Reset Tool
+            </button>
+            <button 
+              onClick={() => setActiveModal('privacy')}
+              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              onClick={() => setActiveModal('terms')}
+              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+            >
+              Terms of Use
+            </button>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Verification</h3>
+          <p className="text-[9px] text-slate-600 leading-relaxed uppercase font-bold tracking-widest">
+            Processing raw metrics from NSE India. <br/>
+            <span className="text-emerald-500/20">Verified AdSense Property</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="border-t border-slate-800/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em] text-slate-700">
+          <span>Method: DUAL_PCR_CPR_V2</span>
+          <span>Multiplier: 6.0x_MIN</span>
+        </div>
+        <p className="text-[8px] text-slate-700 font-bold tracking-widest uppercase">
+          © 2026 OptionChainAnalyzer.in
+        </p>
+      </div>
+    </div>
+  );
+
   const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
       <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-auto p-8 shadow-2xl relative animate-in fade-in zoom-in duration-200">
@@ -357,14 +410,15 @@ export default function App() {
                   or drop it anywhere on this page
                 </p>
 
-                <div className="w-full border-t border-slate-200 mt-8 pt-8">
+                <div className="w-full border-t border-slate-200 mt-8 pt-8 px-4">
                   <GuideContent />
+                  <FooterContent />
                 </div>
               </motion.div>
             </div>
           ) : (
-            <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 p-4 md:p-8">
-              <div className="max-w-screen-xl w-full">
+            <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300">
+              <div className="max-w-screen-xl w-full p-4 md:p-8">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden mb-16">
                   <table className="border-collapse table-fixed min-w-max w-full">
                 <thead className="sticky top-0 z-10 shadow-sm transition-shadow">
@@ -419,70 +473,14 @@ export default function App() {
               </table>
             </div>
 
-            <div className="max-w-4xl mx-auto pb-32">
+            <div className="max-w-4xl mx-auto px-4">
               <GuideContent />
             </div>
+            <FooterContent />
           </div>
         </div>
       )}
     </main>
-
-      <footer className="bg-slate-900 border-t border-slate-800 text-white shrink-0 py-6 px-6">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Option Chain Analyzer</h3>
-            <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
-              India's premier tool for institutional-grade NSE data mapping. Built for speed, privacy, and precision.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Navigation</h3>
-            <div className="flex flex-row flex-wrap gap-x-4 gap-y-1">
-              <button 
-                onClick={() => setData([])}
-                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-              >
-                Reset Tool
-              </button>
-              <button 
-                onClick={() => setActiveModal('privacy')}
-                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-              >
-                Privacy Policy
-              </button>
-              <button 
-                onClick={() => setActiveModal('terms')}
-                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-              >
-                Terms of Use
-              </button>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Data Source</h3>
-            <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
-              Processing raw CSV metrics from NSE India. No data is stored or repurposed.
-              <span className="ml-2 text-emerald-500/30 whitespace-nowrap">Verified AdSense Property</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="border-t border-slate-800/50 pt-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em]">
-            <span className="flex items-center gap-2">
-              <span className="text-slate-600">Method:</span> 
-              <span className="text-[#0f4e5a] underline underline-offset-2">DUAL_PCR_CPR_V2</span>
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="text-slate-600">Mult:</span> 
-              <span className="text-[#0f4e5a]">6.0x_MIN</span>
-            </span>
-          </div>
-          <p className="text-[8px] text-slate-600 font-bold tracking-widest uppercase">
-            © 2026 OptionChainAnalyzer.in | All Rights Reserved
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
