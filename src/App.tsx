@@ -129,115 +129,116 @@ export default function App() {
   };
 
   const GuideContent = () => (
-    <div className="flex flex-col gap-10 text-left w-full">
+    <div className="flex flex-col gap-12 text-left w-full">
       {/* Executive Summary Section */}
-      <section className="bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100/50">
-        <h2 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-2">NSE Option Chain Analysis Guide</h2>
-        <p className="text-[10px] text-slate-500 leading-relaxed max-w-3xl">
+      <section className="bg-emerald-50/40 p-8 rounded-3xl border border-emerald-100/50">
+        <h2 className="text-xs font-black uppercase tracking-widest text-[#0f4e5a] mb-3">NSE Option Chain Analysis Guide</h2>
+        <p className="text-[13px] text-slate-600 leading-relaxed max-w-3xl">
           The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. Our analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong>6.0x institutional multipliers</strong> to identify key market barriers.
         </p>
       </section>
 
       {/* Two-Column Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         <section>
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-4 decoration-emerald-400/50 underline underline-offset-4">Methodology</h3>
-          <div className="space-y-4">
-            <div className="flex gap-3">
-              <div className="w-5 h-5 rounded-full bg-slate-900 text-white text-[9px] font-bold flex items-center justify-center shrink-0">1</div>
+          <h3 className="text-xs font-black uppercase tracking-widest text-[#0f4e5a] mb-5 decoration-emerald-400/50 underline underline-offset-4">Methodology</h3>
+          <div className="space-y-5">
+            <div className="flex gap-4">
+              <div className="w-6 h-6 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</div>
               <div>
-                <h4 className="text-[9px] font-bold text-slate-800 uppercase">Official Data</h4>
-                <p className="text-[10px] leading-relaxed text-slate-500">Download CSV from nseindia.com for Indices or Equities.</p>
+                <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Official Data</h4>
+                <p className="text-xs leading-relaxed text-slate-500">Download CSV from nseindia.com for Indices or Equities.</p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <div className="w-5 h-5 rounded-full bg-slate-900 text-white text-[9px] font-bold flex items-center justify-center shrink-0">2</div>
+            <div className="flex gap-4">
+              <div className="w-6 h-6 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</div>
               <div>
-                <h4 className="text-[9px] font-bold text-slate-800 uppercase">Compatiblity</h4>
-                <p className="text-[10px] leading-relaxed text-slate-500">Supports NIFTY, BANKNIFTY, FINNIFTY and stocks.</p>
+                <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-wide">Compatibility</h4>
+                <p className="text-xs leading-relaxed text-slate-500">Supports NIFTY, BANKNIFTY, FINNIFTY and stocks.</p>
               </div>
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-4 decoration-emerald-400/50 underline underline-offset-4">FAQ</h3>
-          <div className="space-y-4">
+          <h3 className="text-xs font-black uppercase tracking-widest text-[#0f4e5a] mb-5 decoration-emerald-400/50 underline underline-offset-4">FAQ</h3>
+          <div className="space-y-5">
             <div>
-              <h4 className="text-[9px] font-black uppercase text-slate-900">PCR Indicator</h4>
-              <p className="text-[10px] text-slate-500 leading-relaxed">High PCR (especially above 1.5) at strikes suggests strong Put writing (floor).</p>
+              <h4 className="text-[11px] font-black uppercase text-slate-900 mb-1">PCR Indicator</h4>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">High PCR (especially above 1.5) at strikes suggests strong Put writing (floor).</p>
             </div>
             <div>
-              <h4 className="text-[9px] font-black uppercase text-slate-900">6.0x Threshold</h4>
-              <p className="text-[10px] text-slate-500 leading-relaxed">Flags levels where one side has 6x the strength of the other (institutional barrier).</p>
+              <h4 className="text-[11px] font-black uppercase text-slate-900 mb-1">6.0x Threshold</h4>
+              <p className="text-xs text-slate-500 leading-relaxed font-medium">Flags levels where one side has 6x the strength of the other (institutional barrier).</p>
             </div>
           </div>
         </section>
       </div>
 
       {/* Deep Theory Section */}
-      <div className="border-t border-slate-100 pt-8 space-y-8">
+      <div className="border-t border-slate-100 pt-10 space-y-10">
         <section className="max-w-4xl">
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">Market Structure</h3>
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-8">Market Structure</h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">OI Clusters</h4>
-              <p className="text-[10px] text-slate-500">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="space-y-3">
+              <h4 className="font-bold text-[#0f4e5a] text-[10px] uppercase tracking-wider">OI Clusters</h4>
+              <p className="text-[11px] text-slate-600 leading-relaxed">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">Volume Defense</h4>
-              <p className="text-[10px] text-slate-500">High volume at mapped resistance confirms active defense by writers.</p>
+            <div className="space-y-3">
+              <h4 className="font-bold text-[#0f4e5a] text-[10px] uppercase tracking-wider">Volume Defense</h4>
+              <p className="text-[11px] text-slate-600 leading-relaxed">High volume at mapped resistance confirms active defense by writers.</p>
             </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">Strategic Map</h4>
-              <p className="text-[10px] text-slate-500">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
+            <div className="space-y-3">
+              <h4 className="font-bold text-[#0f4e5a] text-[10px] uppercase tracking-wider">Strategic Map</h4>
+              <p className="text-[11px] text-slate-600 leading-relaxed">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
             </div>
           </div>
         </section>
 
-        <section className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-[#0f4e5a] mb-3">Institutional Bias</h3>
-          <p className="text-[10px] text-slate-500 leading-relaxed max-w-4xl mb-4">
+        <section className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200">
+          <h3 className="text-xs font-black uppercase tracking-widest text-[#0f4e5a] mb-4">Institutional Bias</h3>
+          <p className="text-[12px] text-slate-600 leading-relaxed max-w-4xl mb-6 font-medium">
             Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
-               <span className="block text-[8px] font-black uppercase text-slate-400">NIFTY</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
+               <span className="block text-[10px] font-black uppercase text-slate-400">NIFTY</span>
              </div>
-             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
-               <span className="block text-[8px] font-black uppercase text-slate-400">BANKNIFTY</span>
+             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
+               <span className="block text-[10px] font-black uppercase text-slate-400">BANKNIFTY</span>
              </div>
-             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
-               <span className="block text-[8px] font-black uppercase text-slate-400">STOCKS</span>
+             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
+               <span className="block text-[10px] font-black uppercase text-slate-400">STOCKS</span>
              </div>
-             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
-               <span className="block text-[8px] font-black uppercase text-slate-400">EXPIRY</span>
+             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
+               <span className="block text-[10px] font-black uppercase text-slate-400">EXPIRY</span>
              </div>
           </div>
         </section>
 
-        <section className="bg-slate-900 text-white p-6 rounded-2xl relative overflow-hidden ring-1 ring-white/10">
+        <section className="bg-slate-900 text-white p-8 rounded-[2rem] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
           <div className="relative z-10">
-            <h4 className="text-[10px] font-black uppercase mb-2 tracking-widest text-emerald-400">Risk Disclosure</h4>
-            <p className="text-[9px] text-slate-400 leading-relaxed max-w-2xl">
+            <h4 className="text-[11px] font-black uppercase mb-3 tracking-widest text-emerald-400">Risk Disclosure</h4>
+            <p className="text-[11px] text-slate-400 leading-relaxed max-w-2xl font-medium tracking-wide">
               Trading derivatives involves high risk. This educational utility visualizes raw NSE data. We do not provide trading signals. Professional caution is advised.
             </p>
           </div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full" />
         </section>
       </div>
 
       {/* Extended Glossary */}
-      <section className="max-w-4xl pb-10">
-        <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">Glossary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          <div>
-            <dt className="text-[9px] font-black uppercase text-slate-900 mb-1">Change in OI</dt>
-            <dd className="text-[10px] text-slate-500 leading-relaxed">Net difference in contracts from previous day.</dd>
+      <section className="max-w-4xl pb-12">
+        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-8">Glossary</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+          <div className="border-l-2 border-emerald-400 pl-4">
+            <dt className="text-[11px] font-black uppercase text-slate-900 mb-1">Change in OI</dt>
+            <dd className="text-xs text-slate-500 leading-relaxed font-medium">Net difference in contracts from previous day.</dd>
           </div>
-          <div>
-            <dt className="text-[9px] font-black uppercase text-slate-900 mb-1">Time Decay</dt>
-            <dd className="text-[10px] text-slate-500 leading-relaxed">Decrease in option value as expiry approaches.</dd>
+          <div className="border-l-2 border-emerald-400 pl-4">
+            <dt className="text-[11px] font-black uppercase text-slate-900 mb-1">Time Decay</dt>
+            <dd className="text-xs text-slate-500 leading-relaxed font-medium">Decrease in option value as expiry approaches.</dd>
           </div>
         </div>
       </section>
@@ -245,52 +246,52 @@ export default function App() {
   );
 
   const FooterContent = () => (
-    <div className="w-full bg-slate-900 text-white pt-12 pb-6 px-6 mt-20 rounded-t-[2.5rem]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-center md:text-left">
-        <div className="space-y-2">
-          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Option Chain Analyzer</h3>
-          <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
-            Institutional-grade NSE data mapping and visualization.
+    <div className="w-full bg-slate-900 text-white pt-16 pb-8 px-8 mt-24 rounded-t-[3rem] shadow-2xl">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
+        <div className="space-y-4">
+          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-400">Option Chain Analyzer</h3>
+          <p className="text-[11px] text-slate-400 leading-relaxed uppercase font-black tracking-widest">
+            Institutional-grade NSE data mapping and visualization. Trusted by advanced retail traders.
           </p>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Direct Links</h3>
-          <div className="flex flex-row flex-wrap justify-center md:justify-start gap-x-4 gap-y-1">
+        <div className="space-y-4">
+          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-400">Direct Links</h3>
+          <div className="flex flex-row flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
             <button 
               onClick={() => setData([])}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+              className="text-[11px] text-slate-400 hover:text-white transition-colors uppercase font-black tracking-widest"
             >
               Reset Tool
             </button>
             <button 
               onClick={() => setActiveModal('privacy')}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+              className="text-[11px] text-slate-400 hover:text-white transition-colors uppercase font-black tracking-widest"
             >
               Privacy Policy
             </button>
             <button 
               onClick={() => setActiveModal('terms')}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold"
+              className="text-[11px] text-slate-400 hover:text-white transition-colors uppercase font-black tracking-widest"
             >
               Terms of Use
             </button>
           </div>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400">Verification</h3>
-          <p className="text-[9px] text-slate-600 leading-relaxed uppercase font-bold tracking-widest">
-            Processing raw metrics from NSE India. <br/>
-            <span className="text-emerald-500/20">Verified AdSense Property</span>
-          </p>
+        <div className="space-y-4">
+          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-400">Verification</h3>
+          <div className="text-[11px] text-slate-500 leading-relaxed uppercase font-black tracking-widest space-y-2">
+            <p>Processing raw metrics from NSE India.</p>
+            <p className="text-emerald-500/30">Verified AdSense Property</p>
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-slate-800/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em] text-slate-700">
-          <span>Method: DUAL_PCR_CPR_V2</span>
-          <span>Multiplier: 6.0x_MIN</span>
+      <div className="border-t border-slate-800/50 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">
+          <span className="flex items-center gap-2">Method: <span className="text-slate-500">DUAL_PCR_CPR_V2</span></span>
+          <span className="flex items-center gap-2">Multiplier: <span className="text-slate-500">6.0x_MIN</span></span>
         </div>
-        <p className="text-[8px] text-slate-700 font-bold tracking-widest uppercase">
+        <p className="text-[10px] text-slate-600 font-black tracking-[0.25em] uppercase">
           © 2026 OptionChainAnalyzer.in
         </p>
       </div>
@@ -308,24 +309,24 @@ export default function App() {
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">Privacy Policy</h2>
             <p className="font-bold border-b pb-1">Last Updated: April 23, 2026</p>
             <p className="mt-4">Your privacy is important to us. It is NSE Option Chain Analyzer's policy to respect your privacy regarding any information we may collect from you across our website.</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 underline underline-offset-4 decoration-emerald-400">1. Local Processing Only</h3>
-            <p>Our application analyzes data strictly locally in your browser. We do not upload your CSV files to any server. Your proprietary financial data never leaves your machine.</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 underline underline-offset-4 decoration-emerald-400">2. Cookies & Ads</h3>
-            <p>We use third-party advertising services (Google AdSense) to keep this tool free. These services may use cookies to serve personalized ads based on your web browsing history.</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 underline underline-offset-4 decoration-emerald-400">3. Anonymous Usage</h3>
-            <p>We do not collect PII (Personally Identifiable Information). No sign-up or email is required to use the mapper.</p>
+            <h3 className="font-bold text-slate-900 mt-8 mb-4 underline underline-offset-8 decoration-emerald-400 text-base uppercase tracking-wider">1. Local Processing Only</h3>
+            <p className="text-sm leading-relaxed text-slate-600">Our application analyzes data strictly locally in your browser. We do not upload your CSV files to any server. Your proprietary financial data never leaves your machine.</p>
+            <h3 className="font-bold text-slate-900 mt-8 mb-4 underline underline-offset-8 decoration-emerald-400 text-base uppercase tracking-wider">2. Cookies & Ads</h3>
+            <p className="text-sm leading-relaxed text-slate-600">We use third-party advertising services (Google AdSense) to keep this tool free. These services may use cookies to serve personalized ads based on your web browsing history.</p>
+            <h3 className="font-bold text-slate-900 mt-8 mb-4 underline underline-offset-8 decoration-emerald-400 text-base uppercase tracking-wider">3. Anonymous Usage</h3>
+            <p className="text-sm leading-relaxed text-slate-600">We do not collect PII (Personally Identifiable Information). No sign-up or email is required to use the mapper.</p>
           </div>
         ) : (
           <div className="prose prose-slate prose-sm max-w-none">
-            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">Terms of Use</h2>
-            <p className="font-bold border-b pb-1">Legal Agreement</p>
-            <p className="mt-4 text-slate-600">By using optionchainanalyzer.in, you agree to comply with the following terms:</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 uppercase text-[10px] tracking-widest">1. License for Personal Use</h3>
-            <p>We grant you a temporary license to use this analyzer for personal, non-commercial education. This tool is intended to simplify manual OI analysis.</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 uppercase text-[10px] tracking-widest">2. Risk Disclosure</h3>
-            <p className="p-3 bg-rose-50 border border-rose-100 rounded text-rose-700 font-medium">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
-            <h3 className="font-bold text-slate-900 mt-6 mb-2 uppercase text-[10px] tracking-widest">3. No Liability</h3>
-            <p>We are not responsible for any financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
+            <h2 className="text-3xl font-black mb-8 uppercase tracking-tighter">Terms of Use</h2>
+            <p className="font-bold border-b-2 pb-2 text-slate-900">Legal Agreement</p>
+            <p className="mt-6 text-slate-600 text-sm leading-relaxed">By using optionchainanalyzer.in, you agree to comply with the following terms:</p>
+            <h3 className="font-bold text-slate-900 mt-10 mb-4 uppercase text-[11px] tracking-[0.2em] border-l-4 border-emerald-400 pl-4">1. License for Personal Use</h3>
+            <p className="text-sm leading-relaxed text-slate-600">We grant you a temporary license to use this analyzer for personal, non-commercial education. This tool is intended to simplify manual OI analysis.</p>
+            <h3 className="font-bold text-slate-900 mt-10 mb-4 uppercase text-[11px] tracking-[0.2em] border-l-4 border-emerald-400 pl-4">2. Risk Disclosure</h3>
+            <p className="p-6 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold text-sm leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
+            <h3 className="font-bold text-slate-900 mt-10 mb-4 uppercase text-[11px] tracking-[0.2em] border-l-4 border-emerald-400 pl-4">3. No Liability</h3>
+            <p className="text-sm leading-relaxed text-slate-600">We are not responsible for any financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
           </div>
         )}
       </div>
@@ -367,13 +368,13 @@ export default function App() {
               onError={() => setLogoError(true)}
             />
           )}
-          <h1 className="text-sm font-black tracking-widest uppercase text-[#0f4e5a]/90">Option Chain Analyzer</h1>
+          <h1 className="text-base font-black tracking-widest uppercase text-[#0f4e5a]">Option Chain Analyzer</h1>
         </div>
         {data.length > 0 && (
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setData([])}
-              className="px-4 py-2 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-700 active:scale-95 rounded-lg shadow-lg shadow-rose-200 flex items-center gap-2 border border-rose-500"
+              className="px-5 py-2.5 bg-rose-600 text-white text-xs font-black uppercase tracking-widest transition-all hover:bg-rose-700 active:scale-95 rounded-xl shadow-lg shadow-rose-200 flex items-center gap-2 border border-rose-500"
             >
               <AlertCircle size={14} />
               Reset Map
@@ -397,16 +398,16 @@ export default function App() {
                 </p>
                 
                 {error && (
-                  <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-[10px] font-bold uppercase flex items-center gap-2 mb-6">
-                    <AlertCircle size={14} /> {error}
+                  <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-xs font-black uppercase tracking-widest flex items-center gap-3 mb-8 shadow-sm">
+                    <AlertCircle size={18} /> {error}
                   </div>
                 )}
                 
-                <label className="px-8 py-4 bg-slate-900 text-white rounded-full text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:bg-slate-800 hover:shadow-xl hover:shadow-slate-200/50 group mb-4">
+                <label className="px-10 py-5 bg-slate-900 text-white rounded-full text-sm font-black uppercase tracking-[0.25em] transition-all cursor-pointer hover:bg-slate-800 hover:shadow-2xl hover:shadow-slate-300/50 group mb-6 active:scale-[0.98]">
                   Select CSV File
                   <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                 </label>
-                <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 mb-8">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-10">
                   or drop it anywhere on this page
                 </p>
 
@@ -421,52 +422,50 @@ export default function App() {
               <div className="max-w-screen-xl w-full p-4 md:p-8">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden mb-16">
                   <table className="border-collapse table-fixed min-w-max w-full">
-                <thead className="sticky top-0 z-10 shadow-sm transition-shadow">
-                  {/* Level 1: Category Header */}
-                  <tr className="h-8 text-[9px] font-black uppercase text-slate-800 tracking-widest text-center">
+                <thead className="sticky top-0 z-10 shadow-sm transition-shadow">                  {/* Level 1: Category Header */}
+                  <tr className="h-10 text-[11px] font-black uppercase text-slate-800 tracking-[0.2em] text-center">
                     <th colSpan={5} className="bg-[#92D050] border-r border-slate-300">Call Details</th>
-                    <th rowSpan={2} className="bg-[#00B0F0] border-r-2 border-slate-400 text-white w-24 border-b border-slate-300">Strike</th>
-                    <th rowSpan={2} className="bg-[#F8CBAD] border-r-2 border-slate-400 w-24 text-slate-900 border-b border-slate-300">Resistance</th>
-                    <th rowSpan={2} className="bg-[#E2EFDA] border-r-2 border-slate-400 w-24 text-slate-900 border-b border-slate-300">Support</th>
+                    <th rowSpan={2} className="bg-[#00B0F0] border-r-2 border-slate-400 text-white w-28 border-b border-slate-300 text-xs">Strike</th>
+                    <th rowSpan={2} className="bg-[#F8CBAD] border-r-2 border-slate-400 w-28 text-slate-900 border-b border-slate-300 text-xs">Resistance</th>
+                    <th rowSpan={2} className="bg-[#E2EFDA] border-r-2 border-slate-400 w-28 text-slate-900 border-b border-slate-300 text-xs">Support</th>
                     <th colSpan={5} className="bg-[#FF0000] text-white">Put Details</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-10 text-[10px] font-bold uppercase text-center bg-[#FFFF00] divide-x divide-slate-300 border-y border-slate-300">
-                    <th className="w-16">CPR OI</th>
-                    <th className="w-16">CPR VOL</th>
-                    <th className="w-24">OI</th>
-                    <th className="w-24">CHG OI</th>
-                    <th className="w-24 border-r-2 border-slate-400">VOL</th>
-                    <th className="w-24">OI</th>
-                    <th className="w-24">CHG OI</th>
-                    <th className="w-24">VOL</th>
-                    <th className="w-16">PCR OI</th>
-                    <th className="w-16">PCR VOL</th>
+                  <tr className="h-12 text-[11px] font-black uppercase text-center bg-[#FFFF00] divide-x divide-slate-300 border-y border-slate-300">
+                    <th className="w-20">CPR OI</th>
+                    <th className="w-20">CPR VOL</th>
+                    <th className="w-28">OI</th>
+                    <th className="w-28">CHG OI</th>
+                    <th className="w-28 border-r-2 border-slate-400">VOL</th>
+                    <th className="w-28">OI</th>
+                    <th className="w-28">CHG OI</th>
+                    <th className="w-28">VOL</th>
+                    <th className="w-20">PCR OI</th>
+                    <th className="w-20">PCR VOL</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 font-mono text-[10px]">
+                <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
                   {data.map((row) => (
-                    <tr key={row.strikePrice} className="h-8 hover:bg-slate-50 group">
-                      <td className={`text-center font-bold border-r border-slate-200 ${row.isResistance ? 'text-rose-600 bg-rose-50' : 'text-slate-400'}`}>{row.cprOI}</td>
-                      <td className={`text-center font-bold border-r border-slate-200 ${row.isResistance ? 'text-rose-600 bg-rose-50' : 'text-slate-400'}`}>{row.cprVol}</td>
-                      <td className="text-right px-3 border-r border-slate-200">{row.callOI.toLocaleString()}</td>
-                      <td className={`text-right px-3 border-r border-slate-200 ${row.callChngOI >= 0 ? 'text-blue-600 font-medium' : 'text-rose-500'}`}>{row.callChngOI.toLocaleString()}</td>
-                      <td className="text-right px-3 border-r-2 border-slate-400 text-slate-500 font-medium">{row.callVolume.toLocaleString()}</td>
+                    <tr key={row.strikePrice} className="h-10 hover:bg-slate-50 group">
+                      <td className={`text-center font-black border-r border-slate-200 ${row.isResistance ? 'text-rose-600 bg-rose-50' : 'text-slate-400'}`}>{row.cprOI}</td>
+                      <td className={`text-center font-black border-r border-slate-200 ${row.isResistance ? 'text-rose-600 bg-rose-50' : 'text-slate-400'}`}>{row.cprVol}</td>
+                      <td className="text-right px-4 border-r border-slate-200">{row.callOI.toLocaleString()}</td>
+                      <td className={`text-right px-4 border-r border-slate-200 ${row.callChngOI >= 0 ? 'text-blue-600 font-black' : 'text-rose-500 font-black'}`}>{row.callChngOI.toLocaleString()}</td>
+                      <td className="text-right px-4 border-r-2 border-slate-400 text-slate-500 font-bold">{row.callVolume.toLocaleString()}</td>
                       
-                      <td className="text-center font-black bg-[#00B0F0]/90 text-white border-r-2 border-slate-400 text-xs py-1 select-all">{row.strikePrice.toLocaleString()}</td>
+                      <td className="text-center font-black bg-[#00B0F0]/90 text-white border-r-2 border-slate-400 text-sm py-2 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
                       
-                      <td className={`text-center font-black border-r-2 border-slate-400 text-[9px] ${row.isResistance ? 'bg-rose-500 text-white' : 'text-slate-200 italic font-normal'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-400 text-[10px] tracking-widest ${row.isResistance ? 'bg-rose-500 text-white' : 'text-slate-200 italic font-normal'}`}>
                         {row.isResistance ? 'RESISTANCE' : '-'}
                       </td>
-                      <td className={`text-center font-black border-r-2 border-slate-400 text-[9px] ${row.isSupport ? 'bg-emerald-500 text-white' : 'text-slate-200 italic font-normal'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-400 text-[10px] tracking-widest ${row.isSupport ? 'bg-emerald-500 text-white' : 'text-slate-200 italic font-normal'}`}>
                         {row.isSupport ? 'SUPPORT' : '-'}
                       </td>
-
-                      <td className="text-right px-3 border-r border-slate-200">{row.putOI.toLocaleString()}</td>
-                      <td className={`text-right px-3 border-r border-slate-200 ${row.putChngOI >= 0 ? 'text-blue-600 font-medium' : 'text-rose-500'}`}>{row.putChngOI.toLocaleString()}</td>
-                      <td className="text-right px-3 border-r border-slate-200 text-slate-500 font-medium">{row.putVolume.toLocaleString()}</td>
-                      <td className={`text-center font-bold border-r border-slate-200 ${row.isSupport ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400'}`}>{row.pcrOI}</td>
-                      <td className={`text-center font-bold ${row.isSupport ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400'}`}>{row.pcrVol}</td>
+                      <td className="text-right px-4 border-r border-slate-200">{row.putOI.toLocaleString()}</td>
+                      <td className={`text-right px-4 border-r border-slate-200 ${row.putChngOI >= 0 ? 'text-blue-600 font-black' : 'text-rose-500 font-black'}`}>{row.putChngOI.toLocaleString()}</td>
+                      <td className="text-right px-4 border-r border-slate-200 text-slate-500 font-bold">{row.putVolume.toLocaleString()}</td>
+                      <td className={`text-center font-black border-r border-slate-200 ${row.isSupport ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400'}`}>{row.pcrOI}</td>
+                      <td className={`text-center font-black ${row.isSupport ? 'text-emerald-600 bg-emerald-50' : 'text-slate-400'}`}>{row.pcrVol}</td>
                     </tr>
                   ))}
                 </tbody>
