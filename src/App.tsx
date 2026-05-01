@@ -128,112 +128,121 @@ export default function App() {
     if (file) processCSV(file, 'drag_drop');
   };
 
-  const FooterContent = () => (
-    <footer className="bg-slate-900 border-t border-slate-800 text-white shrink-0 py-10 px-6 mt-32 w-full">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        <div className="space-y-2">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/50">Option Chain Analyzer</h3>
-          <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
-            Institutional-grade NSE data mapping. Built for speed and privacy.
-          </p>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/50">Navigation</h3>
-          <div className="flex flex-row flex-wrap gap-x-4 gap-y-1">
-            <button 
-              onClick={() => setData([])}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-            >
-              Reset Tool
-            </button>
-            <button 
-              onClick={() => setActiveModal('privacy')}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-            >
-              Privacy Policy
-            </button>
-            <button 
-              onClick={() => setActiveModal('terms')}
-              className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
-            >
-              Terms of Use
-            </button>
-          </div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500/50">Data Source</h3>
-          <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
-            Processing raw metrics from NSE India. No data stored.
-            <span className="ml-2 text-emerald-500/20 whitespace-nowrap">Verified AdSense Property</span>
-          </p>
-        </div>
-      </div>
-
-      <div className="border-t border-slate-800/50 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em]">
-          <span className="flex items-center gap-2">
-            <span className="text-slate-600">Method:</span> 
-            <span className="text-slate-700 underline underline-offset-2">DUAL_PCR_CPR_V2</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span className="text-slate-600">Mult:</span> 
-            <span className="text-slate-700">6.0x_MIN</span>
-          </span>
-        </div>
-        <p className="text-[8px] text-slate-700 font-bold tracking-widest uppercase">
-          © 2026 OptionChainAnalyzer.in
-        </p>
-      </div>
-    </footer>
-  );
-
   const GuideContent = () => (
-    <div className="flex flex-col gap-8 text-left w-full opacity-60 hover:opacity-100 transition-opacity duration-500 mt-64 border-t border-slate-200 pt-16">
+    <div className="flex flex-col gap-10 text-left w-full">
       {/* Executive Summary Section */}
-      <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-        <h2 className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-2">NSE Option Chain Guide</h2>
-        <p className="text-[9px] text-slate-300 leading-relaxed max-w-3xl">
-          Visualizing Open Interest (OI) into Support/Resistance maps using 6.0x multipliers to identify institutional barriers.
+      <section className="bg-emerald-50/30 p-6 rounded-2xl border border-emerald-100/50">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-2">NSE Option Chain Analysis Guide</h2>
+        <p className="text-[10px] text-slate-500 leading-relaxed max-w-3xl">
+          The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. Our analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong>6.0x institutional multipliers</strong> to identify key market barriers.
         </p>
       </section>
 
+      {/* Two-Column Insights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <section>
-          <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-4 px-1 border-l-2 border-emerald-400/10">Methodology</h3>
-          <div className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-4 decoration-emerald-400/50 underline underline-offset-4">Methodology</h3>
+          <div className="space-y-4">
             <div className="flex gap-3">
-              <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 text-[8px] font-bold flex items-center justify-center shrink-0">1</div>
-              <p className="text-[9px] leading-relaxed text-slate-300 font-medium">Download CSV from nseindia.com (Indices or Equities).</p>
+              <div className="w-5 h-5 rounded-full bg-slate-900 text-white text-[9px] font-bold flex items-center justify-center shrink-0">1</div>
+              <div>
+                <h4 className="text-[9px] font-bold text-slate-800 uppercase">Official Data</h4>
+                <p className="text-[10px] leading-relaxed text-slate-500">Download CSV from nseindia.com for Indices or Equities.</p>
+              </div>
             </div>
             <div className="flex gap-3">
-              <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-400 text-[8px] font-bold flex items-center justify-center shrink-0">2</div>
-              <p className="text-[9px] leading-relaxed text-slate-300 font-medium">Supports NIFTY, BANKNIFTY, FINNIFTY and stocks.</p>
+              <div className="w-5 h-5 rounded-full bg-slate-900 text-white text-[9px] font-bold flex items-center justify-center shrink-0">2</div>
+              <div>
+                <h4 className="text-[9px] font-bold text-slate-800 uppercase">Compatiblity</h4>
+                <p className="text-[10px] leading-relaxed text-slate-500">Supports NIFTY, BANKNIFTY, FINNIFTY and stocks.</p>
+              </div>
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-300 mb-4 px-1 border-l-2 border-emerald-400/10">FAQ</h3>
-          <div className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-[#0f4e5a] mb-4 decoration-emerald-400/50 underline underline-offset-4">FAQ</h3>
+          <div className="space-y-4">
             <div>
-              <p className="text-[9px] text-slate-300 leading-relaxed font-bold uppercase mb-1">PCR Indicator</p>
-              <p className="text-[9px] text-slate-300 leading-relaxed">High PCR (above 1.5) at strikes suggests Put writing (floor).</p>
+              <h4 className="text-[9px] font-black uppercase text-slate-900">PCR Indicator</h4>
+              <p className="text-[10px] text-slate-500 leading-relaxed">High PCR (especially above 1.5) at strikes suggests strong Put writing (floor).</p>
+            </div>
+            <div>
+              <h4 className="text-[9px] font-black uppercase text-slate-900">6.0x Threshold</h4>
+              <p className="text-[10px] text-slate-500 leading-relaxed">Flags levels where one side has 6x the strength of the other (institutional barrier).</p>
             </div>
           </div>
         </section>
       </div>
 
-      <div className="border-t border-slate-100 pt-8 space-y-6">
-        <section className="bg-slate-900/5 p-6 rounded-2xl">
-          <h3 className="text-[9px] font-black uppercase tracking-widest text-slate-200 mb-2">Risk Disclosure</h3>
-          <p className="text-[8px] text-slate-400/50 leading-relaxed max-w-2xl">
-            Trading involves high risk. This utility visualizes raw data only. No trading signals provided. Professional caution advised.
+      {/* Deep Theory Section */}
+      <div className="border-t border-slate-100 pt-8 space-y-8">
+        <section className="max-w-4xl">
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">Market Structure</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">OI Clusters</h4>
+              <p className="text-[10px] text-slate-500">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">Volume Defense</h4>
+              <p className="text-[10px] text-slate-500">High volume at mapped resistance confirms active defense by writers.</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-bold text-[#0f4e5a] text-[9px] uppercase tracking-wider">Strategic Map</h4>
+              <p className="text-[10px] text-slate-500">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-[#0f4e5a] mb-3">Institutional Bias</h3>
+          <p className="text-[10px] text-slate-500 leading-relaxed max-w-4xl mb-4">
+            Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
           </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
+               <span className="block text-[8px] font-black uppercase text-slate-400">NIFTY</span>
+             </div>
+             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
+               <span className="block text-[8px] font-black uppercase text-slate-400">BANKNIFTY</span>
+             </div>
+             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
+               <span className="block text-[8px] font-black uppercase text-slate-400">STOCKS</span>
+             </div>
+             <div className="p-2 bg-white rounded-xl border border-slate-100 text-center">
+               <span className="block text-[8px] font-black uppercase text-slate-400">EXPIRY</span>
+             </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-900 text-white p-6 rounded-2xl relative overflow-hidden ring-1 ring-white/10">
+          <div className="relative z-10">
+            <h4 className="text-[10px] font-black uppercase mb-2 tracking-widest text-emerald-400">Risk Disclosure</h4>
+            <p className="text-[9px] text-slate-400 leading-relaxed max-w-2xl">
+              Trading derivatives involves high risk. This educational utility visualizes raw NSE data. We do not provide trading signals. Professional caution is advised.
+            </p>
+          </div>
         </section>
       </div>
+
+      {/* Extended Glossary */}
+      <section className="max-w-4xl pb-10">
+        <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">Glossary</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <div>
+            <dt className="text-[9px] font-black uppercase text-slate-900 mb-1">Change in OI</dt>
+            <dd className="text-[10px] text-slate-500 leading-relaxed">Net difference in contracts from previous day.</dd>
+          </div>
+          <div>
+            <dt className="text-[9px] font-black uppercase text-slate-900 mb-1">Time Decay</dt>
+            <dd className="text-[10px] text-slate-500 leading-relaxed">Decrease in option value as expiry approaches.</dd>
+          </div>
+        </div>
+      </section>
     </div>
   );
-
 
   const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
@@ -348,9 +357,8 @@ export default function App() {
                   or drop it anywhere on this page
                 </p>
 
-                <div className="w-full">
+                <div className="w-full border-t border-slate-200 mt-8 pt-8">
                   <GuideContent />
-                  <FooterContent />
                 </div>
               </motion.div>
             </div>
@@ -358,7 +366,6 @@ export default function App() {
             <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 p-4 md:p-8">
               <div className="max-w-screen-xl w-full">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden mb-16">
-                  {/* ... Table exists here ... */}
                   <table className="border-collapse table-fixed min-w-max w-full">
                 <thead className="sticky top-0 z-10 shadow-sm transition-shadow">
                   {/* Level 1: Category Header */}
@@ -412,15 +419,70 @@ export default function App() {
               </table>
             </div>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto pb-32">
               <GuideContent />
-              <FooterContent />
             </div>
           </div>
         </div>
       )}
     </main>
-  </div>
+
+      <footer className="bg-slate-900 border-t border-slate-800 text-white shrink-0 py-6 px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Option Chain Analyzer</h3>
+            <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
+              India's premier tool for institutional-grade NSE data mapping. Built for speed, privacy, and precision.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Navigation</h3>
+            <div className="flex flex-row flex-wrap gap-x-4 gap-y-1">
+              <button 
+                onClick={() => setData([])}
+                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
+              >
+                Reset Tool
+              </button>
+              <button 
+                onClick={() => setActiveModal('privacy')}
+                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
+              >
+                Privacy Policy
+              </button>
+              <button 
+                onClick={() => setActiveModal('terms')}
+                className="text-[9px] text-slate-500 hover:text-white transition-colors uppercase font-bold text-left"
+              >
+                Terms of Use
+              </button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">Data Source</h3>
+            <p className="text-[9px] text-slate-500 leading-relaxed uppercase font-bold tracking-widest">
+              Processing raw CSV metrics from NSE India. No data is stored or repurposed.
+              <span className="ml-2 text-emerald-500/30 whitespace-nowrap">Verified AdSense Property</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-800/50 pt-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex gap-6 text-[8px] font-black uppercase tracking-[0.2em]">
+            <span className="flex items-center gap-2">
+              <span className="text-slate-600">Method:</span> 
+              <span className="text-[#0f4e5a] underline underline-offset-2">DUAL_PCR_CPR_V2</span>
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="text-slate-600">Mult:</span> 
+              <span className="text-[#0f4e5a]">6.0x_MIN</span>
+            </span>
+          </div>
+          <p className="text-[8px] text-slate-600 font-bold tracking-widest uppercase">
+            © 2026 OptionChainAnalyzer.in | All Rights Reserved
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }
-
