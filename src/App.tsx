@@ -281,16 +281,11 @@ export default function App() {
           <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-400">Verification</h3>
           <div className="text-[11px] text-slate-500 leading-relaxed uppercase font-black tracking-widest space-y-2">
             <p>Processing raw metrics from NSE India.</p>
-            <p className="text-emerald-500/30">Verified AdSense Property</p>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-slate-800/50 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-600">
-          <span className="flex items-center gap-2">Method: <span className="text-slate-500">DUAL_PCR_CPR_V2</span></span>
-          <span className="flex items-center gap-2">Multiplier: <span className="text-slate-500">6.0x_MIN</span></span>
-        </div>
+      <div className="border-t border-slate-800/50 pt-8 flex flex-col md:flex-row items-center justify-center gap-6">
         <p className="text-[10px] text-slate-600 font-black tracking-[0.25em] uppercase">
           © 2026 OptionChainAnalyzer.in
         </p>
@@ -420,18 +415,19 @@ export default function App() {
           ) : (
             <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300">
               <div className="max-w-screen-xl w-full p-4 md:p-8">
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden mb-16">
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16">
                   <table className="border-collapse table-fixed min-w-max w-full">
-                <thead className="sticky top-0 z-10 shadow-sm transition-shadow">                  {/* Level 1: Category Header */}
-                  <tr className="h-10 text-[11px] font-black uppercase text-slate-800 tracking-[0.2em] text-center">
-                    <th colSpan={5} className="bg-[#92D050] border-r border-slate-300">Call Details</th>
+                <thead className="relative z-20">
+                  {/* Level 1: Category Header */}
+                  <tr className="h-10 text-[11px] font-black uppercase text-slate-800 tracking-[0.2em] text-center sticky top-0 z-30">
+                    <th colSpan={5} className="bg-[#92D050] border-r border-slate-300 rounded-tl-3xl">Call Details</th>
                     <th rowSpan={2} className="bg-[#00B0F0] border-r-2 border-slate-400 text-white w-28 border-b border-slate-300 text-xs">Strike</th>
                     <th rowSpan={2} className="bg-[#F8CBAD] border-r-2 border-slate-400 w-28 text-slate-900 border-b border-slate-300 text-xs">Resistance</th>
                     <th rowSpan={2} className="bg-[#E2EFDA] border-r-2 border-slate-400 w-28 text-slate-900 border-b border-slate-300 text-xs">Support</th>
-                    <th colSpan={5} className="bg-[#FF0000] text-white">Put Details</th>
+                    <th colSpan={5} className="bg-[#FF0000] text-white rounded-tr-3xl">Put Details</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-12 text-[11px] font-black uppercase text-center bg-[#FFFF00] divide-x divide-slate-300 border-y border-slate-300">
+                  <tr className="h-12 text-[11px] font-black uppercase text-center bg-[#FFFF00] divide-x divide-slate-300 border-y border-slate-300 sticky top-10 z-20 shadow-md">
                     <th className="w-20">CPR OI</th>
                     <th className="w-20">CPR VOL</th>
                     <th className="w-28">OI</th>
