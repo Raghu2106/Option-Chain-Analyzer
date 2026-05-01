@@ -275,6 +275,12 @@ export default function App() {
             >
               Terms of Use
             </button>
+            <a 
+              href="mailto:support@optionchainanalyzer.in"
+              className="text-[11px] text-slate-500 hover:text-white transition-colors uppercase font-black tracking-widest"
+            >
+              Contact Support
+            </a>
           </div>
         </div>
         <div className="space-y-4">
