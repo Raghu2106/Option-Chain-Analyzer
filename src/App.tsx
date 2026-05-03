@@ -27,6 +27,12 @@ export default function App() {
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
   const [logoError, setLogoError] = useState(false);
 
+  const handleReset = useCallback(() => {
+    setData([]);
+    setError(null);
+    setIsHovering(false);
+  }, []);
+
   const processCSV = useCallback((file: File, method: 'file_upload' | 'drag_drop' = 'file_upload') => {
     Papa.parse(file, {
       header: false,
@@ -276,7 +282,7 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => setData([])} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Reset Platform</button>
+              <button onClick={handleReset} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
             </div>
           </div>
@@ -389,7 +395,7 @@ export default function App() {
         {data.length > 0 && (
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => setData([])}
+              onClick={handleReset}
               className="px-6 py-2.5 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-100 active:scale-95 rounded-xl shadow-sm shadow-rose-100/50 flex items-center gap-2 border border-rose-200"
             >
               <AlertCircle size={14} className="text-rose-500" />
@@ -449,47 +455,47 @@ export default function App() {
                   <table className="border-collapse table-fixed min-w-max w-full">
                 <thead className="relative z-20">
                   {/* Level 1: Category Header */}
-                  <tr className="h-10 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
+                  <tr className="h-7 text-[9px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
                     <th colSpan={5} className="bg-brand-teal border-r border-white/10 px-4">Call Analysis</th>
-                    <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-36 border-b border-white/10 text-sm font-black">Strike</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Resistance Zones</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Support Zones</th>
+                    <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-28 border-b border-white/10 text-xs font-black">Strike</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[8px] tracking-widest px-2">Resistance Zones</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[8px] tracking-widest px-2">Support Zones</th>
                     <th colSpan={5} className="bg-brand-teal text-white px-4">Put Analysis</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-16 text-[11px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-10 z-20 shadow-xl">
-                    <th className="w-24 text-brand-teal/60">CPR OI</th>
-                    <th className="w-24 text-brand-teal/60">CPR VOL</th>
-                    <th className="w-32">OI</th>
-                    <th className="w-32">CHG OI</th>
-                    <th className="w-32 border-r border-slate-300">Volume</th>
-                    <th className="w-32">OI</th>
-                    <th className="w-32">CHG OI</th>
-                    <th className="w-32">Volume</th>
-                    <th className="w-24 text-brand-teal/60">PCR OI</th>
-                    <th className="w-24 text-brand-teal/60">PCR VOL</th>
+                  <tr className="h-10 text-[9px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-7 z-20 shadow-xl">
+                    <th className="w-16 text-brand-teal/60">CPR OI</th>
+                    <th className="w-16 text-brand-teal/60">CPR VOL</th>
+                    <th className="w-24">OI</th>
+                    <th className="w-24">CHG OI</th>
+                    <th className="w-24 border-r border-slate-300">Volume</th>
+                    <th className="w-24">OI</th>
+                    <th className="w-24">CHG OI</th>
+                    <th className="w-24">Volume</th>
+                    <th className="w-16 text-brand-teal/60">PCR OI</th>
+                    <th className="w-16 text-brand-teal/60">PCR VOL</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                   {data.map((row) => (
-                    <tr key={row.strikePrice} className="h-14 hover:bg-slate-50/80 group transition-colors">
+                    <tr key={row.strikePrice} className="hover:bg-slate-50/80 group transition-colors">
                       <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-400'}`}>{row.cprOI}</td>
                       <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-400'}`}>{row.cprVol}</td>
-                      <td className="text-right px-6 border-r border-slate-100 text-slate-700">{row.callOI.toLocaleString()}</td>
-                      <td className={`text-right px-6 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-brand-teal font-black text-xs' : 'text-resistance font-black text-xs'}`}>{row.callChngOI.toLocaleString()}</td>
-                      <td className="text-right px-6 border-r-2 border-slate-200 text-slate-400 font-medium italic">{row.callVolume.toLocaleString()}</td>
+                      <td className="text-right px-3 border-r border-slate-100 text-slate-700">{row.callOI.toLocaleString()}</td>
+                      <td className={`text-right px-3 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-brand-teal font-black' : 'text-resistance font-black'}`}>{row.callChngOI.toLocaleString()}</td>
+                      <td className="text-right px-3 border-r-2 border-slate-200 text-slate-400 font-medium italic">{row.callVolume.toLocaleString()}</td>
                       
-                      <td className="text-center font-black bg-brand-teal text-white border-x-2 border-white/20 text-base py-3 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
+                      <td className="text-center font-black bg-brand-teal text-white border-x-2 border-white/20 text-xs py-1.5 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
                       
-                      <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-200 text-[8px] tracking-[0.1em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
                         {row.isResistance ? 'RESISTANCE' : '—'}
                       </td>
-                      <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-200 text-[8px] tracking-[0.1em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
                         {row.isSupport ? 'SUPPORT' : '—'}
                       </td>
-                      <td className="text-right px-6 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
-                      <td className={`text-right px-6 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-brand-teal font-black text-xs' : 'text-resistance font-black text-xs'}`}>{row.putChngOI.toLocaleString()}</td>
-                      <td className="text-right px-6 border-r border-slate-100 text-slate-400 font-medium italic">{row.putVolume.toLocaleString()}</td>
+                      <td className="text-right px-3 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
+                      <td className={`text-right px-3 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-brand-teal font-black' : 'text-resistance font-black'}`}>{row.putChngOI.toLocaleString()}</td>
+                      <td className="text-right px-3 border-r border-slate-100 text-slate-400 font-medium italic">{row.putVolume.toLocaleString()}</td>
                       <td className={`text-center font-bold border-r border-slate-100 ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-400'}`}>{row.pcrOI}</td>
                       <td className={`text-center font-bold ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-400'}`}>{row.pcrVol}</td>
                     </tr>
