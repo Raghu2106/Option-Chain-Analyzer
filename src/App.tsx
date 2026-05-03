@@ -433,7 +433,7 @@ export default function App() {
                 
                 <div className="flex flex-col gap-3 mb-10">
                   <label className="px-8 py-4 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center">
-                    Select CSV File
+                    Upload CSV File
                     <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                   </label>
                   <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
