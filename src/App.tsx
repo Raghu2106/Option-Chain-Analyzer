@@ -202,18 +202,11 @@ export default function App() {
             Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
-               <span className="block text-[10px] font-black uppercase text-slate-400">NIFTY</span>
-             </div>
-             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
-               <span className="block text-[10px] font-black uppercase text-slate-400">BANKNIFTY</span>
-             </div>
-             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
-               <span className="block text-[10px] font-black uppercase text-slate-400">STOCKS</span>
-             </div>
-             <div className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
-               <span className="block text-[10px] font-black uppercase text-slate-400">EXPIRY</span>
-             </div>
+             {['NIFTY', 'BANKNIFTY', 'STOCKS', 'EXPIRY'].map(item => (
+               <div key={item} className="p-3 bg-white rounded-2xl border border-slate-100 text-center shadow-sm">
+                 <span className="block text-[10px] font-black uppercase text-slate-400">{item}</span>
+               </div>
+             ))}
           </div>
         </section>
 
@@ -224,32 +217,24 @@ export default function App() {
               Trading derivatives involves high risk. This educational utility visualizes raw NSE data. We do not provide trading signals. Professional caution is advised.
             </p>
           </div>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full" />
         </section>
       </div>
-
-      {/* Extended Glossary */}
-      <section className="max-w-4xl pb-12">
-        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-8">Glossary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-          <div className="border-l-2 border-emerald-400 pl-4">
-            <dt className="text-[11px] font-black uppercase text-slate-900 mb-1">Change in OI</dt>
-            <dd className="text-xs text-slate-500 leading-relaxed font-medium">Net difference in contracts from previous day.</dd>
-          </div>
-          <div className="border-l-2 border-emerald-400 pl-4">
-            <dt className="text-[11px] font-black uppercase text-slate-900 mb-1">Time Decay</dt>
-            <dd className="text-xs text-slate-500 leading-relaxed font-medium">Decrease in option value as expiry approaches.</dd>
-          </div>
-        </div>
-      </section>
     </div>
   );
 
   const FooterContent = () => (
     <div className="w-full bg-slate-900 text-white pt-16 pb-8 px-8 mt-24 rounded-t-[3rem] shadow-2xl">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 text-center md:text-left">
-        <div className="space-y-4">
-          <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-emerald-400">Option Chain Analyzer</h3>
+        <div className="space-y-6">
+          <div className="flex items-center justify-center md:justify-start gap-4">
+            <div className="w-12 h-12 bg-white rounded-xl shadow-2xl flex items-center justify-center overflow-hidden border border-white/10 p-1">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain brightness-110" referrerPolicy="no-referrer" />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-sm font-black uppercase tracking-[0.25em] text-white">Analyzer</h3>
+              <span className="text-[9px] font-bold tracking-[0.4em] text-[#c5a04a] uppercase">Version 2.0</span>
+            </div>
+          </div>
           <p className="text-[11px] text-slate-400 leading-relaxed uppercase font-black tracking-widest">
             Institutional-grade NSE data mapping and visualization. Trusted by advanced retail traders.
           </p>
@@ -305,9 +290,18 @@ export default function App() {
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 transition-colors">
           <AlertCircle size={24} className="rotate-45" />
         </button>
+        <div className="flex items-center gap-5 mb-8">
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 border border-slate-100 shadow-xl shadow-[#0f4e5a]/5">
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-black uppercase tracking-tighter text-[#0f4e5a]">{type === 'privacy' ? 'Privacy Policy' : 'Terms of Use'}</h2>
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-[#c5a04a]">Protocol Document</span>
+          </div>
+        </div>
+        <div className="prose prose-slate prose-sm max-w-none">
         {type === 'privacy' ? (
-          <div className="prose prose-slate prose-sm max-w-none">
-            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter">Privacy Policy</h2>
+          <>
             <p className="font-bold border-b pb-1">Last Updated: April 23, 2026</p>
             <p className="mt-4">Your privacy is important to us. It is NSE Option Chain Analyzer's policy to respect your privacy regarding any information we may collect from you across our website.</p>
             <h3 className="font-bold text-slate-900 mt-8 mb-4 underline underline-offset-8 decoration-emerald-400 text-base uppercase tracking-wider">1. Local Processing Only</h3>
@@ -316,10 +310,9 @@ export default function App() {
             <p className="text-sm leading-relaxed text-slate-600">We use third-party advertising services (Google AdSense) to keep this tool free. These services may use cookies to serve personalized ads based on your web browsing history.</p>
             <h3 className="font-bold text-slate-900 mt-8 mb-4 underline underline-offset-8 decoration-emerald-400 text-base uppercase tracking-wider">3. Anonymous Usage</h3>
             <p className="text-sm leading-relaxed text-slate-600">We do not collect PII (Personally Identifiable Information). No sign-up or email is required to use the mapper.</p>
-          </div>
+          </>
         ) : (
-          <div className="prose prose-slate prose-sm max-w-none">
-            <h2 className="text-3xl font-black mb-8 uppercase tracking-tighter">Terms of Use</h2>
+          <>
             <p className="font-bold border-b-2 pb-2 text-slate-900">Legal Agreement</p>
             <p className="mt-6 text-slate-600 text-sm leading-relaxed">By using optionchainanalyzer.in, you agree to comply with the following terms:</p>
             <h3 className="font-bold text-slate-900 mt-10 mb-4 uppercase text-[11px] tracking-[0.2em] border-l-4 border-emerald-400 pl-4">1. License for Personal Use</h3>
@@ -328,8 +321,9 @@ export default function App() {
             <p className="p-6 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold text-sm leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
             <h3 className="font-bold text-slate-900 mt-10 mb-4 uppercase text-[11px] tracking-[0.2em] border-l-4 border-emerald-400 pl-4">3. No Liability</h3>
             <p className="text-sm leading-relaxed text-slate-600">We are not responsible for any financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
-          </div>
+          </>
         )}
+        </div>
       </div>
     </div>
   );
@@ -354,22 +348,20 @@ export default function App() {
       )}
 
       {/* Header */}
-      <header className="h-12 border-b bg-white px-6 flex items-center justify-between shrink-0 shadow-sm z-30">
-        <div className="flex items-center gap-3">
-          {logoError ? (
-            <div className="w-9 h-9 bg-slate-100 rounded flex items-center justify-center shadow-sm">
-              <TrendingUp className="text-[#0f4e5a] w-5 h-5" />
-            </div>
-          ) : (
+      <header className="h-20 border-b bg-white px-8 flex items-center justify-between shrink-0 shadow-sm z-30 sticky top-0">
+        <div className="flex items-center gap-5">
+          <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-[#0f4e5a]/5 flex items-center justify-center overflow-hidden border border-slate-100 p-1.5">
             <img 
               src="/logo.png" 
-              alt="Option Chain Analyzer Logo" 
-              className="w-9 h-auto rounded shadow-sm" 
+              alt="Logo" 
+              className="w-full h-full object-contain" 
               referrerPolicy="no-referrer"
-              onError={() => setLogoError(true)}
             />
-          )}
-          <h1 className="text-base font-black tracking-widest uppercase text-[#0f4e5a]">Option Chain Analyzer</h1>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-black tracking-tighter uppercase text-[#0f4e5a] leading-none">Option Chain Analyzer</h1>
+            <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#c5a04a] mt-1">Institutional Metrics</span>
+          </div>
         </div>
         {data.length > 0 && (
           <div className="flex items-center gap-4">
@@ -393,7 +385,7 @@ export default function App() {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col items-center max-w-2xl w-full"
               >
-                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900 pt-8">Option Chain Analyzer</h2>
+                <h2 className="text-3xl font-black mb-4 tracking-tighter uppercase text-slate-900">Option Chain Analyzer</h2>
                 <p className="text-slate-500 text-sm leading-relaxed mb-10 max-w-lg text-center">
                   Analyze NSE Option Chain data effortlessly. Upload your desired option chain CSV for <strong>Indices (NIFTY, BANKNIFTY, FINNIFTY)</strong> or <strong>individual Stocks</strong> directly from the NSE website to identify institutional Support & Resistance levels based on real-time OI and Volume clusters.
                 </p>
@@ -460,7 +452,7 @@ export default function App() {
                       <td className={`text-center font-black border-r-2 border-slate-400 text-[10px] tracking-widest ${row.isResistance ? 'bg-rose-500 text-white' : 'text-slate-200 italic font-normal'}`}>
                         {row.isResistance ? 'RESISTANCE' : '-'}
                       </td>
-                      <td className={`text-center font-black border-r-2 border-slate-400 text-[10px] tracking-widest ${row.isSupport ? 'bg-emerald-500 text-white' : 'text-slate-200 italic font-normal'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-widest ${row.isSupport ? 'bg-emerald-500 text-white' : 'text-slate-200 italic font-normal'}`}>
                         {row.isSupport ? 'SUPPORT' : '-'}
                       </td>
                       <td className="text-right px-4 border-r border-slate-200">{row.putOI.toLocaleString()}</td>
