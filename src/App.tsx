@@ -243,10 +243,13 @@ export default function App() {
           <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
               <img 
-                src="/logo.png" 
+                src="/logo.svg" 
                 alt="Logo" 
                 className="w-full h-full object-contain" 
-                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
             </div>
             <div className="space-y-2">
@@ -304,7 +307,15 @@ export default function App() {
         </button>
         <div className="flex items-center gap-8 mb-16">
           <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center p-3 border border-slate-100 shadow-2xl shadow-brand-teal/10">
-            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+            <img 
+              src="/logo.svg" 
+              alt="Logo" 
+              className="w-full h-full object-contain" 
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
+            />
           </div>
           <div>
             <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{type === 'privacy' ? 'Privacy Policy' : 'Terms of Use'}</h2>
@@ -363,10 +374,13 @@ export default function App() {
         <div className="flex items-center gap-6">
           <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group">
             <img 
-              src="/logo.png" 
+              src="/logo.svg" 
               alt="Logo" 
               className="w-full h-full object-contain" 
-              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
             />
           </div>
           <div className="flex flex-col">
