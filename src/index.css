@@ -6,15 +6,13 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --color-brand-teal: #0f4e5a;
-  --color-brand-gold: #c5a04a;
-  --color-brand-gold-light: #e5c06a;
   --color-support: #10b981;
   --color-resistance: #ef4444;
 }
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-gold/20;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-teal/20;
   }
 }
 
@@ -25,9 +23,5 @@
   
   .premium-shadow {
     box-shadow: 0 20px 50px -12px rgba(15, 78, 90, 0.12), 0 10px 20px -5px rgba(15, 78, 90, 0.05);
-  }
-
-  .gold-gradient {
-    background: linear-gradient(135deg, #c5a04a 0%, #ecd08c 50%, #c5a04a 100%);
   }
 }
