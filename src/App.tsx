@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface OptionChainRow {
@@ -246,7 +246,15 @@ export default function App() {
           <a href="mailto:support@optionchainanalyzer.in" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-colors">Contact Support</a>
         </div>
         
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/20">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-full h-full object-contain" 
+              referrerPolicy="no-referrer"
+            />
+          </div>
           <p className="text-[10px] text-slate-500 font-black tracking-[0.4em] uppercase text-center">
             Institutional-grade NSE data mapping • © 2026 OptionChainAnalyzer.in
           </p>
@@ -322,9 +330,9 @@ export default function App() {
       )}
 
       {/* Header */}
-      <header className="h-20 border-b bg-white/80 backdrop-blur-md px-8 flex items-center justify-between shrink-0 glass z-30 sticky top-0">
+      <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
-          <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-100 p-1.5">
+          <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group">
             <img 
               src="/logo.png" 
               alt="Logo" 
@@ -400,14 +408,14 @@ export default function App() {
                 <thead className="relative z-20">
                   {/* Level 1: Category Header */}
                   <tr className="h-10 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
-                    <th colSpan={5} className="bg-brand-teal/95 backdrop-blur-sm border-r border-white/10 px-4">Call Analysis</th>
+                    <th colSpan={5} className="bg-brand-teal border-r border-white/10 px-4">Call Analysis</th>
                     <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-36 border-b border-white/10 text-sm font-black">Strike</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Boundary</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Zone</th>
-                    <th colSpan={5} className="bg-brand-teal/95 backdrop-blur-sm text-white px-4">Put Analysis</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Resistance Zones</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-32 text-slate-900 border-b border-slate-200 text-[9px] tracking-widest px-4">Support Zones</th>
+                    <th colSpan={5} className="bg-brand-teal text-white px-4">Put Analysis</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-16 text-[11px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-16 z-20 shadow-xl">
+                  <tr className="h-16 text-[11px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-10 z-20 shadow-xl">
                     <th className="w-24 text-brand-teal/60">CPR OI</th>
                     <th className="w-24 text-brand-teal/60">CPR VOL</th>
                     <th className="w-32">OI</th>
@@ -432,10 +440,10 @@ export default function App() {
                       <td className="text-center font-black bg-brand-teal text-white border-x-2 border-white/20 text-base py-3 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
                       
                       <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
-                        {row.isResistance ? 'RESISTANCE' : '—'}
+                        {row.isResistance ? 'RESISTANCE ZONE' : '—'}
                       </td>
                       <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
-                        {row.isSupport ? 'SUPPORT' : '—'}
+                        {row.isSupport ? 'SUPPORT ZONE' : '—'}
                       </td>
                       <td className="text-right px-6 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
                       <td className={`text-right px-6 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-brand-teal font-black text-xs' : 'text-resistance font-black text-xs'}`}>{row.putChngOI.toLocaleString()}</td>
