@@ -236,21 +236,36 @@ export default function App() {
     </div>
   );
 
+  const Logo = ({ className = "w-full h-full" }: { className?: string }) => {
+    const [error, setError] = useState(false);
+    // Use a versioning param to bust cache
+    const logoUrl = "/logo.svg?v=2";
+
+    if (error) {
+      return (
+        <div className={`${className} bg-brand-teal rounded-lg flex items-center justify-center`}>
+          <TrendingUp className="text-white w-2/3 h-2/3" />
+        </div>
+      );
+    }
+
+    return (
+      <img 
+        src={logoUrl}
+        alt="Logo" 
+        className={className} 
+        onError={() => setError(true)}
+      />
+    );
+  };
+
   const FooterContent = () => (
     <footer className="w-full bg-slate-50 border-t border-slate-200 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
             <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
-              <img 
-                src="/logo.svg" 
-                alt="Logo" 
-                className="w-full h-full object-contain" 
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
-                }}
-              />
+              <Logo />
             </div>
             <div className="space-y-2">
               <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
@@ -307,15 +322,7 @@ export default function App() {
         </button>
         <div className="flex items-center gap-8 mb-16">
           <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center p-3 border border-slate-100 shadow-2xl shadow-brand-teal/10">
-            <img 
-              src="/logo.svg" 
-              alt="Logo" 
-              className="w-full h-full object-contain" 
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
-            />
+            <Logo />
           </div>
           <div>
             <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{type === 'privacy' ? 'Privacy Policy' : 'Terms of Use'}</h2>
@@ -373,15 +380,7 @@ export default function App() {
       <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
           <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group">
-            <img 
-              src="/logo.svg" 
-              alt="Logo" 
-              className="w-full h-full object-contain" 
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-              }}
-            />
+            <Logo className="w-full h-full object-contain" />
           </div>
           <div className="flex flex-col">
             <h1 className="text-xl font-black tracking-tighter uppercase text-brand-teal leading-none">Option Chain Analyzer</h1>
@@ -431,7 +430,7 @@ export default function App() {
                     Select CSV File
                     <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                   </label>
-                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 opacity-60 text-center">
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
                     or drop it anywhere on this page
                   </p>
                 </div>
