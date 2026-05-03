@@ -482,10 +482,10 @@ export default function App() {
                       <td className="text-center font-black bg-brand-teal text-white border-x-2 border-white/20 text-base py-3 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
                       
                       <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
-                        {row.isResistance ? 'RESISTANCE ZONE' : '—'}
+                        {row.isResistance ? 'RESISTANCE' : '—'}
                       </td>
                       <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.2em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.02]' : 'text-slate-200 font-normal italic'}`}>
-                        {row.isSupport ? 'SUPPORT ZONE' : '—'}
+                        {row.isSupport ? 'SUPPORT' : '—'}
                       </td>
                       <td className="text-right px-6 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
                       <td className={`text-right px-6 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-brand-teal font-black text-xs' : 'text-resistance font-black text-xs'}`}>{row.putChngOI.toLocaleString()}</td>
