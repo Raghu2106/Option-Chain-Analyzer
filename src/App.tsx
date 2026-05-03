@@ -237,34 +237,63 @@ export default function App() {
   );
 
   const FooterContent = () => (
-    <div className="w-full bg-slate-900 text-white py-12 px-8 mt-16 rounded-t-[2.5rem] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col items-center gap-10">
-        <div className="flex flex-wrap justify-center gap-x-12 gap-y-4">
-          <button onClick={() => setData([])} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-colors">Reset Tool</button>
-          <button onClick={() => setActiveModal('privacy')} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-colors">Privacy Policy</button>
-          <button onClick={() => setActiveModal('terms')} className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-colors">Terms of Use</button>
-          <a href="mailto:support@optionchainanalyzer.in" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 hover:text-white transition-colors">Contact Support</a>
+    <footer className="w-full bg-slate-50 border-t border-slate-200 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="w-full h-full object-contain" 
+                referrerPolicy="no-referrer"
+              />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
+              <p className="text-[11px] text-slate-500 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setData([])} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Reset Platform</button>
+              <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Security & Legal</h4>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
+              <button onClick={() => setActiveModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Support</h4>
+            <div className="flex flex-col gap-3">
+              <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
+              <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest">v1.2.0 Stable Build</span>
+            </div>
+          </div>
         </div>
         
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/20">
-            <img 
-              src="/logo.png" 
-              alt="Logo" 
-              className="w-full h-full object-contain" 
-              referrerPolicy="no-referrer"
-            />
-          </div>
-          <p className="text-[10px] text-slate-500 font-black tracking-[0.4em] uppercase text-center">
-            Institutional-grade NSE data mapping • © 2026 OptionChainAnalyzer.in
+        <div className="pt-10 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[10px] text-slate-400 font-black tracking-[0.4em] uppercase">
+            © 2026 OptionChainAnalyzer.in • All Rights Reserved
           </p>
-          <div className="flex gap-6 text-[9px] font-black uppercase tracking-[0.3em] text-emerald-500/50">
-            <span>Security Verified</span>
-            <span>End-to-End Local</span>
+          <div className="flex gap-8 items-center">
+            <div className="flex gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-teal/40">
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> System Active</span>
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Data Isolated</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-teal/[0.02] blur-[100px] rounded-full -mr-48 -mt-48" />
+    </footer>
   );
 
   const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
