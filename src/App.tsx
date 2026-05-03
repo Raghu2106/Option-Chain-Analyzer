@@ -340,10 +340,10 @@ export default function App() {
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setData([])}
-              className="px-6 py-2.5 bg-brand-teal text-white text-[10px] font-black uppercase tracking-widest transition-all hover:bg-brand-teal/90 active:scale-95 rounded-xl shadow-md shadow-brand-teal/20 flex items-center gap-2 border border-white/10"
+              className="px-6 py-2.5 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-100 active:scale-95 rounded-xl shadow-sm shadow-rose-100/50 flex items-center gap-2 border border-rose-200"
             >
-              <AlertCircle size={14} className="text-emerald-400" />
-              New Analysis
+              <AlertCircle size={14} className="text-rose-500" />
+              Reset
             </button>
           </div>
         )}
