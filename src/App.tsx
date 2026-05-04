@@ -139,7 +139,7 @@ export default function App() {
       {/* Executive Summary Section */}
       <section className="bg-brand-teal/5 p-8 rounded-[2rem] border border-brand-teal/10 relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-brand-teal mb-3">NSE Option Chain Analysis Guide</h2>
+          <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-3">NSE Option Chain Analysis Guide</h2>
           <p className="text-base text-slate-600 leading-relaxed max-w-4xl font-medium">
             The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. The analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong className="text-brand-teal">6.0x institutional multipliers</strong> to identify key market barriers.
           </p>
@@ -150,7 +150,7 @@ export default function App() {
       {/* Two-Column Insights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-2">
         <section>
-          <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Methodology & How-to-Use</h3>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Methodology & How-to-Use</h3>
           <div className="space-y-6">
             <div className="flex gap-4">
               <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">1</div>
@@ -177,7 +177,7 @@ export default function App() {
         </section>
 
         <section>
-          <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
           <div className="space-y-6">
             <div className="group">
               <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What is the 6.0x Threshold?</h4>
@@ -202,15 +202,15 @@ export default function App() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[10px] uppercase tracking-wider">OI Clusters</h4>
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">OI Clusters</h4>
               <p className="text-[12px] text-slate-600 leading-relaxed">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[10px] uppercase tracking-wider">Volume Defense</h4>
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Volume Defense</h4>
               <p className="text-[12px] text-slate-600 leading-relaxed">High volume at mapped resistance confirms active defense by writers.</p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[10px] uppercase tracking-wider">Strategic Map</h4>
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Strategic Map</h4>
               <p className="text-[12px] text-slate-600 leading-relaxed">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
             </div>
           </div>
@@ -277,12 +277,12 @@ export default function App() {
             </div>
             <div className="space-y-2">
               <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
-              <p className="text-[11px] text-slate-500 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
+              <p className="text-[12px] text-slate-600 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
             <div className="flex flex-col gap-3">
               <button onClick={handleReset} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
@@ -290,7 +290,7 @@ export default function App() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Security & Legal</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
             <div className="flex flex-col gap-3">
               <button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
               <button onClick={() => setActiveModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
@@ -298,7 +298,7 @@ export default function App() {
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Support</h4>
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support</h4>
             <div className="flex flex-col gap-3">
               <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
               <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest">v1.2.0 Stable Build</span>
@@ -307,7 +307,7 @@ export default function App() {
         </div>
         
         <div className="pt-10 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[10px] text-slate-400 font-black tracking-[0.4em] uppercase">
+          <p className="text-[11px] text-slate-500 font-black tracking-[0.4em] uppercase">
             © 2026 OptionChainAnalyzer.in • All Rights Reserved
           </p>
           <div className="flex gap-8 items-center">
@@ -462,16 +462,16 @@ export default function App() {
                     <caption className="sr-only">NSE Option Chain Analysis Data Table</caption>
                 <thead className="relative z-20">
                   {/* Level 1: Category Header */}
-                  <tr className="h-7 text-[9px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
+                  <tr className="h-7 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
                     <th colSpan={5} className="bg-brand-teal border-r border-white/10 px-4">Call Analysis</th>
                     <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-28 border-b border-white/10 text-xs font-black">Strike</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[8px] tracking-widest px-2">Resistance Zones</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[8px] tracking-widest px-2">Support Zones</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2">Resistance Zones</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2">Support Zones</th>
                     <th colSpan={5} className="bg-brand-teal text-white px-4">Put Analysis</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-10 text-[9px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-7 z-20 shadow-xl">
-                    <th className="w-16 text-brand-teal/60">CPR OI</th>
+                  <tr className="h-10 text-[10px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-7 z-20 shadow-xl">
+                    <th className="w-16 text-brand-teal/70">CPR OI</th>
                     <th className="w-16 text-brand-teal/60">CPR VOL</th>
                     <th className="w-24">OI</th>
                     <th className="w-24">CHG OI</th>
@@ -483,28 +483,28 @@ export default function App() {
                     <th className="w-16 text-brand-teal/60">PCR VOL</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
+                <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
                   {data.map((row) => (
                     <tr key={row.strikePrice} className="hover:bg-slate-50/80 group transition-colors">
-                      <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-400'}`}>{row.cprOI}</td>
-                      <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-400'}`}>{row.cprVol}</td>
+                      <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-500'}`}>{row.cprOI}</td>
+                      <td className={`text-center font-bold border-r border-slate-100 ${row.isResistance ? 'text-resistance bg-resistance/5' : 'text-slate-500'}`}>{row.cprVol}</td>
                       <td className="text-right px-3 border-r border-slate-100 text-slate-700">{row.callOI.toLocaleString()}</td>
                       <td className={`text-right px-3 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-brand-teal font-black' : 'text-resistance font-black'}`}>{row.callChngOI.toLocaleString()}</td>
-                      <td className="text-right px-3 border-r-2 border-slate-200 text-slate-400 font-medium italic">{row.callVolume.toLocaleString()}</td>
+                      <td className="text-right px-3 border-r-2 border-slate-200 text-slate-500 font-medium italic">{row.callVolume.toLocaleString()}</td>
                       
                       <td className="text-center font-black bg-brand-teal text-white border-x-2 border-white/20 text-xs py-1.5 select-all shadow-inner tracking-tight">{row.strikePrice.toLocaleString()}</td>
                       
-                      <td className={`text-center font-black border-r-2 border-slate-200 text-[8px] tracking-[0.1em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.1em] transition-all duration-300 ${row.isResistance ? 'bg-resistance text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
                         {row.isResistance ? 'RESISTANCE' : '—'}
                       </td>
-                      <td className={`text-center font-black border-r-2 border-slate-200 text-[8px] tracking-[0.1em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
+                      <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-[0.1em] transition-all duration-300 ${row.isSupport ? 'bg-support text-white shadow-inner scale-x-[1.01]' : 'text-slate-200 font-normal italic'}`}>
                         {row.isSupport ? 'SUPPORT' : '—'}
                       </td>
                       <td className="text-right px-3 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
                       <td className={`text-right px-3 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-brand-teal font-black' : 'text-resistance font-black'}`}>{row.putChngOI.toLocaleString()}</td>
-                      <td className="text-right px-3 border-r border-slate-100 text-slate-400 font-medium italic">{row.putVolume.toLocaleString()}</td>
-                      <td className={`text-center font-bold border-r border-slate-100 ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-400'}`}>{row.pcrOI}</td>
-                      <td className={`text-center font-bold ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-400'}`}>{row.pcrVol}</td>
+                      <td className="text-right px-3 border-r border-slate-100 text-slate-500 font-medium italic">{row.putVolume.toLocaleString()}</td>
+                      <td className={`text-center font-bold border-r border-slate-100 ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-500'}`}>{row.pcrOI}</td>
+                      <td className={`text-center font-bold ${row.isSupport ? 'text-support bg-support/5' : 'text-slate-500'}`}>{row.pcrVol}</td>
                     </tr>
                   ))}
                 </tbody>
