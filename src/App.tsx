@@ -250,7 +250,7 @@ export default function App() {
     if (error) {
       return (
         <div className={`${className} bg-brand-teal rounded-lg flex items-center justify-center`}>
-          <TrendingUp className="text-white w-2/3 h-2/3" />
+          <TrendingUp className="text-white w-2/3 h-2/3" aria-hidden="true" />
         </div>
       );
     }
@@ -258,8 +258,10 @@ export default function App() {
     return (
       <img 
         src={logoUrl}
-        alt="Logo" 
+        alt="Option Chain Analyzer Logo" 
         className={className} 
+        width="48"
+        height="48"
         onError={() => setError(true)}
       />
     );
@@ -396,7 +398,8 @@ export default function App() {
           <div className="flex items-center gap-4">
             <button 
               onClick={handleReset}
-              className="px-6 py-2.5 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-100 active:scale-95 rounded-xl shadow-sm shadow-rose-100/50 flex items-center gap-2 border border-rose-200"
+              aria-label="Reset Analysis"
+              className="px-6 py-3 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-100 active:scale-95 rounded-xl shadow-sm shadow-rose-100/50 flex items-center gap-2 border border-rose-200"
             >
               <AlertCircle size={14} className="text-rose-500" />
               Reset
@@ -432,7 +435,10 @@ export default function App() {
                 )}
                 
                 <div className="flex flex-col gap-3 mb-10">
-                  <label className="px-8 py-4 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center">
+                  <label 
+                    className="px-8 py-5 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center"
+                    aria-label="Upload NSE Option Chain CSV File"
+                  >
                     Upload CSV File
                     <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                   </label>
@@ -451,8 +457,9 @@ export default function App() {
           ) : (
             <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300">
               <div className="max-w-screen-xl w-full p-4 md:p-8">
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16">
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16 overflow-hidden">
                   <table className="border-collapse table-fixed min-w-max w-full">
+                    <caption className="sr-only">NSE Option Chain Analysis Data Table</caption>
                 <thead className="relative z-20">
                   {/* Level 1: Category Header */}
                   <tr className="h-7 text-[9px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
