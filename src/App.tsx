@@ -456,31 +456,31 @@ export default function App() {
 
           ) : (
             <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300">
-              <div className="max-w-screen-xl w-full p-4 md:p-8">
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16 overflow-hidden">
-                  <table className="border-collapse table-fixed min-w-max w-full">
+              <div className="max-w-screen-xl w-full p-4 md:p-12">
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16">
+                  <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
                     <caption className="sr-only">NSE Option Chain Analysis Data Table</caption>
                 <thead className="relative z-20">
                   {/* Level 1: Category Header */}
-                  <tr className="h-7 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center sticky top-0 z-30">
-                    <th colSpan={5} className="bg-brand-teal border-r border-white/10 px-4">Call Analysis</th>
-                    <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-28 border-b border-white/10 text-xs font-black">Strike</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2">Resistance Zones</th>
-                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2">Support Zones</th>
-                    <th colSpan={5} className="bg-brand-teal text-white px-4">Put Analysis</th>
+                  <tr className="h-7 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
+                    <th colSpan={5} className="bg-brand-teal border-r border-white/10 px-4 sticky top-0 z-30 first:rounded-tl-3xl">Call Analysis</th>
+                    <th rowSpan={2} className="bg-brand-teal border-x-2 border-white/20 text-emerald-400 w-28 border-b border-white/10 text-xs font-black sticky top-0 z-40">Strike</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2 sticky top-0 z-40">Resistance Zones</th>
+                    <th rowSpan={2} className="bg-white border-r-2 border-slate-200 w-24 text-slate-900 border-b border-slate-200 text-[10px] tracking-widest px-2 sticky top-0 z-40">Support Zones</th>
+                    <th colSpan={5} className="bg-brand-teal text-white px-4 sticky top-0 z-30 last:rounded-tr-3xl">Put Analysis</th>
                   </tr>
                   {/* Level 2: Metric Header */}
-                  <tr className="h-10 text-[10px] font-black uppercase text-center bg-slate-50 divide-x divide-slate-200 border-b border-slate-200 sticky top-7 z-20 shadow-xl">
-                    <th className="w-16 text-brand-teal/70">CPR OI</th>
-                    <th className="w-16 text-brand-teal/60">CPR VOL</th>
-                    <th className="w-24">OI</th>
-                    <th className="w-24">CHG OI</th>
-                    <th className="w-24 border-r border-slate-300">Volume</th>
-                    <th className="w-24">OI</th>
-                    <th className="w-24">CHG OI</th>
-                    <th className="w-24">Volume</th>
-                    <th className="w-16 text-brand-teal/60">PCR OI</th>
-                    <th className="w-16 text-brand-teal/60">PCR VOL</th>
+                  <tr className="h-10 text-[10px] font-black uppercase text-center bg-slate-50 border-b border-slate-200 shadow-sm">
+                    <th className="w-16 text-brand-teal/70 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">CPR OI</th>
+                    <th className="w-16 text-brand-teal/60 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">CPR VOL</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">OI</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">CHG OI</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r-2 border-slate-300">Volume</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">OI</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">CHG OI</th>
+                    <th className="w-24 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">Volume</th>
+                    <th className="w-16 text-brand-teal/60 sticky top-7 z-30 bg-slate-50 border-r border-slate-200">PCR OI</th>
+                    <th className="w-16 text-brand-teal/60 sticky top-7 z-30 bg-slate-50">PCR VOL</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
