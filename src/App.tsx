@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, ArrowUpCircle, ArrowDownCircle, Twitter, Facebook, Instagram } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OptionChainRow {
@@ -296,6 +296,17 @@ export default function App() {
             <div className="space-y-2">
               <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
               <p className="text-[12px] text-slate-600 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
+            </div>
+            <div className="flex gap-4 pt-4 border-t border-slate-200/50 w-full">
+              <a href="https://x.com/opchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-teal transition-all hover:scale-110" aria-label="Follow us on X">
+                <Twitter size={18} />
+              </a>
+              <a href="https://www.facebook.com/optionchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Follow us on Facebook">
+                <Facebook size={18} />
+              </a>
+              <a href="https://www.instagram.com/optionchainanalyzer/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow us on Instagram">
+                <Instagram size={18} />
+              </a>
             </div>
           </div>
 
