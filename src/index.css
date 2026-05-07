@@ -7,6 +7,12 @@
   --color-brand-teal: #0f4e5a;
   --color-support: #10b981;
   --color-resistance: #ef4444;
+
+  @keyframes slow-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  --animate-slow-blink: slow-blink 1.5s ease-in-out infinite;
 }
 
 @layer base {
