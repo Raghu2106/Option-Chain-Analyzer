@@ -1,7 +1,7 @@
-import { useState, useCallback, DragEvent } from 'react';
+import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, BarChart3 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Upload, AlertCircle, TrendingUp, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface OptionChainRow {
   strikePrice: number;
@@ -23,6 +23,9 @@ export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [isHovering, setIsHovering] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const hasShownHintInSession = useRef(false);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
   const [logoError, setLogoError] = useState(false);
@@ -102,6 +105,21 @@ export default function App() {
 
           setData(parsedRows.sort((a, b) => a.strikePrice - b.strikePrice));
           setError(null);
+
+          // Handle table auto-scroll and hint
+          setTimeout(() => {
+            if (tableContainerRef.current) {
+              const container = tableContainerRef.current;
+              const scrollTarget = (container.scrollHeight / 2) - (container.clientHeight / 2);
+              container.scrollTo({ top: scrollTarget, behavior: 'instant' });
+            }
+
+            if (!hasShownHintInSession.current) {
+              setShowScrollHint(true);
+              hasShownHintInSession.current = true;
+              setTimeout(() => setShowScrollHint(false), 2500);
+            }
+          }, 100);
 
           // Google Analytics Event
           if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -384,6 +402,27 @@ export default function App() {
         </div>
       )}
 
+      {/* Scroll Hint Popup */}
+      <AnimatePresence>
+        {showScrollHint && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-slate-900 text-white px-10 py-6 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-6 border border-slate-700/50 backdrop-blur-xl"
+          >
+            <div className="flex flex-col gap-1.5">
+              <ArrowUpCircle size={24} className="text-amber-400 animate-bounce" />
+              <ArrowDownCircle size={24} className="text-amber-400 animate-bounce delay-150" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-[15px] font-black uppercase text-amber-400 tracking-[0.2em] leading-tight">Scroll Up/Down</p>
+              <p className="text-[11px] font-bold text-slate-300 uppercase tracking-widest">Find high probable S/R zones</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
@@ -455,7 +494,10 @@ export default function App() {
             </div>
 
           ) : (
-            <div className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300">
+            <div 
+              ref={tableContainerRef}
+              className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth"
+            >
               <div className="max-w-screen-xl w-full p-4 md:p-12">
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 mb-16">
                   <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
