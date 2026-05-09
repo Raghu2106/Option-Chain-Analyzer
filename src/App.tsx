@@ -1,7 +1,7 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, ArrowUpCircle, ArrowDownCircle, Twitter, Facebook, Instagram } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface OptionChainRow {
   strikePrice: number;
@@ -29,29 +29,78 @@ export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
+  const [symbolName, setSymbolName] = useState<string | null>(null);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [pricesCache, setPricesCache] = useState<Record<string, number>>({});
+  const [isFetchingLive, setIsFetchingLive] = useState(false);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showScrollHint, setShowScrollHint] = useState(false);
-  const hasShownHintInSession = useRef(false);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
-  const [showAnomalyPopup, setShowAnomalyPopup] = useState(false);
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
   const [logoError, setLogoError] = useState(false);
+
+  const fetchLivePrice = useCallback(async (symbol: string) => {
+    setIsFetchingLive(true);
+    try {
+      const cleanSymbol = symbol.trim().toUpperCase();
+      let yahooSymbol = `${cleanSymbol}.NS`;
+      
+      // Improved Index mapping with more variations
+      if (cleanSymbol === 'NIFTY' || cleanSymbol === 'NIFTY 50' || cleanSymbol === 'NIFTY50') {
+        yahooSymbol = '%5ENSEI'; // ^NSEI
+      } else if (cleanSymbol.includes('BANKNIFTY') || cleanSymbol.includes('NIFTY BANK') || cleanSymbol === 'BANK NIFTY') {
+        yahooSymbol = '%5ENSEBANK'; // ^NSEBANK
+      } else if (cleanSymbol.includes('FINNIFTY') || cleanSymbol.includes('FIN SERVICE') || cleanSymbol === 'NIFTY FIN') {
+        yahooSymbol = '%5ECNXFIN'; // ^CNXFIN
+      } else if (cleanSymbol.includes('MIDCPNIFTY') || cleanSymbol.includes('MIDCAP') || cleanSymbol.includes('MID SELECT')) {
+        yahooSymbol = '%5ENSEMIDCAP50'; // ^NSEMIDCAP50
+      }
+
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1m&range=1d`)}`;
+      const response = await fetch(proxyUrl);
+      if (!response.ok) return;
+      const outerData = await response.json();
+      if (!outerData.contents) return;
+      const innerData = JSON.parse(outerData.contents);
+      
+      if (innerData.chart?.result?.[0]) {
+        const price = innerData.chart.result[0].meta.regularMarketPrice;
+        if (price) {
+          setLivePrice(price);
+          setPricesCache(prev => ({ ...prev, [cleanSymbol]: price }));
+        }
+      }
+    } catch (err) {
+      console.debug('Live price sync paused');
+    } finally {
+      setIsFetchingLive(false);
+    }
+  }, []);
+
+  // Pre-fetch major indices on mount for instant availability removed
+  useEffect(() => {
+    if (symbolName) {
+      if (pricesCache[symbolName] && !livePrice) {
+        setLivePrice(pricesCache[symbolName]);
+      }
+      fetchLivePrice(symbolName);
+    }
+  }, [symbolName, fetchLivePrice]);
 
   const handleReset = useCallback(() => {
     setData([]);
     setSpotPrice(null);
+    setLivePrice(null);
     setAsOfTime(null);
+    setSymbolName(null);
     setIvSentiment(null);
     setAnomalyStrikes([]);
     setError(null);
     setIsHovering(false);
-    setShowAnomalyPopup(false);
-    setShowScrollHint(false);
     // Ensure we scroll back to top
     if (homeContainerRef.current) {
       homeContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
@@ -65,7 +114,50 @@ export default function App() {
     }
   }, [data.length]);
 
+  useEffect(() => {
+    const activePrice = livePrice ?? spotPrice;
+    if (data.length > 0 && activePrice && tableContainerRef.current) {
+      const container = tableContainerRef.current;
+      const targetStrike = activePrice;
+
+      // Find the row with the closest strike price
+      const closestRow = data.reduce((prev, curr) => {
+        return Math.abs(curr.strikePrice - targetStrike) < Math.abs(prev.strikePrice - targetStrike) ? curr : prev;
+      }, data[0]);
+
+      // Use a combination of microtask and timeout to ensure the DOM is ready
+      const scrollTimer = setTimeout(() => {
+        const targetElement = container.querySelector(`[data-strike="${closestRow.strikePrice}"]`) as HTMLElement;
+
+        if (targetElement) {
+          const containerHeight = container.clientHeight;
+          const rowHeight = targetElement.clientHeight;
+          const rowTop = targetElement.offsetTop;
+          
+          // Center the row in the container
+          const scrollTarget = rowTop - (containerHeight / 2) + (rowHeight / 2);
+          
+          container.scrollTo({
+            top: scrollTarget,
+            behavior: 'auto'
+          });
+        }
+      }, 150); // Increased timeout for better reliability
+
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [data, spotPrice, livePrice]);
+
   const processCSV = useCallback((file: File, method: 'file_upload' | 'drag_drop' = 'file_upload') => {
+    // Initial extraction from filename as hint
+    const fileName = file.name.toUpperCase();
+    const symbolMatch = fileName.match(/OPTION-CHAIN-ED-([^-]+)/) || fileName.match(/([A-Z]+)/);
+    let detectedSymbol: string | null = null;
+    
+    if (symbolMatch && symbolMatch[1]) {
+      detectedSymbol = symbolMatch[1];
+    }
+
     Papa.parse(file, {
       header: false,
       skipEmptyLines: true,
@@ -73,16 +165,36 @@ export default function App() {
         try {
           const rawData = results.data as string[][];
           
-          // Detect Spot Price (Usually in the top few rows like "Underlying Index: NIFTY 19674.25")
+          // More aggressive Spot Price & Instrument Detection
           let detectedSpot: number | null = null;
+          let detectedInstrument: string | null = null;
           let detectedTime: string | null = null;
-          for (const row of rawData.slice(0, 5)) {
+          
+          for (const row of rawData.slice(0, 15)) {
             for (const cell of row) {
-              if (cell && (cell.includes('Underlying Index') || cell.includes('Spot Price'))) {
-                const match = cell.match(/[\d,.]+/g);
-                if (match) {
-                  const val = parseFloat(match[match.length - 1].replace(/,/g, ''));
-                  if (!isNaN(val)) detectedSpot = val;
+              if (cell && (cell.includes('Underlying') || cell.includes('Spot') || cell.includes('Index') || cell.includes('Stock'))) {
+                // Try to extract the instrument name (e.g. NIFTY, BANKNIFTY, SBIN)
+                // Pattern search: "Underlying Index: NIFTY", "Underlying Stock: SBIN"
+                const nameMatch = cell.match(/(?:Index|Stock|Underlying):\s*([A-Z\s]+?)(?:\s+[\d,.]|$)/i);
+                if (nameMatch && nameMatch[1]) {
+                  const rawName = nameMatch[1].trim().toUpperCase();
+                  // Normalize name
+                  if (rawName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
+                  else if (rawName.includes('FIN')) detectedInstrument = 'FINNIFTY';
+                  else if (rawName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
+                  else if (rawName.includes('NIFTY')) detectedInstrument = 'NIFTY';
+                  else detectedInstrument = rawName;
+                }
+
+                const priceMatch = cell.match(/[\d,.]+/g);
+                if (priceMatch) {
+                  const possiblePrices = priceMatch
+                    .map(m => parseFloat(m.replace(/,/g, '')))
+                    .filter(v => v > 100);
+                  
+                  if (possiblePrices.length > 0) {
+                    detectedSpot = possiblePrices[possiblePrices.length - 1];
+                  }
                 }
               }
               if (cell && cell.includes('As on')) {
@@ -90,8 +202,27 @@ export default function App() {
               }
             }
           }
+
+          // Override filename-detected symbol with content-detected one if found
+          if (detectedInstrument) {
+            detectedSymbol = detectedInstrument;
+          }
+
+          if (detectedSymbol) {
+            setSymbolName(detectedSymbol);
+            if (pricesCache[detectedSymbol]) {
+              setLivePrice(pricesCache[detectedSymbol]);
+            }
+            fetchLivePrice(detectedSymbol);
+          }
+
           setSpotPrice(detectedSpot);
           setAsOfTime(detectedTime);
+          
+          // Only use spot as fallback if live fetch is still pending or failed
+          if (detectedSpot && !livePrice) {
+            setLivePrice(detectedSpot);
+          }
 
           const dataStartIndex = rawData.findIndex(row => 
             row.some(cell => cell.toLowerCase().includes('strike'))
@@ -188,8 +319,8 @@ export default function App() {
                 pcrVol,
                 cprOI,
                 cprVol,
-                isSupport: pcrOI >= 6 && pcrVol >= 6,
-                isResistance: cprOI >= 6 && cprVol >= 6,
+                isSupport: (pcrOI >= 6 || pcrVol >= 6),
+                isResistance: (cprOI >= 6 || cprVol >= 6),
                 isCallIVAnomaly,
                 isPutIVAnomaly
               };
@@ -212,33 +343,6 @@ export default function App() {
           }
 
           setError(null);
-
-          // Handle table auto-scroll and hint sequence
-          const showHint = !hasShownHintInSession.current;
-          const scrollHintDuration = 2500;
-          const anomalyPopupDelay = showHint ? scrollHintDuration + 500 : 0;
-
-          setTimeout(() => {
-            if (tableContainerRef.current) {
-              const container = tableContainerRef.current;
-              const scrollTarget = (container.scrollHeight / 2) - (container.clientHeight / 2);
-              container.scrollTo({ top: scrollTarget, behavior: 'instant' });
-            }
-
-            if (showHint) {
-              setShowScrollHint(true);
-              hasShownHintInSession.current = true;
-              setTimeout(() => setShowScrollHint(false), scrollHintDuration);
-            }
-          }, 100);
-
-          // Show Anomaly Popup if any found
-          if (uniqueAnomalies.length > 0) {
-            setTimeout(() => {
-              setShowAnomalyPopup(true);
-              setTimeout(() => setShowAnomalyPopup(false), 4000);
-            }, 100 + anomalyPopupDelay);
-          }
 
           // Google Analytics Event
           if (typeof window !== 'undefined' && (window as any).gtag) {
@@ -552,59 +656,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Scroll Hint Popup */}
-      <AnimatePresence mode="wait">
-        {showScrollHint && (
-          <motion.div 
-            key="scroll-hint"
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-slate-900 text-white px-10 py-6 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center gap-6 border border-slate-700/50 backdrop-blur-xl"
-          >
-            <div className="flex flex-col gap-1.5">
-              <ArrowUpCircle size={24} className="text-amber-400 animate-bounce" />
-              <ArrowDownCircle size={24} className="text-amber-400 animate-bounce delay-150" />
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-[15px] font-black uppercase text-amber-400 tracking-[0.2em] leading-tight">Scroll Up/Down</p>
-              <p className="text-[11px] font-bold text-slate-300 uppercase tracking-widest">Find high probable S/R zones</p>
-            </div>
-          </motion.div>
-        )}
-
-        {showAnomalyPopup && (
-          <motion.div 
-            key="iv-anomaly"
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-amber-500 text-white px-10 py-8 rounded-[3rem] shadow-[0_30px_70px_rgba(245,158,11,0.4)] flex flex-col items-center gap-4 border border-amber-400/50 backdrop-blur-xl text-center min-w-[320px]"
-          >
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-2">
-              <AlertCircle size={40} className="animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-xl font-black uppercase tracking-widest leading-none">IV Anomaly Detected</p>
-              <p className="text-[10px] font-black uppercase text-amber-900/40 tracking-[0.4em]">Institutional Fear Magnets</p>
-            </div>
-            <div className="bg-white/10 p-4 rounded-2xl w-full border border-white/10 mt-2">
-              <p className="text-[9px] font-black uppercase text-amber-100 tracking-widest mb-2 opacity-60">Impacted Strike Levels</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {anomalyStrikes.map(strike => (
-                  <span key={strike} className="px-3 py-1 bg-white text-amber-600 rounded-lg text-xs font-black shadow-sm tracking-tight border border-amber-400/20">
-                    {strike.toLocaleString()}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <p className="text-[10px] font-bold text-amber-100 leading-relaxed max-w-[240px] mt-2 italic opacity-80">
-              High volatility spikes detected at these levels. Professional hedging or breakout expected.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Header */}
       <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
@@ -687,85 +738,184 @@ export default function App() {
             </div>
 
           ) : (
-            <div 
-              ref={tableContainerRef}
-              className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth"
-            >
-              <div className="max-w-screen-xl w-full px-4 md:px-12 pb-20">
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-200/50 my-12 relative text-slate-900">
-                  <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-teal/5 blur-[100px] -mr-48 -mt-48 pointer-events-none" />
-                  <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
+            <div className="flex-1 flex flex-col overflow-hidden bg-white">
+              {/* Fixed Instrument Bar - Stays on top under page header */}
+              <div className="bg-white border-b border-slate-200 z-50">
+                <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-6">
+                    <div className="flex flex-col">
+                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Instrument</span>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-black uppercase tracking-tighter text-brand-teal leading-none">
+                          {symbolName || "Market Index"}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {(livePrice || spotPrice) && (
+                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em]">Spot Price</span>
+                        </div>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-lg font-black text-slate-900 tabular-nums leading-none">
+                            {(livePrice || spotPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-[8px] font-black text-slate-300">INR</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {anomalyStrikes.length > 0 && (
+                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="text-[7px] font-black text-amber-500 uppercase tracking-[0.3em]">IV Anomalies</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {anomalyStrikes.slice(0, 4).map(strike => (
+                            <span key={strike} className="text-[9px] font-black text-amber-700 bg-amber-50 px-1 border border-amber-100 rounded tabular-nums">
+                              {strike}
+                            </span>
+                          ))}
+                          {anomalyStrikes.length > 4 && (
+                            <span className="text-[7px] font-black text-slate-400">+{anomalyStrikes.length - 4}</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 ml-auto">
+                    {ivSentiment && (
+                       <div className="hidden lg:flex items-center gap-2.5 bg-white px-2.5 py-1 rounded-lg border border-slate-100 shadow-sm mr-1">
+                          <div className="flex flex-col items-end">
+                            <span className="text-[6px] font-black text-slate-400 uppercase leading-none mb-0.5">Sentiment</span>
+                            <span className={`text-[9px] font-black uppercase tracking-tight ${ivSentiment.mood === 'Bearish' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                              {ivSentiment.mood}
+                            </span>
+                          </div>
+                          <div className="w-[1px] h-3.5 bg-slate-100" />
+                          <div className="flex flex-col items-end">
+                            <span className="text-[6px] font-black text-slate-400 uppercase leading-none mb-0.5">Skew</span>
+                            <span className="text-[9px] font-black text-slate-900 tabular-nums">
+                              {ivSentiment.skew}
+                            </span>
+                          </div>
+                       </div>
+                    )}
+                    
+
+
+                    {asOfTime && (
+                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-slate-100/50 rounded-lg border border-slate-100 text-[7px] font-bold text-slate-400">
+                        <Clock size={8} className="text-slate-300" />
+                        <span>Snap: {asOfTime}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrollable Content Container */}
+              <div 
+                ref={tableContainerRef}
+                className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth bg-slate-50"
+              >
+                <div className="max-w-[1600px] w-full px-4 md:px-12 py-6">
+                  <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/40 relative text-slate-900 rounded-lg overflow-visible">
+                    <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-teal/5 blur-[100px] -mr-48 -mt-48 pointer-events-none" />
+                    <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
                     <caption className="sr-only">NSE Option Chain Analysis Data Table</caption>
-                  <thead className="relative z-40">
-                  {/* Level 1: Category Header */}
-                  <tr className="h-8 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
-                    <th colSpan={7} className="bg-brand-teal border-r border-white/5 px-4 sticky top-0 z-30 first:rounded-tl-3xl">Call Analysis</th>
-                    <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-emerald-400 w-24 border-b border-white/5 text-[11px] font-black sticky top-0 z-40">Strike</th>
-                    <th rowSpan={2} className="bg-slate-50 border-r border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-40">Resistance</th>
-                    <th rowSpan={2} className="bg-slate-50 border-r-2 border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-40">Support</th>
-                    <th colSpan={7} className="bg-brand-teal text-white px-4 sticky top-0 z-30 last:rounded-tr-3xl">Put Analysis</th>
-                  </tr>
-                  {/* Level 2: Metric Header */}
-                  <tr className="h-10 text-[9px] font-black uppercase text-center bg-white border-b border-slate-200 shadow-sm">
-                    <th className="w-12 text-slate-400 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR OI</th>
-                    <th className="w-12 text-slate-400 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR VOL</th>
-                    <th className="w-16 text-amber-600 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
-                    <th className="w-16 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
-                    <th className="w-20 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
-                    <th className="w-20 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
-                    <th className="w-20 text-slate-400 sticky top-8 z-30 bg-white border-r-2 border-slate-200">Volume</th>
-                    <th className="w-20 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
-                    <th className="w-20 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
-                    <th className="w-20 text-slate-400 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
-                    <th className="w-16 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
-                    <th className="w-16 text-amber-600 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
-                    <th className="w-12 text-slate-400 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR OI</th>
-                    <th className="w-12 text-slate-400 sticky top-8 z-30 bg-white">PCR VOL</th>
-                  </tr>
-                </thead>
+                    <thead className="relative z-40 bg-white">
+                    {/* Level 1: Category Header */}
+                    <tr className="h-8 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
+                      <th colSpan={7} className="bg-brand-teal border-r border-white/5 px-4 sticky top-0 z-40 first:rounded-tl-lg">Call Analysis</th>
+                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-emerald-400 w-24 border-b border-white/5 text-[11px] font-black sticky top-0 z-50">Strike</th>
+                      <th rowSpan={2} className="bg-slate-50 border-r border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Resistance</th>
+                      <th rowSpan={2} className="bg-slate-50 border-r-2 border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Support</th>
+                      <th colSpan={7} className="bg-brand-teal text-white px-4 sticky top-0 z-40 last:rounded-tr-lg">Put Analysis</th>
+                    </tr>
+                    {/* Level 2: Metric Header */}
+                    <tr className="h-10 text-[9px] font-black uppercase text-center bg-white border-b border-slate-200 shadow-sm transition-shadow">
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR OI</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR VOL</th>
+                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
+                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
+                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
+                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
+                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r-2 border-slate-200">Volume</th>
+                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
+                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
+                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
+                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
+                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR OI</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white">PCR VOL</th>
+                    </tr>
+                  </thead>
                   <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
-                    {data.map((row) => {
-                      const strikeDiff = data.length > 1 ? Math.abs(data[1].strikePrice - data[0].strikePrice) : 50;
-                      const isATM = spotPrice && Math.abs(row.strikePrice - spotPrice) <= (strikeDiff / 2);
-                      
-                      return (
-                        <tr key={row.strikePrice} className={`hover:bg-slate-50/80 group transition-colors ${isATM ? 'bg-brand-teal/[0.04]' : ''}`}>
-                          <td className="text-center font-bold border-r border-slate-100 text-slate-400">{row.cprOI}</td>
-                          <td className="text-center font-bold border-r border-slate-100 text-slate-400">{row.cprVol}</td>
-                          <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/50' : 'text-amber-600/80 font-bold'}`}>
-                            {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400" />}
-                            <span className={row.isCallIVAnomaly ? 'text-amber-700 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
-                          </td>
-                          <td className={`text-center border-r border-slate-100 italic font-bold ${row.callChng >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{row.callChng}</td>
-                          <td className="text-right px-2 border-r border-slate-100 text-slate-700">{row.callOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}`}>{row.callChngOI.toLocaleString()}</td>
-                          <td className="text-right px-2 border-r-2 border-slate-200 text-slate-400 italic">{(row.callVolume / 1000).toFixed(1)}k</td>
-                          
-                          <td className="text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative">
-                            {isATM && <div className="absolute inset-y-0 left-0 w-1 bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />}
-                            {row.strikePrice.toLocaleString()}
-                          </td>
-                          
-                          <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 ${row.isResistance ? 'bg-resistance text-white' : 'text-slate-200 italic'}`}>
-                            {row.isResistance ? 'RESISTANCE' : '—'}
-                          </td>
-                          <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 ${row.isSupport ? 'bg-support text-white' : 'text-slate-200 italic'}`}>
-                            {row.isSupport ? 'SUPPORT' : '—'}
-                          </td>
-                          
-                          <td className="text-right px-2 border-r border-slate-100 text-slate-700">{row.putOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}`}>{row.putChngOI.toLocaleString()}</td>
-                          <td className="text-right px-2 border-r border-slate-100 text-slate-400 italic">{(row.putVolume / 1000).toFixed(1)}k</td>
-                          <td className={`text-center border-r border-slate-100 italic font-bold ${row.putChng >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{row.putChng}</td>
-                          <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/50' : 'text-amber-600/80 font-bold'}`}>
-                            {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400" />}
-                            <span className={row.isPutIVAnomaly ? 'text-amber-700 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
-                          </td>
-                          <td className="text-center font-bold border-r border-slate-100 text-slate-400">{row.pcrOI}</td>
-                          <td className="text-center font-bold text-slate-400">{row.pcrVol}</td>
-                        </tr>
-                      );
-                    })}
+                    {(() => {
+                      const activePrice = livePrice ?? spotPrice ?? 0;
+                      const spotStrike = data.length > 0 ? data.reduce((prev, curr) => {
+                        return Math.abs(curr.strikePrice - activePrice) < Math.abs(prev.strikePrice - activePrice) ? curr : prev;
+                      }, data[0]).strikePrice : null;
+
+                      return data.map((row) => {
+                        const strikeDiff = data.length > 1 ? Math.abs(data[1].strikePrice - data[0].strikePrice) : 50;
+                        const isATM = activePrice && Math.abs(row.strikePrice - activePrice) <= (strikeDiff / 2);
+                        const isSpotRow = row.strikePrice === spotStrike;
+                        
+                        // Resistance = Call OTM = Strike >= Spot
+                        // Support = Put OTM = Strike <= Spot
+                        const showResistance = row.isResistance && row.strikePrice >= activePrice;
+                        const showSupport = row.isSupport && row.strikePrice <= activePrice;
+                        
+                        return (
+                            <tr 
+                              key={row.strikePrice} 
+                              data-strike={row.strikePrice}
+                              className={`hover:bg-slate-100/50 group transition-all relative ${
+                                isSpotRow 
+                                  ? 'bg-blue-50/50 ring-1 ring-blue-500/20 shadow-[0_10px_30px_rgba(59,130,246,0.1)] z-10 scale-[1.002]' 
+                                  : ''
+                              }`}
+                            >
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.cprOI}</td>
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.cprVol}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400" />}
+                              <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
+                            </td>
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callChng}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callChngOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r-2 border-slate-200 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{(row.callVolume / 1000).toFixed(1)}k</td>
+                            
+                            <td className={`text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative ${isSpotRow ? 'bg-blue-600 scale-110 z-20 shadow-2xl rounded-sm ring-2 ring-white/20' : ''}`}>
+                              {row.strikePrice.toLocaleString()}
+                            </td>
+                            
+                            <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showResistance ? 'bg-blue-50/50 border-y border-blue-200' : isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {showResistance ? 'RESISTANCE' : '—'}
+                            </td>
+                            <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showSupport ? 'bg-support text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showSupport ? 'bg-blue-50/50 border-y border-blue-200' : isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {showSupport ? 'SUPPORT' : '—'}
+                            </td>
+                            
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putChngOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{(row.putVolume / 1000).toFixed(1)}k</td>
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.putChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putChng}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400" />}
+                              <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
+                            </td>
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.pcrOI}</td>
+                            <td className={`text-center font-bold text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.pcrVol}</td>
+                          </tr>
+                        );
+                      });
+                    })()}
                 </tbody>
               </table>
             </div>
@@ -813,10 +963,11 @@ export default function App() {
               <GuideContent />
             </div>
             <FooterContent />
-          </div>
-        </div>
-      )}
-    </main>
-    </div>
-  );
-}
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    );
+  }
