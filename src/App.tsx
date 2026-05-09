@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface OptionChainRow {
@@ -25,274 +25,6 @@ interface OptionChainRow {
   isPutIVAnomaly: boolean;
 }
 
-const Logo = ({ className = "w-full h-full" }: { className?: string }) => {
-  const [error, setError] = useState(false);
-  // Use a versioning param to bust cache
-  const logoUrl = "/logo.svg?v=2";
-
-  if (error) {
-    return (
-      <div className={`${className} bg-brand-teal rounded-lg flex items-center justify-center`}>
-        <TrendingUp className="text-white w-2/3 h-2/3" aria-hidden="true" />
-      </div>
-    );
-  }
-
-  return (
-    <img 
-      src={logoUrl}
-      alt="Option Chain Analyzer Logo" 
-      className={className} 
-      width="48"
-      height="48"
-      onError={() => setError(true)}
-    />
-  );
-};
-
-const GuideContent = () => (
-  <div className="flex flex-col gap-12 text-left w-full py-6">
-    {/* Executive Summary Section */}
-    <section className="bg-brand-teal/5 p-8 rounded-[2rem] border border-brand-teal/10 relative overflow-hidden">
-      <div className="relative z-10">
-        <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-3">NSE Option Chain Analysis Guide</h2>
-        <p className="text-base text-slate-600 leading-relaxed max-w-4xl font-medium">
-          The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. The analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong className="text-brand-teal">6.0x institutional multipliers</strong> to identify key market barriers.
-        </p>
-      </div>
-      <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-brand-teal/5 blur-[100px] rounded-full" />
-    </section>
-
-    {/* Two-Column Insights */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-2">
-      <section>
-        <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Methodology & How-to-Use</h3>
-        <div className="space-y-6">
-          <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">1</div>
-            <div>
-              <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Download Source</h4>
-              <p className="text-sm leading-relaxed text-slate-500 font-medium italic">Important: Download official CSV files for <strong>Nifty, Bank Nifty</strong>, other indices like <strong>FINNIFTY, MIDCPNIFTY</strong> or individual <strong>Stocks</strong> directly from <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.nseindia.com/option-chain</a>.</p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">2</div>
-            <div>
-              <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Upload Process</h4>
-              <p className="text-sm leading-relaxed text-slate-500 font-medium">Navigate to the Option Chain page on NSE for your instrument of choice, click 'Download CSV', and upload that file here using the selector or drag-drop.</p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">3</div>
-            <div>
-              <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Analyze Matrix</h4>
-              <p className="text-sm leading-relaxed text-slate-500 font-medium">Review the Strike Map. The tool automatically flags strikes where Open Interest exceeds the 6.0x institutional barrier.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
-        <div className="space-y-6">
-          <div className="group">
-            <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What is the 6.0x Threshold?</h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">It identifies levels where one side (Calls or Puts) is 600% stronger than the other, indicating a significant institutional 'wall'.</p>
-          </div>
-          <div className="group">
-            <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">How to read PCR OI?</h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">Put-Call Ratio (PCR) above 1.0 at a strike suggests bullish bias (support), while below 1.0 suggests bearish bias (resistance).</p>
-          </div>
-          <div className="group">
-            <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Is my data secure?</h4>
-            <p className="text-sm text-slate-500 leading-relaxed font-medium">Yes. The analyzer runs 100% locally in your browser. Your CSV data is never uploaded to any server or database.</p>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    {/* Deep Theory Section */}
-    <div className="border-t border-slate-100 pt-8 gap-6 flex flex-col">
-      <section className="bg-amber-50 p-6 rounded-[1.5rem] border border-amber-100 relative overflow-hidden">
-        <div className="relative z-10">
-          <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3">Understanding IV Anomalies</h3>
-          <p className="text-[13px] text-amber-900/80 leading-relaxed max-w-4xl font-medium">
-            <strong>Implied Volatility (IV)</strong> represents the market's expectation of price movement. Think of it as the <strong>"Fear Index"</strong> for specific strikes.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div className="bg-white/60 p-4 rounded-xl">
-              <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">Volatility Anomaly (Spike)</h4>
-              <p className="text-[11px] text-slate-600 leading-relaxed">When a specific strike's IV is <strong>25%+ higher</strong> than the current market average, it signals an <strong>"Institutional Magnet"</strong>. This suggests pros are paying huge premiums expecting a massive move to (or rejection from) that level.</p>
-            </div>
-            <div className="bg-white/60 p-4 rounded-xl">
-              <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">IV Skew Interpretation</h4>
-              <p className="text-[11px] text-slate-600 leading-relaxed">If Put IVs are much higher than Call IVs, the market is <strong>Bearish/Hedging</strong>. If Call IVs are spiking, the market anticipates an <strong>Explosive Breakout</strong>.</p>
-            </div>
-          </div>
-        </div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 blur-[60px] rounded-full -mr-16 -mt-16" />
-      </section>
-
-      <section className="max-w-4xl">
-        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-6">Market Structure</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">OI Clusters</h4>
-            <p className="text-[12px] text-slate-600 leading-relaxed">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Volume Defense</h4>
-            <p className="text-[12px] text-slate-600 leading-relaxed">High volume at mapped resistance confirms active defense by writers.</p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Strategic Map</h4>
-            <p className="text-[12px] text-slate-600 leading-relaxed">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-200">
-        <h3 className="text-xs font-black uppercase tracking-widest text-brand-teal mb-3">Institutional Bias</h3>
-        <p className="text-[13px] text-slate-600 leading-relaxed max-w-4xl mb-4 font-medium">
-          Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-           {['NIFTY', 'BANKNIFTY', 'STOCKS', 'EXPIRY'].map(item => (
-             <div key={item} className="p-2.5 bg-white rounded-xl border border-slate-100 text-center shadow-sm">
-               <span className="block text-[10px] font-black uppercase text-slate-400">{item}</span>
-             </div>
-           ))}
-        </div>
-      </section>
-
-      <section className="bg-brand-teal text-white p-8 rounded-[2rem] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
-        <div className="relative z-10">
-          <h4 className="text-[11px] font-black uppercase mb-3 tracking-widest text-emerald-400">Risk Disclosure</h4>
-          <p className="text-[12px] text-slate-300 leading-relaxed max-w-2xl font-medium tracking-wide">
-            Trading derivatives involves high risk. This educational utility visualizes raw NSE data. The tool does not provide trading signals. Professional caution is advised.
-          </p>
-        </div>
-      </section>
-    </div>
-  </div>
-);
-
-interface FooterProps {
-  onReset: () => void;
-  onModal: (type: 'privacy' | 'terms') => void;
-}
-
-const FooterContent = ({ onReset, onModal }: FooterProps) => (
-  <footer className="w-full bg-slate-50 border-t border-slate-200 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden">
-    <div className="max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-        <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
-          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
-            <Logo />
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
-            <p className="text-[12px] text-slate-600 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
-          </div>
-          <div className="flex gap-4 pt-4 border-t border-slate-200/50 w-full">
-            <a href="https://x.com/opchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-teal transition-all hover:scale-110" aria-label="Follow us on X">
-              <Twitter size={18} />
-            </a>
-            <a href="https://www.facebook.com/optionchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Follow us on Facebook">
-              <Facebook size={18} />
-            </a>
-            <a href="https://www.instagram.com/optionchainanalyzer/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow us on Instagram">
-              <Instagram size={18} />
-            </a>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
-          <div className="flex flex-col gap-3">
-            <button onClick={onReset} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
-            <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
-          <div className="flex flex-col gap-3">
-            <button onClick={() => onModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
-            <button onClick={() => onModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support</h4>
-          <div className="flex flex-col gap-3">
-            <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
-            <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest">v1.2.0 Stable Build</span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="pt-10 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p className="text-[11px] text-slate-500 font-black tracking-[0.4em] uppercase">
-          © 2026 OptionChainAnalyzer.in • All Rights Reserved
-        </p>
-        <div className="flex gap-8 items-center">
-          <div className="flex gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-teal/40">
-            <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> System Active</span>
-            <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Data Isolated</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="absolute top-0 right-0 w-96 h-96 bg-brand-teal/[0.02] blur-[100px] rounded-full -mr-48 -mt-48" />
-  </footer>
-);
-
-const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-teal/80 backdrop-blur-xl">
-    <div className="bg-white rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-auto p-16 premium-shadow relative animate-in fade-in zoom-in duration-300 scrollbar-none">
-      <button onClick={onClose} className="absolute top-8 right-8 text-slate-300 hover:text-brand-teal transition-all hover:rotate-90">
-        <AlertCircle size={32} className="rotate-45" />
-      </button>
-      <div className="flex items-center gap-8 mb-16">
-        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center p-3 border border-slate-100 shadow-2xl shadow-brand-teal/10">
-          <Logo />
-        </div>
-        <div>
-          <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{type === 'privacy' ? 'Privacy Policy' : 'Terms of Use'}</h2>
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1 block">Protocol Document</span>
-        </div>
-      </div>
-      <div className="prose prose-slate prose-lg max-w-none">
-      {type === 'privacy' ? (
-        <div className="space-y-12 text-base">
-          <p className="font-bold border-b pb-1">Last Updated: April 23, 2026</p>
-          <p className="mt-4">Your privacy is important to us. It is NSE Option Chain Analyzer's policy to respect your privacy regarding any information we may collect from you across our website.</p>
-          <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">1. Local Processing Only</h3>
-          <p className="leading-relaxed text-slate-600">The application analyzes data strictly locally in your browser. CSV files are not uploaded to any server. Proprietary financial data remains on your machine.</p>
-          <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">2. Cookies & Ads</h3>
-          <p className="leading-relaxed text-slate-600">Third-party advertising services (Google AdSense) may be used to keep this tool free. These services may use cookies to serve personalized ads based on web browsing history.</p>
-          <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">3. Anonymous Usage</h3>
-          <p className="leading-relaxed text-slate-600">PII (Personally Identifiable Information) is not collected. No sign-up or email is required to use the mapper.</p>
-        </div>
-      ) : (
-        <div className="space-y-12 text-base">
-          <p className="font-bold border-b-2 pb-2 text-slate-900 border-brand-teal inline-block">Legal Agreement</p>
-          <p className="mt-6 text-slate-600 leading-relaxed font-medium">By using optionchainanalyzer.in, users agree to comply with the following terms:</p>
-          <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">1. License for Personal Use</h3>
-          <p className="leading-relaxed text-slate-600">The tool is under temporary license for personal, non-commercial education. This tool is intended to simplify manual OI analysis.</p>
-          <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">2. Risk Disclosure</h3>
-          <p className="p-8 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
-          <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">3. No Liability</h3>
-          <p className="leading-relaxed text-slate-600">There is no liability for financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
-        </div>
-      )}
-      </div>
-    </div>
-  </div>
-);
-
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
@@ -309,6 +41,7 @@ export default function App() {
 
   const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   const fetchLivePrice = useCallback(async (symbol: string) => {
     setIsFetchingLive(true);
@@ -327,17 +60,9 @@ export default function App() {
         yahooSymbol = '%5ENSEMIDCAP50'; // ^NSEMIDCAP50
       }
 
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
-
       const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1m&range=1d`)}`;
-      const response = await fetch(proxyUrl, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.warn('Live price API returned non-OK response');
-        return;
-      }
+      const response = await fetch(proxyUrl);
+      if (!response.ok) return;
       const outerData = await response.json();
       if (!outerData.contents) return;
       const innerData = JSON.parse(outerData.contents);
@@ -400,7 +125,7 @@ export default function App() {
         return Math.abs(curr.strikePrice - targetStrike) < Math.abs(prev.strikePrice - targetStrike) ? curr : prev;
       }, data[0]);
 
-      // Use requestAnimationFrame or a very short timeout to ensure the DOM is ready
+      // Use a combination of microtask and timeout to ensure the DOM is ready
       const scrollTimer = setTimeout(() => {
         const targetElement = container.querySelector(`[data-strike="${closestRow.strikePrice}"]`) as HTMLElement;
 
@@ -414,10 +139,10 @@ export default function App() {
           
           container.scrollTo({
             top: scrollTarget,
-            behavior: 'instant'
+            behavior: 'auto'
           });
         }
-      }, 50); // Reduced timeout for faster response
+      }, 150); // Increased timeout for better reliability
 
       return () => clearTimeout(scrollTimer);
     }
@@ -650,6 +375,268 @@ export default function App() {
     if (file) processCSV(file, 'drag_drop');
   };
 
+  const GuideContent = () => (
+    <div className="flex flex-col gap-12 text-left w-full py-6">
+      {/* Executive Summary Section */}
+      <section className="bg-brand-teal/5 p-8 rounded-[2rem] border border-brand-teal/10 relative overflow-hidden">
+        <div className="relative z-10">
+          <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-3">NSE Option Chain Analysis Guide</h2>
+          <p className="text-base text-slate-600 leading-relaxed max-w-4xl font-medium">
+            The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. The analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong className="text-brand-teal">6.0x institutional multipliers</strong> to identify key market barriers.
+          </p>
+        </div>
+        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-brand-teal/5 blur-[100px] rounded-full" />
+      </section>
+
+      {/* Two-Column Insights */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-2">
+        <section>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Methodology & How-to-Use</h3>
+          <div className="space-y-6">
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">1</div>
+              <div>
+                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Download Source</h4>
+                <p className="text-sm leading-relaxed text-slate-500 font-medium italic">Important: Download official CSV files for <strong>Nifty, Bank Nifty</strong>, other indices like <strong>FINNIFTY, MIDCPNIFTY</strong> or individual <strong>Stocks</strong> directly from <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.nseindia.com/option-chain</a>.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">2</div>
+              <div>
+                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Upload Process</h4>
+                <p className="text-sm leading-relaxed text-slate-500 font-medium">Navigate to the Option Chain page on NSE for your instrument of choice, click 'Download CSV', and upload that file here using the selector or drag-drop.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">3</div>
+              <div>
+                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Analyze Matrix</h4>
+                <p className="text-sm leading-relaxed text-slate-500 font-medium">Review the Strike Map. The tool automatically flags strikes where Open Interest exceeds the 6.0x institutional barrier.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
+          <div className="space-y-6">
+            <div className="group">
+              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What is the 6.0x Threshold?</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">It identifies levels where one side (Calls or Puts) is 600% stronger than the other, indicating a significant institutional 'wall'.</p>
+            </div>
+            <div className="group">
+              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">How to read PCR OI?</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">Put-Call Ratio (PCR) above 1.0 at a strike suggests bullish bias (support), while below 1.0 suggests bearish bias (resistance).</p>
+            </div>
+            <div className="group">
+              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Is my data secure?</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">Yes. The analyzer runs 100% locally in your browser. Your CSV data is never uploaded to any server or database.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Deep Theory Section */}
+      <div className="border-t border-slate-100 pt-8 gap-6 flex flex-col">
+        <section className="bg-amber-50 p-6 rounded-[1.5rem] border border-amber-100 relative overflow-hidden">
+          <div className="relative z-10">
+            <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3">Understanding IV Anomalies</h3>
+            <p className="text-[13px] text-amber-900/80 leading-relaxed max-w-4xl font-medium">
+              <strong>Implied Volatility (IV)</strong> represents the market's expectation of price movement. Think of it as the <strong>"Fear Index"</strong> for specific strikes.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+              <div className="bg-white/60 p-4 rounded-xl">
+                <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">Volatility Anomaly (Spike)</h4>
+                <p className="text-[11px] text-slate-600 leading-relaxed">When a specific strike's IV is <strong>25%+ higher</strong> than the current market average, it signals an <strong>"Institutional Magnet"</strong>. This suggests pros are paying huge premiums expecting a massive move to (or rejection from) that level.</p>
+              </div>
+              <div className="bg-white/60 p-4 rounded-xl">
+                <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">IV Skew Interpretation</h4>
+                <p className="text-[11px] text-slate-600 leading-relaxed">If Put IVs are much higher than Call IVs, the market is <strong>Bearish/Hedging</strong>. If Call IVs are spiking, the market anticipates an <strong>Explosive Breakout</strong>.</p>
+              </div>
+            </div>
+          </div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 blur-[60px] rounded-full -mr-16 -mt-16" />
+        </section>
+
+        <section className="max-w-4xl">
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-6">Market Structure</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">OI Clusters</h4>
+              <p className="text-[12px] text-slate-600 leading-relaxed">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Volume Defense</h4>
+              <p className="text-[12px] text-slate-600 leading-relaxed">High volume at mapped resistance confirms active defense by writers.</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Strategic Map</h4>
+              <p className="text-[12px] text-slate-600 leading-relaxed">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-200">
+          <h3 className="text-xs font-black uppercase tracking-widest text-brand-teal mb-3">Institutional Bias</h3>
+          <p className="text-[13px] text-slate-600 leading-relaxed max-w-4xl mb-4 font-medium">
+            Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+             {['NIFTY', 'BANKNIFTY', 'STOCKS', 'EXPIRY'].map(item => (
+               <div key={item} className="p-2.5 bg-white rounded-xl border border-slate-100 text-center shadow-sm">
+                 <span className="block text-[10px] font-black uppercase text-slate-400">{item}</span>
+               </div>
+             ))}
+          </div>
+        </section>
+
+        <section className="bg-brand-teal text-white p-8 rounded-[2rem] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
+          <div className="relative z-10">
+            <h4 className="text-[11px] font-black uppercase mb-3 tracking-widest text-emerald-400">Risk Disclosure</h4>
+            <p className="text-[12px] text-slate-300 leading-relaxed max-w-2xl font-medium tracking-wide">
+              Trading derivatives involves high risk. This educational utility visualizes raw NSE data. The tool does not provide trading signals. Professional caution is advised.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+
+  const Logo = ({ className = "w-full h-full" }: { className?: string }) => {
+    const [error, setError] = useState(false);
+    // Use a versioning param to bust cache
+    const logoUrl = "/logo.svg?v=2";
+
+    if (error) {
+      return (
+        <div className={`${className} bg-brand-teal rounded-lg flex items-center justify-center`}>
+          <TrendingUp className="text-white w-2/3 h-2/3" aria-hidden="true" />
+        </div>
+      );
+    }
+
+    return (
+      <img 
+        src={logoUrl}
+        alt="Option Chain Analyzer Logo" 
+        className={className} 
+        width="48"
+        height="48"
+        onError={() => setError(true)}
+      />
+    );
+  };
+
+  const FooterContent = () => (
+    <footer className="w-full bg-slate-50 border-t border-slate-200 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
+              <Logo />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
+              <p className="text-[12px] text-slate-600 font-medium leading-relaxed max-w-[200px]">Institutional-grade NSE data mapping and OI visualization tool.</p>
+            </div>
+            <div className="flex gap-4 pt-4 border-t border-slate-200/50 w-full">
+              <a href="https://x.com/opchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-teal transition-all hover:scale-110" aria-label="Follow us on X">
+                <Twitter size={18} />
+              </a>
+              <a href="https://www.facebook.com/optionchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Follow us on Facebook">
+                <Facebook size={18} />
+              </a>
+              <a href="https://www.instagram.com/optionchainanalyzer/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow us on Instagram">
+                <Instagram size={18} />
+              </a>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
+            <div className="flex flex-col gap-3">
+              <button onClick={handleReset} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
+              <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
+              <button onClick={() => setActiveModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support</h4>
+            <div className="flex flex-col gap-3">
+              <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
+              <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest">v1.2.0 Stable Build</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="pt-10 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-[11px] text-slate-500 font-black tracking-[0.4em] uppercase">
+            © 2026 OptionChainAnalyzer.in • All Rights Reserved
+          </p>
+          <div className="flex gap-8 items-center">
+            <div className="flex gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-teal/40">
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> System Active</span>
+              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Data Isolated</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-teal/[0.02] blur-[100px] rounded-full -mr-48 -mt-48" />
+    </footer>
+  );
+
+  const Modal = ({ type, onClose }: { type: 'privacy' | 'terms', onClose: () => void }) => (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-teal/80 backdrop-blur-xl">
+      <div className="bg-white rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-auto p-16 premium-shadow relative animate-in fade-in zoom-in duration-300 scrollbar-none">
+        <button onClick={onClose} className="absolute top-8 right-8 text-slate-300 hover:text-brand-teal transition-all hover:rotate-90">
+          <AlertCircle size={32} className="rotate-45" />
+        </button>
+        <div className="flex items-center gap-8 mb-16">
+          <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center p-3 border border-slate-100 shadow-2xl shadow-brand-teal/10">
+            <Logo />
+          </div>
+          <div>
+            <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{type === 'privacy' ? 'Privacy Policy' : 'Terms of Use'}</h2>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1 block">Protocol Document</span>
+          </div>
+        </div>        <div className="prose prose-slate prose-lg max-w-none">
+        {type === 'privacy' ? (
+          <div className="space-y-12 text-base">
+            <p className="font-bold border-b pb-1">Last Updated: April 23, 2026</p>
+            <p className="mt-4">Your privacy is important to us. It is NSE Option Chain Analyzer's policy to respect your privacy regarding any information we may collect from you across our website.</p>
+            <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">1. Local Processing Only</h3>
+            <p className="leading-relaxed text-slate-600">The application analyzes data strictly locally in your browser. CSV files are not uploaded to any server. Proprietary financial data remains on your machine.</p>
+            <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">2. Cookies & Ads</h3>
+            <p className="leading-relaxed text-slate-600">Third-party advertising services (Google AdSense) may be used to keep this tool free. These services may use cookies to serve personalized ads based on web browsing history.</p>
+            <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">3. Anonymous Usage</h3>
+            <p className="leading-relaxed text-slate-600">PII (Personally Identifiable Information) is not collected. No sign-up or email is required to use the mapper.</p>
+          </div>
+        ) : (
+          <div className="space-y-12 text-base">
+            <p className="font-bold border-b-2 pb-2 text-slate-900 border-brand-teal inline-block">Legal Agreement</p>
+            <p className="mt-6 text-slate-600 leading-relaxed font-medium">By using optionchainanalyzer.in, users agree to comply with the following terms:</p>
+            <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">1. License for Personal Use</h3>
+            <p className="leading-relaxed text-slate-600">The tool is under temporary license for personal, non-commercial education. This tool is intended to simplify manual OI analysis.</p>
+            <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">2. Risk Disclosure</h3>
+            <p className="p-8 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
+            <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">3. No Liability</h3>
+            <p className="leading-relaxed text-slate-600">There is no liability for financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
+          </div>
+        )}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div 
       className="h-screen bg-slate-100 font-sans text-slate-900 flex flex-col relative overflow-hidden"
@@ -658,6 +645,7 @@ export default function App() {
       onDrop={handleDrop}
     >
       {activeModal && <Modal type={activeModal} onClose={() => setActiveModal(null)} />}
+      {/* ... Rest of the UI */}
       {/* Drop Overlay */}
       {isHovering && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-12 pointer-events-none">
@@ -744,7 +732,7 @@ export default function App() {
 
                 <div className="w-full border-t border-slate-200/60 mt-2 pt-10 px-4">
                   <GuideContent />
-                  <FooterContent onReset={handleReset} onModal={setActiveModal} />
+                  <FooterContent />
                 </div>
               </motion.div>
             </div>
@@ -883,48 +871,48 @@ export default function App() {
                         const showSupport = row.isSupport && row.strikePrice <= activePrice;
                         
                         return (
-                          <tr 
-                            key={row.strikePrice} 
-                            data-strike={row.strikePrice}
-                            className={`hover:bg-slate-100/50 group transition-all relative ${
-                              isSpotRow 
-                                ? 'bg-blue-50/60 ring-2 ring-blue-500/40 shadow-[0_4px_20px_rgba(59,130,246,0.15)] z-10 scale-[1.002] border-y-2 border-blue-500/30' 
-                                : ''
-                            }`}
-                          >
-                          <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.cprOI}</td>
-                          <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.cprVol}</td>
-                          <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>
-                            {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400" />}
-                            <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
-                          </td>
-                          <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.callChng}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.callOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.callChngOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r-2 border-slate-200 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{(row.callVolume / 1000).toFixed(1)}k</td>
-                          
-                          <td className={`text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative ${isSpotRow ? 'bg-blue-600 scale-110 z-20 shadow-2xl rounded-sm ring-2 ring-white/20' : ''}`}>
-                            {row.strikePrice.toLocaleString()}
-                          </td>
-                          
-                          <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showResistance ? 'bg-blue-50/50 border-y border-blue-200/50' : isSpotRow ? 'border-y border-blue-200/50' : ''}`}>
-                            {showResistance ? 'RESISTANCE' : '—'}
-                          </td>
-                          <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showSupport ? 'bg-support text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showSupport ? 'bg-blue-50/50 border-y border-blue-200/50' : isSpotRow ? 'border-y border-blue-200/50' : ''}`}>
-                            {showSupport ? 'SUPPORT' : '—'}
-                          </td>
-                          
-                          <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.putOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.putChngOI.toLocaleString()}</td>
-                          <td className={`text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{(row.putVolume / 1000).toFixed(1)}k</td>
-                          <td className={`text-center border-r border-slate-100 italic font-black ${row.putChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.putChng}</td>
-                          <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>
-                            {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400" />}
-                            <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
-                          </td>
-                          <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.pcrOI}</td>
-                          <td className={`text-center font-bold text-slate-500 ${isSpotRow ? 'border-y border-blue-200/50' : ''}`}>{row.pcrVol}</td>
-                        </tr>
+                            <tr 
+                              key={row.strikePrice} 
+                              data-strike={row.strikePrice}
+                              className={`hover:bg-slate-100/50 group transition-all relative ${
+                                isSpotRow 
+                                  ? 'bg-blue-50/50 ring-1 ring-blue-500/20 shadow-[0_10px_30px_rgba(59,130,246,0.1)] z-10 scale-[1.002]' 
+                                  : ''
+                              }`}
+                            >
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.cprOI}</td>
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.cprVol}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400" />}
+                              <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
+                            </td>
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callChng}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.callChngOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r-2 border-slate-200 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{(row.callVolume / 1000).toFixed(1)}k</td>
+                            
+                            <td className={`text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative ${isSpotRow ? 'bg-blue-600 scale-110 z-20 shadow-2xl rounded-sm ring-2 ring-white/20' : ''}`}>
+                              {row.strikePrice.toLocaleString()}
+                            </td>
+                            
+                            <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showResistance ? 'bg-blue-50/50 border-y border-blue-200' : isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {showResistance ? 'RESISTANCE' : '—'}
+                            </td>
+                            <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showSupport ? 'bg-support text-white' : 'text-slate-300 italic opacity-40'} ${isSpotRow && !showSupport ? 'bg-blue-50/50 border-y border-blue-200' : isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {showSupport ? 'SUPPORT' : '—'}
+                            </td>
+                            
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-800 font-medium ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putChngOI.toLocaleString()}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{(row.putVolume / 1000).toFixed(1)}k</td>
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.putChng >= 0 ? 'text-emerald-700' : 'text-rose-700'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.putChng}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'} ${isSpotRow ? 'border-y border-blue-200' : ''}`}>
+                              {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400" />}
+                              <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
+                            </td>
+                            <td className={`text-center font-bold border-r border-slate-100 text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.pcrOI}</td>
+                            <td className={`text-center font-bold text-slate-500 ${isSpotRow ? 'border-y border-blue-200' : ''}`}>{row.pcrVol}</td>
+                          </tr>
                         );
                       });
                     })()}
@@ -974,7 +962,7 @@ export default function App() {
             <div className="max-w-4xl mx-auto px-4">
               <GuideContent />
             </div>
-            <FooterContent onReset={handleReset} onModal={setActiveModal} />
+            <FooterContent />
                 </div>
               </div>
             </div>
