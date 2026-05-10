@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OptionChainRow {
@@ -62,7 +62,7 @@ export default function App() {
     if (showScrollPopup) {
       const timer = setTimeout(() => {
         setShowScrollPopup(false);
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [showScrollPopup]);
@@ -570,15 +570,37 @@ export default function App() {
       <AnimatePresence>
         {showScrollPopup && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-brand-teal text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[11px] border border-white/20 backdrop-blur-md"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-white/20 p-2 rounded-lg">
-              <Zap size={18} className="text-emerald-400 fill-emerald-400 animate-pulse" />
+            <div className="relative flex flex-col items-center gap-4">
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                className="text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]"
+              >
+                <ChevronUp size={48} strokeWidth={3} />
+              </motion.div>
+              
+              <div className="bg-slate-900/95 border border-white/10 px-6 py-3 rounded shadow-2xl backdrop-blur-md flex flex-col items-center min-w-[200px]">
+                <span className="text-white font-black uppercase tracking-[0.25em] text-[10px] leading-tight text-center">
+                  Scroll to view
+                </span>
+                <span className="text-emerald-400 font-bold uppercase tracking-[0.1em] text-[9px] leading-tight text-center mt-0.5">
+                  High Probable SR Levels
+                </span>
+              </div>
+
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+                className="text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]"
+              >
+                <ChevronDown size={48} strokeWidth={3} />
+              </motion.div>
             </div>
-            <span>Scroll up/down to view high probable S/R levels</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -747,8 +769,8 @@ export default function App() {
                     {/* Level 1: Category Header */}
                     <tr className="h-8 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
                       <th colSpan={7} className="bg-brand-teal border-r border-white/5 px-4 sticky top-0 z-40 first:rounded-tl-lg">Call Analysis</th>
-                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-emerald-400 w-24 border-b border-white/5 text-[11px] font-black sticky top-0 z-50">Strike</th>
                       <th rowSpan={2} className="bg-slate-50 border-r border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Resistance</th>
+                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-emerald-400 w-24 border-b border-white/5 text-[11px] font-black sticky top-0 z-50">Strike</th>
                       <th rowSpan={2} className="bg-slate-50 border-r-2 border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Support</th>
                       <th colSpan={7} className="bg-brand-teal text-white px-4 sticky top-0 z-40 last:rounded-tr-lg">Put Analysis</th>
                     </tr>
@@ -794,13 +816,14 @@ export default function App() {
                             <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'}`}>{row.callChngOI.toLocaleString()}</td>
                             <td className="text-right px-2 border-r-2 border-slate-200 text-slate-500 italic font-bold">{(row.callVolume / 1000).toFixed(1)}k</td>
                             
+                            <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'}`}>
+                              {showResistance ? 'RESISTANCE' : '—'}
+                            </td>
+
                             <td className="text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative">
                               {row.strikePrice.toLocaleString()}
                             </td>
                             
-                            <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'}`}>
-                              {showResistance ? 'RESISTANCE' : '—'}
-                            </td>
                             <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showSupport ? 'bg-support text-white' : 'text-slate-300 italic opacity-40'}`}>
                               {showSupport ? 'SUPPORT' : '—'}
                             </td>
