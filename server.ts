@@ -14,33 +14,44 @@ async function startServer() {
   // API routes
   app.get("/api/price/:symbol", async (req, res) => {
     const { symbol } = req.params;
-    let yahooSymbol = symbol;
-
-    // Map common index names to Yahoo Finance symbols
-    if (symbol === "NIFTY") yahooSymbol = "^NSEI";
-    else if (symbol === "BANKNIFTY") yahooSymbol = "^NSEBANK";
-    else if (symbol === "FINNIFTY") yahooSymbol = "NIFTY_FIN_SERVICE.NS";
-    else if (symbol === "MIDCPNIFTY") yahooSymbol = "NIFTY_MID_SELECT.NS";
-    else if (symbol === "NIFTYIT") yahooSymbol = "^CNXIT";
-    else if (!symbol.includes(".") && !symbol.startsWith("^")) yahooSymbol = `${symbol}.NS`;
+    const normalizedSymbol = symbol.toUpperCase().trim().replace(/\s+/g, '');
+    
+    let yahooSymbol = normalizedSymbol;
+    if (normalizedSymbol === "NIFTY") yahooSymbol = "^NSEI";
+    else if (normalizedSymbol === "BANKNIFTY") yahooSymbol = "^NSEBANK";
+    else if (normalizedSymbol === "FINNIFTY") yahooSymbol = "NIFTY_FIN_SERVICE.NS";
+    else if (normalizedSymbol === "MIDCPNIFTY") yahooSymbol = "NIFTY_MID_SELECT.NS";
+    else if (normalizedSymbol === "NIFTYIT") yahooSymbol = "^CNXIT";
+    else if (!yahooSymbol.includes(".") && !yahooSymbol.startsWith("^")) yahooSymbol = `${yahooSymbol}.NS`;
 
     try {
-      console.log(`[API] Fetching price for ${symbol} using Yahoo symbol: ${yahooSymbol}`);
-      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+      console.log(`[Price-API] Attempting ${normalizedSymbol} as ${yahooSymbol}`);
+      
+      const response = await axios.get(`https://query2.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+        params: {
+          interval: '1m',
+          range: '1d'
+        },
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json'
+        },
+        timeout: 5000
       });
-      const result = response.data.chart.result[0];
-      if (!result) {
-        throw new Error("No data found for symbol");
+
+      const result = response.data?.chart?.result?.[0];
+      
+      if (!result?.meta) {
+        throw new Error("No metadata in Yahoo response");
       }
+
       const price = result.meta.regularMarketPrice;
       const instrument = result.meta.symbol;
       
-      res.json({ price, instrument, timestamp: Date.now() });
+      console.log(`[Price-API] Success: ${instrument} = ${price}`);
+      res.json({ price, instrument, timestamp: Date.now(), success: true });
     } catch (error: any) {
-      console.error(`Error fetching price for ${symbol} (Yahoo: ${yahooSymbol}):`, error.message);
+      console.error(`[Price-API] Error for ${symbol}:`, error.message);
       res.status(500).json({ error: "Failed to fetch price", message: error.message });
     }
   });

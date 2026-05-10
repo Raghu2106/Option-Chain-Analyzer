@@ -140,15 +140,20 @@ export default function App() {
           for (const row of rawData.slice(0, 20)) {
             const rowStr = row.join(' ');
             if (/underlying|spot|index|price|as on/i.test(rowStr)) {
-              // Extract instrument
-              const nameMatch = rowStr.match(/(?:Index|Stock|Underlying):\s*([A-Z\s]+?)(?:\s+[\d,.]|$)/i);
+              // Extract instrument - tighter regex to avoid matching weird footer text
+              const nameMatch = rowStr.match(/(?:Index|Stock|Underlying|Instrument):\s*([A-Z0-9\s\&]{2,20})/i);
               if (nameMatch && nameMatch[1]) {
                 const rawName = nameMatch[1].trim().toUpperCase();
-                if (rawName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
-                else if (rawName.includes('FIN')) detectedInstrument = 'FINNIFTY';
-                else if (rawName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
-                else if (rawName.includes('NIFTY')) detectedInstrument = 'NIFTY';
-                else detectedInstrument = rawName;
+                // Filter out common non-instrument words and junk
+                const blacklist = ['ETERNAL', 'TOTAL', 'PRICE', 'SPOT', 'INDEX', 'AS ON', 'OFFLINE'];
+                if (!blacklist.some(b => rawName === b || rawName.includes(b)) && rawName.length > 2) {
+                  let finalName = rawName.split(/\s{2,}/)[0].trim(); // Take first part if large gap
+                  if (finalName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
+                  else if (finalName.includes('FIN')) detectedInstrument = 'FINNIFTY';
+                  else if (finalName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
+                  else if (finalName.includes('NIFTY')) detectedInstrument = 'NIFTY';
+                  else detectedInstrument = finalName;
+                }
               }
 
               // Robust Price Extraction
@@ -159,8 +164,8 @@ export default function App() {
                   for (const numStr of numbers) {
                     const cleanNum = numStr.replace(/,/g, '');
                     const val = parseFloat(cleanNum);
-                    // Spot prices are usually > 100, but we also filter out potential year values
-                    if (val > 100 && val < 500000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
+                    // Spot prices are usually > 10, expand range for penny stocks
+                    if (val > 10 && val < 1000000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
                       detectedSpot = val;
                       break;
                     }
@@ -756,16 +761,27 @@ export default function App() {
 
                     <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
                       <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">
-                        {isLiveActive ? 'Live Market Price' : 'Spot Price'}
+                        {isLiveActive ? 'Live Market Price' : 'Detected Spot Price'}
                       </span>
                       <div className="flex items-center gap-2">
                         <div className="text-lg font-black text-slate-900 leading-none">
-                          {(livePrice || spotPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {(() => {
+                            const val = livePrice || spotPrice;
+                            return val && val > 0 
+                              ? val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                              : '0.00'
+                          })()}
                         </div>
                         {isLiveActive && (
                           <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">
                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                             <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+                          </div>
+                        )}
+                        {!isLiveActive && symbolName && (
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded-lg">
+                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                             <span className="text-[7px] font-bold text-slate-400">OFFLINE</span>
                           </div>
                         )}
                       </div>
