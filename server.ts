@@ -20,18 +20,28 @@ async function startServer() {
     if (symbol === "NIFTY") yahooSymbol = "^NSEI";
     else if (symbol === "BANKNIFTY") yahooSymbol = "^NSEBANK";
     else if (symbol === "FINNIFTY") yahooSymbol = "NIFTY_FIN_SERVICE.NS";
+    else if (symbol === "MIDCPNIFTY") yahooSymbol = "NIFTY_MID_SELECT.NS";
+    else if (symbol === "NIFTYIT") yahooSymbol = "^CNXIT";
     else if (!symbol.includes(".") && !symbol.startsWith("^")) yahooSymbol = `${symbol}.NS`;
 
     try {
-      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`);
+      console.log(`[API] Fetching price for ${symbol} using Yahoo symbol: ${yahooSymbol}`);
+      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+      });
       const result = response.data.chart.result[0];
+      if (!result) {
+        throw new Error("No data found for symbol");
+      }
       const price = result.meta.regularMarketPrice;
       const instrument = result.meta.symbol;
       
       res.json({ price, instrument, timestamp: Date.now() });
-    } catch (error) {
-      console.error(`Error fetching price for ${symbol}:`, error);
-      res.status(500).json({ error: "Failed to fetch price" });
+    } catch (error: any) {
+      console.error(`Error fetching price for ${symbol} (Yahoo: ${yahooSymbol}):`, error.message);
+      res.status(500).json({ error: "Failed to fetch price", message: error.message });
     }
   });
 

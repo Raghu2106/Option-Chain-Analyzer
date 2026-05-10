@@ -74,6 +74,9 @@ export default function App() {
         if (data.price) {
           setLivePrice(data.price);
           setIsLiveActive(true);
+        } else if (data.error) {
+          console.warn(`Price API error for ${symbolName}:`, data.message || data.error);
+          setIsLiveActive(false);
         }
       } catch (err) {
         console.error("Live price fetch failed:", err);
