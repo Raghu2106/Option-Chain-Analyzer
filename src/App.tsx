@@ -2,6 +2,9 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface OptionChainRow {
   strikePrice: number;
@@ -71,7 +74,31 @@ export default function App() {
         setIsLiveActive(false);
         return;
       }
+      
       try {
+        // Use Gemini with Google Search grounding for real-time prices
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`,
+          config: {
+            tools: [{ googleSearch: {} }]
+          }
+        });
+
+        const text = response.text?.trim() || "";
+        // Extract pure number from potential extra text
+        const match = text.match(/[\d,]+(?:\.\d+)?/);
+        if (match) {
+          const price = parseFloat(match[0].replace(/,/g, ''));
+          if (!isNaN(price) && price > 0) {
+            setLivePrice(price);
+            setIsLiveActive(true);
+            return;
+          }
+        }
+        
+        // Fallback to existing API if Gemini fails to give a valid number
+        console.warn("Gemini price detection failed, trying fallback API...");
         const res = await fetch(`/api/price/${symbolName}`);
         const result = await res.json();
         
@@ -79,7 +106,6 @@ export default function App() {
           setLivePrice(result.price);
           setIsLiveActive(true);
         } else {
-          console.warn(`Price API error for ${symbolName}:`, result.message || result.error);
           setIsLiveActive(false);
         }
       } catch (err) {
@@ -90,7 +116,7 @@ export default function App() {
 
     if (symbolName) {
       fetchLivePrice();
-      interval = setInterval(fetchLivePrice, 20000); // Poll every 20s to stay safe from rate limits
+      interval = setInterval(fetchLivePrice, 45000); // Poll every 45s to avoid hitting Gemini rate limits too fast
     }
 
     return () => clearInterval(interval);
@@ -785,9 +811,12 @@ export default function App() {
                           })()}
                         </div>
                         {isLiveActive && (
-                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm">
                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest shrink-0">Live</span>
+                            <div className="w-[1px] h-2 bg-emerald-200 mx-0.5" />
+                            <Zap size={8} className="text-amber-500 fill-amber-500" />
+                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">AI Powered</span>
                           </div>
                         )}
                         {!isLiveActive && symbolName && (
