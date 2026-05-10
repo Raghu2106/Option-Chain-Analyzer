@@ -67,7 +67,10 @@ export default function App() {
     let interval: NodeJS.Timeout;
     
     const fetchLivePrice = async () => {
-      if (!symbolName) return;
+      if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName)) {
+        setIsLiveActive(false);
+        return;
+      }
       try {
         const res = await fetch(`/api/price/${symbolName}`);
         const data = await res.json();
@@ -145,14 +148,14 @@ export default function App() {
               if (nameMatch && nameMatch[1]) {
                 const rawName = nameMatch[1].trim().toUpperCase();
                 // Filter out common non-instrument words and junk
-                const blacklist = ['ETERNAL', 'TOTAL', 'PRICE', 'SPOT', 'INDEX', 'AS ON', 'OFFLINE'];
+                const blacklist = ['ETERNAL', 'TOTAL', 'PRICE', 'SPOT', 'INDEX', 'AS ON', 'OFFLINE', 'SYMBOL', 'UNDERLYING'];
                 if (!blacklist.some(b => rawName === b || rawName.includes(b)) && rawName.length > 2) {
-                  let finalName = rawName.split(/\s{2,}/)[0].trim(); // Take first part if large gap
+                  let finalName = rawName.split(/\s{2,}/)[0].split(':')[0].trim(); // Take first part and remove remaining colons
                   if (finalName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
                   else if (finalName.includes('FIN')) detectedInstrument = 'FINNIFTY';
                   else if (finalName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
                   else if (finalName.includes('NIFTY')) detectedInstrument = 'NIFTY';
-                  else detectedInstrument = finalName;
+                  else if (finalName.length > 2) detectedInstrument = finalName;
                 }
               }
 

@@ -25,24 +25,30 @@ async function startServer() {
     else if (!yahooSymbol.includes(".") && !yahooSymbol.startsWith("^")) yahooSymbol = `${yahooSymbol}.NS`;
 
     try {
-      console.log(`[Price-API] Attempting ${normalizedSymbol} as ${yahooSymbol}`);
+      const cacheBuster = Math.floor(Math.random() * 1000000);
+      console.log(`[Price-API] Fetching ${normalizedSymbol} as ${yahooSymbol}`);
       
       const response = await axios.get(`https://query2.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
         params: {
           interval: '1m',
-          range: '1d'
+          range: '1d',
+          includePrePost: 'false',
+          useYf: 'true',
+          _cb: cacheBuster
         },
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+          'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol,
+          'Origin': 'https://finance.yahoo.com'
         },
-        timeout: 5000
+        timeout: 10000
       });
 
       const result = response.data?.chart?.result?.[0];
       
       if (!result?.meta) {
-        throw new Error("No metadata in Yahoo response");
+        throw new Error("No chart data found in Yahoo response");
       }
 
       const price = result.meta.regularMarketPrice;
@@ -51,8 +57,15 @@ async function startServer() {
       console.log(`[Price-API] Success: ${instrument} = ${price}`);
       res.json({ price, instrument, timestamp: Date.now(), success: true });
     } catch (error: any) {
-      console.error(`[Price-API] Error for ${symbol}:`, error.message);
-      res.status(500).json({ error: "Failed to fetch price", message: error.message });
+      const status = error.response?.status || 500;
+      const message = error.response?.data?.chart?.error?.description || error.message;
+      console.error(`[Price-API] Error ${status} for ${symbol}:`, message);
+      res.status(status).json({ 
+        error: "Failed to fetch price", 
+        message,
+        symbol: symbol,
+        mapped: yahooSymbol
+      });
     }
   });
 
