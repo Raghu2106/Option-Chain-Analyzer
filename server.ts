@@ -28,9 +28,9 @@ async function startServer() {
       const cacheBuster = Date.now();
       console.log(`[Price-API] Fetching ${normalizedSymbol} as ${yahooSymbol}`);
       
-      // Try charts endpoint first as it has more data but can be restricted
-      try {
-        const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+      const fetchFromYahoo = async (baseUrl: string, endpoint: string) => {
+        const url = `${baseUrl}/v8/finance/chart/${yahooSymbol}`;
+        const response = await axios.get(url, {
           params: {
             interval: '1m',
             range: '1d',
@@ -40,51 +40,86 @@ async function startServer() {
           },
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-            'Accept': 'application/json',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
             'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol,
-            'Origin': 'https://finance.yahoo.com'
+            'Origin': 'https://finance.yahoo.com',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-site'
           },
-          timeout: 8000
+          timeout: 10000
         });
+        return response.data;
+      };
 
-        const result = response.data?.chart?.result?.[0];
+      const fetchQuoteFromYahoo = async (baseUrl: string) => {
+        const url = `${baseUrl}/v7/finance/quote`;
+        const response = await axios.get(url, {
+          params: {
+            symbols: yahooSymbol,
+            _cb: cacheBuster
+          },
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol
+          },
+          timeout: 10000
+        });
+        return response.data;
+      };
+
+      // Attempt sequence:
+      // 1. Query2 Chart
+      // 2. Query1 Chart
+      // 3. Query2 Quote
+      // 4. Query1 Quote
+
+      let data: any = null;
+      let method = "";
+
+      try {
+        data = await fetchFromYahoo('https://query2.finance.yahoo.com', 'chart');
+        method = "Chart-Q2";
+      } catch (e) {
+        try {
+          data = await fetchFromYahoo('https://query1.finance.yahoo.com', 'chart');
+          method = "Chart-Q1";
+        } catch (e2) {
+          try {
+            data = await fetchQuoteFromYahoo('https://query2.finance.yahoo.com');
+            method = "Quote-Q2";
+          } catch (e3) {
+            data = await fetchQuoteFromYahoo('https://query1.finance.yahoo.com');
+            method = "Quote-Q1";
+          }
+        }
+      }
+
+      if (method.startsWith("Chart")) {
+        const result = data?.chart?.result?.[0];
         if (result?.meta?.regularMarketPrice) {
           const price = result.meta.regularMarketPrice;
           const instrument = result.meta.symbol;
-          console.log(`[Price-API] Success (Chart): ${instrument} = ${price}`);
+          console.log(`[Price-API] Success (${method}): ${instrument} = ${price}`);
           res.json({ price, instrument, timestamp: Date.now(), success: true });
           return;
         }
-      } catch (chartErr) {
-        console.warn(`[Price-API] Chart endpoint failed for ${yahooSymbol}, trying Quote...`);
+      } else if (method.startsWith("Quote")) {
+        const quote = data?.quoteResponse?.result?.[0];
+        if (quote?.regularMarketPrice) {
+          const price = quote.regularMarketPrice;
+          const instrument = quote.symbol;
+          console.log(`[Price-API] Success (${method}): ${instrument} = ${price}`);
+          res.json({ price, instrument, timestamp: Date.now(), success: true });
+          return;
+        }
       }
 
-      // Fallback to Quote endpoint (v7) which is often more reliable for current price
-      const quoteResponse = await axios.get(`https://query1.finance.yahoo.com/v7/finance/quote`, {
-        params: {
-          symbols: yahooSymbol,
-          _cb: cacheBuster
-        },
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept': 'application/json',
-          'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol,
-          'Origin': 'https://finance.yahoo.com'
-        },
-        timeout: 8000
-      });
-
-      const quote = quoteResponse.data?.quoteResponse?.result?.[0];
-      
-      if (!quote) {
-        throw new Error(`No data found for ${yahooSymbol} on Yahoo Finance`);
-      }
-
-      const price = quote.regularMarketPrice;
-      const instrument = quote.symbol;
-      
-      console.log(`[Price-API] Success (Quote): ${instrument} = ${price}`);
-      res.json({ price, instrument, timestamp: Date.now(), success: true });
+      throw new Error(`No valid price data found for ${yahooSymbol} after multiple attempts`);
     } catch (error: any) {
       const status = error.response?.status || 500;
       const message = error.response?.data?.chart?.error?.description || error.message;

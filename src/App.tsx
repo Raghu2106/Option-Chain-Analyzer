@@ -63,37 +63,43 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
+  const fetchLivePrice = useCallback(async () => {
+    if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName)) {
+      console.log(`[App] Skipping price fetch for blacklisted symbol: ${symbolName}`);
+      setIsLiveActive(false);
+      return;
+    }
+    try {
+      console.log(`[App] Fetching live price for: ${symbolName}`);
+      const res = await fetch(`/api/price/${symbolName}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.price && data.price > 0) {
+        setLivePrice(data.price);
+        setIsLiveActive(true);
+        console.log(`[App] Successfully updated live price: ${data.price}`);
+      } else {
+        console.warn(`[App] Price API returned no price for ${symbolName}:`, data);
+        setIsLiveActive(false);
+      }
+    } catch (err) {
+      console.error(`[App] Live price fetch failed for ${symbolName}:`, err);
+      setIsLiveActive(false);
+    }
+  }, [symbolName]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    const fetchLivePrice = async () => {
-      if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName)) {
-        setIsLiveActive(false);
-        return;
-      }
-      try {
-        const res = await fetch(`/api/price/${symbolName}`);
-        const data = await res.json();
-        if (data.price) {
-          setLivePrice(data.price);
-          setIsLiveActive(true);
-        } else if (data.error) {
-          console.warn(`Price API error for ${symbolName}:`, data.message || data.error);
-          setIsLiveActive(false);
-        }
-      } catch (err) {
-        console.error("Live price fetch failed:", err);
-        setIsLiveActive(false);
-      }
-    };
-
     if (symbolName) {
       fetchLivePrice();
       interval = setInterval(fetchLivePrice, 30000); // Poll every 30s
     }
 
     return () => clearInterval(interval);
-  }, [symbolName]);
+  }, [symbolName, fetchLivePrice]);
 
   useEffect(() => {
     if (data.length > 0 && (livePrice || spotPrice)) {
@@ -789,12 +795,21 @@ export default function App() {
                           </div>
                         )}
                         {!isLiveActive && symbolName && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded-lg">
-                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
-                             <span className="text-[7px] font-bold text-slate-400">OFFLINE</span>
-                          </div>
+                          <button 
+                            onClick={() => fetchLivePrice()}
+                            className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg hover:bg-white hover:border-brand-teal transition-all cursor-pointer group active:scale-95"
+                            title="Click to retry live price"
+                          >
+                             <div className="w-1.5 h-1.5 bg-slate-300 rounded-full group-hover:bg-brand-teal transition-colors"></div>
+                             <span className="text-[8px] font-black text-slate-400 group-hover:text-brand-teal uppercase tracking-widest">Offline (Retry)</span>
+                          </button>
                         )}
                       </div>
+                      {isLiveActive && (
+                        <span className="text-[7px] font-bold text-slate-400 uppercase tracking-wider mt-1.5 flex items-center gap-1.5">
+                          <Clock size={8} /> Updated: {new Date().toLocaleTimeString()}
+                        </span>
+                      )}
                     </div>
 
                     {anomalyStrikes.length > 0 && (
