@@ -167,8 +167,15 @@ export default function App() {
                   for (const numStr of numbers) {
                     const cleanNum = numStr.replace(/,/g, '');
                     const val = parseFloat(cleanNum);
-                    // Spot prices are usually > 10, expand range for penny stocks
-                    if (val > 10 && val < 1000000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
+                    
+                    // Specific logic for spot price:
+                    // 1. It must be reasonably large (usually > 10)
+                    // 2. It shouldn't be the year (e.g., 2024, 2025, 2026)
+                    // 3. In the row string, it shouldn't be part of a time string (HH:MM:SS)
+                    const isYear = val >= 2020 && val <= 2030;
+                    const isDay = val >= 1 && val <= 31 && rowStr.toLowerCase().includes('as on');
+                    
+                    if (val > 10 && !isYear && !isDay && val < 1000000) {
                       detectedSpot = val;
                       break;
                     }

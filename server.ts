@@ -19,42 +19,71 @@ async function startServer() {
     let yahooSymbol = normalizedSymbol;
     if (normalizedSymbol === "NIFTY") yahooSymbol = "^NSEI";
     else if (normalizedSymbol === "BANKNIFTY") yahooSymbol = "^NSEBANK";
-    else if (normalizedSymbol === "FINNIFTY") yahooSymbol = "NIFTY_FIN_SERVICE.NS";
-    else if (normalizedSymbol === "MIDCPNIFTY") yahooSymbol = "NIFTY_MID_SELECT.NS";
+    else if (normalizedSymbol === "FINNIFTY") yahooSymbol = "^CNXFIN";
+    else if (normalizedSymbol === "MIDCPNIFTY") yahooSymbol = "^NIFTYMDCP100";
     else if (normalizedSymbol === "NIFTYIT") yahooSymbol = "^CNXIT";
     else if (!yahooSymbol.includes(".") && !yahooSymbol.startsWith("^")) yahooSymbol = `${yahooSymbol}.NS`;
 
     try {
-      const cacheBuster = Math.floor(Math.random() * 1000000);
+      const cacheBuster = Date.now();
       console.log(`[Price-API] Fetching ${normalizedSymbol} as ${yahooSymbol}`);
       
-      const response = await axios.get(`https://query2.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+      // Try charts endpoint first as it has more data but can be restricted
+      try {
+        const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`, {
+          params: {
+            interval: '1m',
+            range: '1d',
+            includePrePost: 'false',
+            useYf: 'true',
+            _cb: cacheBuster
+          },
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+            'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol,
+            'Origin': 'https://finance.yahoo.com'
+          },
+          timeout: 8000
+        });
+
+        const result = response.data?.chart?.result?.[0];
+        if (result?.meta?.regularMarketPrice) {
+          const price = result.meta.regularMarketPrice;
+          const instrument = result.meta.symbol;
+          console.log(`[Price-API] Success (Chart): ${instrument} = ${price}`);
+          res.json({ price, instrument, timestamp: Date.now(), success: true });
+          return;
+        }
+      } catch (chartErr) {
+        console.warn(`[Price-API] Chart endpoint failed for ${yahooSymbol}, trying Quote...`);
+      }
+
+      // Fallback to Quote endpoint (v7) which is often more reliable for current price
+      const quoteResponse = await axios.get(`https://query1.finance.yahoo.com/v7/finance/quote`, {
         params: {
-          interval: '1m',
-          range: '1d',
-          includePrePost: 'false',
-          useYf: 'true',
+          symbols: yahooSymbol,
           _cb: cacheBuster
         },
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
           'Accept': 'application/json',
           'Referer': 'https://finance.yahoo.com/quote/' + yahooSymbol,
           'Origin': 'https://finance.yahoo.com'
         },
-        timeout: 10000
+        timeout: 8000
       });
 
-      const result = response.data?.chart?.result?.[0];
+      const quote = quoteResponse.data?.quoteResponse?.result?.[0];
       
-      if (!result?.meta) {
-        throw new Error("No chart data found in Yahoo response");
+      if (!quote) {
+        throw new Error(`No data found for ${yahooSymbol} on Yahoo Finance`);
       }
 
-      const price = result.meta.regularMarketPrice;
-      const instrument = result.meta.symbol;
+      const price = quote.regularMarketPrice;
+      const instrument = quote.symbol;
       
-      console.log(`[Price-API] Success: ${instrument} = ${price}`);
+      console.log(`[Price-API] Success (Quote): ${instrument} = ${price}`);
       res.json({ price, instrument, timestamp: Date.now(), success: true });
     } catch (error: any) {
       const status = error.response?.status || 500;
