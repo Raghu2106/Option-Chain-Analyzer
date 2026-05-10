@@ -854,27 +854,25 @@ export default function App() {
                     {/* Level 1: Category Header */}
                     <tr className="h-8 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
                       <th colSpan={7} className="bg-brand-teal border-r border-white/5 px-4 sticky top-0 z-40 first:rounded-tl-lg">Call Analysis</th>
-                      <th rowSpan={2} className="bg-slate-50 border-r border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Resistance</th>
-                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-emerald-400 w-24 border-b border-white/5 text-[11px] font-black sticky top-0 z-50">Strike</th>
-                      <th rowSpan={2} className="bg-slate-50 border-r-2 border-slate-200 w-20 text-slate-500 border-b border-slate-200 text-[9px] tracking-widest px-1 sticky top-0 z-50">Support</th>
+                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-white w-28 border-b border-white/5 text-[10px] font-black sticky top-0 z-50 tracking-wider">STRIKE PRICE</th>
                       <th colSpan={7} className="bg-brand-teal text-white px-4 sticky top-0 z-40 last:rounded-tr-lg">Put Analysis</th>
                     </tr>
                     {/* Level 2: Metric Header */}
                     <tr className="h-10 text-[9px] font-black uppercase text-center bg-white border-b border-slate-200 shadow-sm transition-shadow">
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR OI</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR VOL</th>
-                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
                       <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
                       <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
+                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
                       <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
-                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r-2 border-slate-200">Volume</th>
-                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
+                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR OI</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r-2 border-slate-200 italic">CPR VOL</th>
+                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR VOL</th>
+                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR OI</th>
+                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
                       <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
                       <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
-                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
-                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR OI</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white">PCR VOL</th>
+                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
+                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white italic">CHG</th>
                     </tr>
                   </thead>
                    <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
@@ -891,11 +889,13 @@ export default function App() {
 
                       return data.map((row) => {
                         const isAtTheMoney = row.strikePrice === closestStrike;
-                        // Eliminate ITM SR levels using detected spot price if available
+                        const isCallOTM = effectiveSpot !== null && row.strikePrice >= effectiveSpot;
+                        const isPutOTM = effectiveSpot !== null && row.strikePrice <= effectiveSpot;
+                        const isCallHighlight = isCallOTM && (row.cprOI >= 6 || row.cprVol >= 6);
+                        const isPutHighlight = isPutOTM && (row.pcrOI >= 6 || row.pcrVol >= 6);
+
                         // Resistance = Call OTM = Strike >= Spot
                         // Support = Put OTM = Strike <= Spot
-                        const showResistance = row.isResistance && (effectiveSpot === null || row.strikePrice >= effectiveSpot);
-                        const showSupport = row.isSupport && (effectiveSpot === null || row.strikePrice <= effectiveSpot);
                         
                         return (
                             <tr 
@@ -908,39 +908,41 @@ export default function App() {
                                   : 'hover:bg-slate-100/50 border-slate-100'
                               }`}
                             >
-                            <td className="text-center font-bold border-r border-slate-100 text-slate-500">{row.cprOI}</td>
-                            <td className="text-center font-bold border-r border-slate-100 text-slate-500">{row.cprVol}</td>
-                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'}`}>
-                              {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400" />}
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.callChng}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 font-medium">{row.callOI.toLocaleString()}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 italic font-bold">{(row.callVolume / 1000).toFixed(1)}k</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.callChngOI.toLocaleString()}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
+                              {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400/50" />}
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
-                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{row.callChng}</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-800 font-medium">{row.callOI.toLocaleString()}</td>
-                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'}`}>{row.callChngOI.toLocaleString()}</td>
-                            <td className="text-right px-2 border-r-2 border-slate-200 text-slate-500 italic font-bold">{(row.callVolume / 1000).toFixed(1)}k</td>
+                            <td className={`text-center border-r border-slate-100 transition-all ${row.cprOI >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.cprOI}</td>
+                            <td className={`text-center border-r-2 border-slate-200 transition-all ${row.cprVol >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.cprVol}</td>
                             
-                            <td className={`text-center font-black border-r border-slate-100 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showResistance ? 'bg-resistance text-white' : 'text-slate-300 italic opacity-40'}`}>
-                              {showResistance ? 'RESISTANCE' : '—'}
-                            </td>
-
-                            <td className="text-center font-black bg-brand-teal text-white border-x border-white/10 text-[11px] py-2 shadow-inner tracking-tight relative">
+                            <td className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
+                              isAtTheMoney 
+                                ? 'bg-brand-teal text-white ring-1 ring-white/10 z-20 shadow-lg scale-[1.005]' 
+                                : isCallHighlight && isPutHighlight
+                                  ? 'bg-gradient-to-r from-rose-100 to-emerald-100 text-slate-900 border-x-rose-200'
+                                  : isCallHighlight
+                                    ? 'bg-rose-100 text-rose-800 border-x-rose-200 shadow-sm'
+                                    : isPutHighlight
+                                      ? 'bg-emerald-100 text-emerald-800 border-x-emerald-200 shadow-sm'
+                                      : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
+                            }`}>
                               {row.strikePrice.toLocaleString()}
                             </td>
                             
-                            <td className={`text-center font-black border-r-2 border-slate-200 text-[10px] tracking-tighter py-1.5 transition-colors duration-500 ${showSupport ? 'bg-support text-white' : 'text-slate-300 italic opacity-40'}`}>
-                              {showSupport ? 'SUPPORT' : '—'}
-                            </td>
-                            
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-800 font-medium">{row.putOI.toLocaleString()}</td>
-                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-700 font-black' : 'text-rose-700 font-black'}`}>{row.putChngOI.toLocaleString()}</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold">{(row.putVolume / 1000).toFixed(1)}k</td>
-                            <td className={`text-center border-r border-slate-100 italic font-black ${row.putChng >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{row.putChng}</td>
-                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/50' : 'text-amber-700 font-black'}`}>
-                              {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400" />}
+                            <td className={`text-center border-r border-slate-100 transition-all ${row.pcrVol >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.pcrVol}</td>
+                            <td className={`text-center border-r border-slate-100 transition-all ${row.pcrOI >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.pcrOI}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
+                              {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400/50" />}
                               <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
                             </td>
-                            <td className="text-center font-bold border-r border-slate-100 text-slate-500">{row.pcrOI}</td>
-                            <td className="text-center font-bold text-slate-500">{row.pcrVol}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.putChngOI.toLocaleString()}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 italic font-bold">{(row.putVolume / 1000).toFixed(1)}k</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 font-medium">{row.putOI.toLocaleString()}</td>
+                            <td className={`text-center italic font-black ${row.putChng >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.putChng}</td>
                           </tr>
                         );
                       });
