@@ -28,6 +28,8 @@ interface OptionChainRow {
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+  const [isLiveActive, setIsLiveActive] = useState(false);
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
   const [symbolName, setSymbolName] = useState<string | null>(null);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
@@ -41,10 +43,13 @@ export default function App() {
   const [logoError, setLogoError] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
   const [hasShownPopupThisSession, setHasShownPopupThisSession] = useState(false);
+  const spotRowRef = useRef<HTMLTableRowElement>(null);
 
   const handleReset = useCallback(() => {
     setData([]);
     setSpotPrice(null);
+    setLivePrice(null);
+    setIsLiveActive(false);
     setAsOfTime(null);
     setSymbolName(null);
     setIvSentiment(null);
@@ -57,6 +62,40 @@ export default function App() {
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    const fetchLivePrice = async () => {
+      if (!symbolName) return;
+      try {
+        const res = await fetch(`/api/price/${symbolName}`);
+        const data = await res.json();
+        if (data.price) {
+          setLivePrice(data.price);
+          setIsLiveActive(true);
+        }
+      } catch (err) {
+        console.error("Live price fetch failed:", err);
+        setIsLiveActive(false);
+      }
+    };
+
+    if (symbolName) {
+      fetchLivePrice();
+      interval = setInterval(fetchLivePrice, 30000); // Poll every 30s
+    }
+
+    return () => clearInterval(interval);
+  }, [symbolName]);
+
+  useEffect(() => {
+    if (data.length > 0 && (livePrice || spotPrice)) {
+      setTimeout(() => {
+        spotRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }, [data.length, livePrice, spotPrice]);
 
   useEffect(() => {
     if (showScrollPopup) {
@@ -95,35 +134,42 @@ export default function App() {
           let detectedInstrument: string | null = null;
           let detectedTime: string | null = null;
           
-          for (const row of rawData.slice(0, 15)) {
-            for (const cell of row) {
-              if (cell && (cell.includes('Underlying') || cell.includes('Spot') || cell.includes('Index') || cell.includes('Stock'))) {
-                // Try to extract the instrument name (e.g. NIFTY, BANKNIFTY, SBIN)
-                // Pattern search: "Underlying Index: NIFTY", "Underlying Stock: SBIN"
-                const nameMatch = cell.match(/(?:Index|Stock|Underlying):\s*([A-Z\s]+?)(?:\s+[\d,.]|$)/i);
-                if (nameMatch && nameMatch[1]) {
-                  const rawName = nameMatch[1].trim().toUpperCase();
-                  // Normalize name
-                  if (rawName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
-                  else if (rawName.includes('FIN')) detectedInstrument = 'FINNIFTY';
-                  else if (rawName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
-                  else if (rawName.includes('NIFTY')) detectedInstrument = 'NIFTY';
-                  else detectedInstrument = rawName;
-                }
+          for (const row of rawData.slice(0, 20)) {
+            const rowStr = row.join(' ');
+            if (/underlying|spot|index|price|as on/i.test(rowStr)) {
+              // Extract instrument
+              const nameMatch = rowStr.match(/(?:Index|Stock|Underlying):\s*([A-Z\s]+?)(?:\s+[\d,.]|$)/i);
+              if (nameMatch && nameMatch[1]) {
+                const rawName = nameMatch[1].trim().toUpperCase();
+                if (rawName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
+                else if (rawName.includes('FIN')) detectedInstrument = 'FINNIFTY';
+                else if (rawName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
+                else if (rawName.includes('NIFTY')) detectedInstrument = 'NIFTY';
+                else detectedInstrument = rawName;
+              }
 
-                const priceMatch = cell.match(/[\d,.]+/g);
-                if (priceMatch) {
-                  const possiblePrices = priceMatch
-                    .map(m => parseFloat(m.replace(/,/g, '')))
-                    .filter(v => v > 100);
-                  
-                  if (possiblePrices.length > 0) {
-                    detectedSpot = possiblePrices[possiblePrices.length - 1];
+              // Robust Price Extraction
+              for (const cell of row) {
+                if (!cell) continue;
+                const numbers = cell.match(/[\d,]+(?:\.\d+)?/g);
+                if (numbers) {
+                  for (const numStr of numbers) {
+                    const cleanNum = numStr.replace(/,/g, '');
+                    const val = parseFloat(cleanNum);
+                    // Spot prices are usually > 100, but we also filter out potential year values
+                    if (val > 100 && val < 500000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
+                      detectedSpot = val;
+                      break;
+                    }
                   }
                 }
+                if (detectedSpot) break;
               }
-              if (cell && cell.includes('As on')) {
-                detectedTime = cell.replace('As on', '').trim();
+            }
+            
+            for (const cell of row) {
+              if (cell && /as on/i.test(cell)) {
+                detectedTime = cell.replace(/as on/i, '').trim();
               }
             }
           }
@@ -705,6 +751,23 @@ export default function App() {
                       </div>
                     </div>
 
+                    <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
+                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">
+                        {isLiveActive ? 'Live Market Price' : 'Spot Price'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <div className="text-lg font-black text-slate-900 leading-none">
+                          {(livePrice || spotPrice || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        {isLiveActive && (
+                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full">
+                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {anomalyStrikes.length > 0 && (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
                         <div className="flex items-center gap-2 mb-0.5">
@@ -792,18 +855,36 @@ export default function App() {
                       <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white">PCR VOL</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
+                   <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                     {(() => {
+                      const effectiveSpot = livePrice || spotPrice;
+                      
+                      // Find the strike closest to the spot price
+                      let closestStrike = -1;
+                      if (effectiveSpot !== null && data.length > 0) {
+                        closestStrike = data.reduce((prev, curr) => 
+                          Math.abs(curr.strikePrice - effectiveSpot) < Math.abs(prev.strikePrice - effectiveSpot) ? curr : prev
+                        ).strikePrice;
+                      }
+
                       return data.map((row) => {
-                        // All identified SR levels are shown since spot price is removed
-                        const showResistance = row.isResistance;
-                        const showSupport = row.isSupport;
+                        const isAtTheMoney = row.strikePrice === closestStrike;
+                        // Eliminate ITM SR levels using detected spot price if available
+                        // Resistance = Call OTM = Strike >= Spot
+                        // Support = Put OTM = Strike <= Spot
+                        const showResistance = row.isResistance && (effectiveSpot === null || row.strikePrice >= effectiveSpot);
+                        const showSupport = row.isSupport && (effectiveSpot === null || row.strikePrice <= effectiveSpot);
                         
                         return (
                             <tr 
                               key={row.strikePrice} 
+                              ref={isAtTheMoney ? spotRowRef : null}
                               data-strike={row.strikePrice}
-                              className="hover:bg-slate-100/50 group transition-all relative"
+                              className={`group transition-all border-y ${
+                                isAtTheMoney 
+                                  ? 'bg-emerald-50/50 relative z-10 shadow-[0_0_15px_rgba(45,212,191,0.2)] border-brand-teal ring-1 ring-brand-teal/30 scale-[1.002]' 
+                                  : 'hover:bg-slate-100/50 border-slate-100'
+                              }`}
                             >
                             <td className="text-center font-bold border-r border-slate-100 text-slate-500">{row.cprOI}</td>
                             <td className="text-center font-bold border-r border-slate-100 text-slate-500">{row.cprVol}</td>
