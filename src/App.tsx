@@ -73,12 +73,13 @@ export default function App() {
       }
       try {
         const res = await fetch(`/api/price/${symbolName}`);
-        const data = await res.json();
-        if (data.price) {
-          setLivePrice(data.price);
+        const result = await res.json();
+        
+        if (result.success && result.price) {
+          setLivePrice(result.price);
           setIsLiveActive(true);
-        } else if (data.error) {
-          console.warn(`Price API error for ${symbolName}:`, data.message || data.error);
+        } else {
+          console.warn(`Price API error for ${symbolName}:`, result.message || result.error);
           setIsLiveActive(false);
         }
       } catch (err) {
@@ -89,7 +90,7 @@ export default function App() {
 
     if (symbolName) {
       fetchLivePrice();
-      interval = setInterval(fetchLivePrice, 30000); // Poll every 30s
+      interval = setInterval(fetchLivePrice, 20000); // Poll every 20s to stay safe from rate limits
     }
 
     return () => clearInterval(interval);
@@ -140,62 +141,70 @@ export default function App() {
           let detectedInstrument: string | null = null;
           let detectedTime: string | null = null;
           
-          for (const row of rawData.slice(0, 20)) {
+          for (const row of rawData.slice(0, 30)) { // Check more rows
             const rowStr = row.join(' ');
-            if (/underlying|spot|index|price|as on/i.test(rowStr)) {
-              // Extract instrument - tighter regex to avoid matching weird footer text
-              const nameMatch = rowStr.match(/(?:Index|Stock|Underlying|Instrument):\s*([A-Z0-9\s\&]{2,20})/i);
+            
+            // Look for Underlying Index/Stock info
+            if (/underlying|spot|index|price|as on|value/i.test(rowStr)) {
+              // Extract instrument
+              const nameMatch = rowStr.match(/(?:Index|Stock|Underlying|Instrument|Value|Name|Symbol):\s*([A-Z0-9\s\&]{2,40})/i) || 
+                               rowStr.match(/([A-Z\s\&]{3,20})\s+(?:\d{4,})/); // e.g., "NIFTY 24205.35"
+              
               if (nameMatch && nameMatch[1]) {
                 const rawName = nameMatch[1].trim().toUpperCase();
-                // Filter out common non-instrument words and junk
-                const blacklist = ['ETERNAL', 'TOTAL', 'PRICE', 'SPOT', 'INDEX', 'AS ON', 'OFFLINE', 'SYMBOL', 'UNDERLYING'];
-                if (!blacklist.some(b => rawName === b || rawName.includes(b)) && rawName.length > 2) {
-                  let finalName = rawName.split(/\s{2,}/)[0].split(':')[0].trim(); // Take first part and remove remaining colons
+                const blacklist = ['ETERNAL', 'TOTAL', 'PRICE', 'SPOT', 'INDEX', 'AS ON', 'OFFLINE', 'SYMBOL', 'UNDERLYING', 'VALUE'];
+                if (!blacklist.some(b => rawName === b || rawName.includes(b)) && rawName.length >= 2) {
+                  let finalName = rawName.split(/\s{2,}/)[0].split(':')[0].trim();
                   if (finalName.includes('BANK')) detectedInstrument = 'BANKNIFTY';
                   else if (finalName.includes('FIN')) detectedInstrument = 'FINNIFTY';
                   else if (finalName.includes('MID')) detectedInstrument = 'MIDCPNIFTY';
                   else if (finalName.includes('NIFTY')) detectedInstrument = 'NIFTY';
-                  else if (finalName.length > 2) detectedInstrument = finalName;
+                  else detectedInstrument = finalName.match(/[A-Z0-9]+/)?.[0] || finalName;
                 }
               }
 
-              // Robust Price Extraction
-              for (const cell of row) {
-                if (!cell) continue;
-                const numbers = cell.match(/[\d,]+(?:\.\d+)?/g);
-                if (numbers) {
-                  for (const numStr of numbers) {
-                    const cleanNum = numStr.replace(/,/g, '');
-                    const val = parseFloat(cleanNum);
-                    // Spot prices are usually > 10, expand range for penny stocks
-                    if (val > 10 && val < 1000000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
-                      detectedSpot = val;
-                      break;
+              // Robust Price Extraction from current row
+              const numbers = rowStr.match(/[\d,]+(?:\.\d+)?/g);
+              if (numbers) {
+                for (const numStr of numbers) {
+                  const cleanNum = numStr.replace(/,/g, '');
+                  const val = parseFloat(cleanNum);
+                  // Spot prices are usually > 10, check for realistic stock/index values
+                  if (val > 5 && val < 500000 && !rowStr.includes(`202${numStr.slice(-1)}`)) {
+                    // Avoid matching timestamps or dates if possible
+                    if (numStr.length < 10) {
+                       detectedSpot = val;
+                       break;
                     }
                   }
                 }
-                if (detectedSpot) break;
               }
             }
             
-            for (const cell of row) {
-              if (cell && /as on/i.test(cell)) {
-                detectedTime = cell.replace(/as on/i, '').trim();
-              }
+            if (rowStr.toLowerCase().includes('as on')) {
+              detectedTime = rowStr.split(/as on/i)[1]?.trim() || detectedTime;
+            }
+
+            if (detectedSpot && detectedInstrument) break;
+          }
+
+          // Backup: If still no spot, look for it in ANY row before the data starts
+          if (!detectedSpot) {
+            const dataStartIndex = rawData.findIndex(row => row.some(cell => cell.toLowerCase().includes('strike')));
+            for (let i = 0; i < (dataStartIndex > -1 ? dataStartIndex : 20); i++) {
+               const rowStr = rawData[i].join(' ');
+               const numbers = rowStr.match(/[\d,]+\.\d{2}/g); // Look specifically for 2-decimal floats
+               if (numbers) {
+                 detectedSpot = parseFloat(numbers[0].replace(/,/g, ''));
+                 break;
+               }
             }
           }
 
-          // Override filename-detected symbol with content-detected one if found
-          if (detectedInstrument) {
-            detectedSymbol = detectedInstrument;
-          }
-
-          if (detectedSymbol) {
-            setSymbolName(detectedSymbol);
-          }
-
-          setSpotPrice(detectedSpot);
-          setAsOfTime(detectedTime);
+          if (detectedInstrument) detectedSymbol = detectedInstrument;
+          if (detectedSymbol) setSymbolName(detectedSymbol);
+          if (detectedSpot) setSpotPrice(detectedSpot);
+          if (detectedTime) setAsOfTime(detectedTime);
 
           const dataStartIndex = rawData.findIndex(row => 
             row.some(cell => cell.toLowerCase().includes('strike'))
