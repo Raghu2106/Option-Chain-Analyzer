@@ -929,14 +929,31 @@ export default function App() {
                       <th className="w-16 text-slate-600 sticky top-10 z-30 bg-slate-200 italic">CHG</th>
                     </tr>
                   </thead>
-                   <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
+                  <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                     {(() => {
                       // Use live price if available (except for MIDCPNIFTY as per request)
                       const effectiveSpot = (symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') 
                         ? liveSpotMap[symbolName] 
-                        : spotPrice;
+                        : (spotPrice || 0);
                       
-                      // Find the strike closest to the spot price
+                      // Identify highlight zones for ranking by distance
+                      const supportStrikes = data
+                        .filter(r => {
+                          const isPutOTM = effectiveSpot !== null && r.strikePrice <= effectiveSpot;
+                          return isPutOTM && (r.pcrOI >= 6 || r.pcrVol >= 6);
+                        })
+                        .map(r => ({ strike: r.strikePrice, dist: Math.abs(r.strikePrice - effectiveSpot) }))
+                        .sort((a, b) => a.dist - b.dist);
+
+                      const resistanceStrikes = data
+                        .filter(r => {
+                          const isCallOTM = effectiveSpot !== null && r.strikePrice >= effectiveSpot;
+                          return isCallOTM && (r.cprOI >= 6 || r.cprVol >= 6);
+                        })
+                        .map(r => ({ strike: r.strikePrice, dist: Math.abs(r.strikePrice - effectiveSpot) }))
+                        .sort((a, b) => a.dist - b.dist);
+
+                      // Find the strike closest to the spot price for ATM row highlighting
                       let closestStrike = -1;
                       if (effectiveSpot !== null && data.length > 0) {
                         closestStrike = data.reduce((prev, curr) => 
@@ -948,12 +965,38 @@ export default function App() {
                         const isAtTheMoney = row.strikePrice === closestStrike;
                         const isCallOTM = effectiveSpot !== null && row.strikePrice >= effectiveSpot;
                         const isPutOTM = effectiveSpot !== null && row.strikePrice <= effectiveSpot;
-                        const isCallHighlight = isCallOTM && (row.cprOI >= 6 || row.cprVol >= 6);
-                        const isPutHighlight = isPutOTM && (row.pcrOI >= 6 || row.pcrVol >= 6);
-
-                        // Resistance = Call OTM = Strike >= Spot
-                        // Support = Put OTM = Strike <= Spot
                         
+                        // Get ranks for shade selection
+                        const sRank = supportStrikes.findIndex(z => z.strike === row.strikePrice);
+                        const rRank = resistanceStrikes.findIndex(z => z.strike === row.strikePrice);
+
+                        let strikeHighlightClass = '';
+                        if (sRank !== -1) {
+                          const sShades = [
+                            'bg-emerald-200 text-emerald-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)]',
+                            'bg-emerald-300 text-emerald-950',
+                            'bg-emerald-400 text-white font-black',
+                            'bg-emerald-500 text-white font-black',
+                            'bg-emerald-600 text-white font-black'
+                          ];
+                          const baseClass = sShades[Math.min(sRank, 4)];
+                          strikeHighlightClass = sRank === 0 
+                            ? `${baseClass} shadow-[0_4px_12px_-2px_rgba(16,185,129,0.25)] z-10 scale-[1.02] ring-1 ring-emerald-300` 
+                            : baseClass;
+                        } else if (rRank !== -1) {
+                          const rShades = [
+                            'bg-rose-200 text-rose-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)]',
+                            'bg-rose-300 text-rose-950',
+                            'bg-rose-400 text-white font-black',
+                            'bg-rose-500 text-white font-black',
+                            'bg-rose-600 text-white font-black'
+                          ];
+                          const baseClass = rShades[Math.min(rRank, 4)];
+                          strikeHighlightClass = rRank === 0 
+                            ? `${baseClass} shadow-[0_4px_12px_-2px_rgba(225,29,72,0.25)] z-10 scale-[1.02] ring-1 ring-rose-300` 
+                            : baseClass;
+                        }
+
                         return (
                             <tr 
                               key={row.strikePrice} 
@@ -975,19 +1018,21 @@ export default function App() {
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.cprOI >= 6 && isCallOTM)
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] ring-1 ring-rose-200 relative z-10' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_4px_12px_-2px_rgba(225,29,72,0.15)] ring-1 ring-rose-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all duration-300 ${
                               (row.cprVol >= 6 && isCallOTM) 
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] ring-1 ring-rose-200 relative z-10' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_4px_12px_-2px_rgba(225,29,72,0.15)] ring-1 ring-rose-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
                             
                             <td className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
                               isAtTheMoney 
                                 ? 'bg-brand-teal text-white ring-1 ring-white/10 z-20 shadow-lg scale-[1.005]' 
-                                : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
+                                : strikeHighlightClass
+                                  ? strikeHighlightClass
+                                  : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
                             }`}>
                                {row.strikePrice.toLocaleString()}
                             </td>
