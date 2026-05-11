@@ -64,6 +64,7 @@ export default function App() {
   const [logoError, setLogoError] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
   const [hasShownPopupThisSession, setHasShownPopupThisSession] = useState(false);
+  const [hasScrolledToSpot, setHasScrolledToSpot] = useState(false);
   const spotRowRef = useRef<HTMLTableRowElement>(null);
 
   const handleReset = useCallback(() => {
@@ -111,14 +112,17 @@ export default function App() {
   }, [fetchLiveData]);
 
   useEffect(() => {
-    if (data.length > 0) {
+    if (data.length > 0 && !hasScrolledToSpot) {
       // Small delay to ensure table is rendered
       const timer = setTimeout(() => {
-        spotRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (spotRowRef.current) {
+          spotRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setHasScrolledToSpot(true);
+        }
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [data.length, symbolName, liveSpotMap]);
+  }, [data.length, hasScrolledToSpot, symbolName, liveSpotMap]);
 
   useEffect(() => {
     if (showScrollPopup) {
@@ -326,6 +330,7 @@ export default function App() {
             .filter((r): r is OptionChainRow => r !== null);
 
           setData(parsedRows.sort((a, b) => a.strikePrice - b.strikePrice));
+          setHasScrolledToSpot(false); // Reset for new analysis
           
           if (!hasShownPopupThisSession) {
             setShowScrollPopup(true);
@@ -839,11 +844,11 @@ export default function App() {
                       </div>
                     </div>
 
-                    {anomalyStrikes.length > 0 && (
-                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <span className="text-[7px] font-black text-amber-500 uppercase tracking-[0.3em]">IV Anomalies</span>
-                        </div>
+                    <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[7px] font-black text-amber-500 uppercase tracking-[0.3em]">IV Anomaly Status</span>
+                      </div>
+                      {anomalyStrikes.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {anomalyStrikes.slice(0, 4).map(strike => (
                             <span key={strike} className="text-[9px] font-black text-amber-700 bg-amber-50 px-1 border border-amber-100 rounded tabular-nums">
@@ -854,8 +859,10 @@ export default function App() {
                             <span className="text-[7px] font-black text-slate-400">+{anomalyStrikes.length - 4}</span>
                           )}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">IV Anomaly not found</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-3 ml-auto">
@@ -976,10 +983,9 @@ export default function App() {
                             'bg-emerald-200 text-emerald-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)]',
                             'bg-emerald-300 text-emerald-950',
                             'bg-emerald-400 text-white font-black',
-                            'bg-emerald-500 text-white font-black',
-                            'bg-emerald-600 text-white font-black'
+                            'bg-emerald-500 text-white font-black'
                           ];
-                          const baseClass = sShades[Math.min(sRank, 4)];
+                          const baseClass = sShades[Math.min(sRank, 3)];
                           strikeHighlightClass = sRank === 0 
                             ? `${baseClass} shadow-[0_4px_12px_-2px_rgba(16,185,129,0.25)] z-10 scale-[1.02] ring-1 ring-emerald-300` 
                             : baseClass;
@@ -988,10 +994,9 @@ export default function App() {
                             'bg-rose-200 text-rose-900 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3)]',
                             'bg-rose-300 text-rose-950',
                             'bg-rose-400 text-white font-black',
-                            'bg-rose-500 text-white font-black',
-                            'bg-rose-600 text-white font-black'
+                            'bg-rose-500 text-white font-black'
                           ];
-                          const baseClass = rShades[Math.min(rRank, 4)];
+                          const baseClass = rShades[Math.min(rRank, 3)];
                           strikeHighlightClass = rRank === 0 
                             ? `${baseClass} shadow-[0_4px_12px_-2px_rgba(225,29,72,0.25)] z-10 scale-[1.02] ring-1 ring-rose-300` 
                             : baseClass;
