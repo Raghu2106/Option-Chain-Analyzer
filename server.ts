@@ -3,7 +3,6 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from "axios";
-import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,15 +11,6 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const PORT = 3000;
-
-  // Initialize Gemini
-  const genAI = process.env.GEMINI_API_KEY 
-    ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) 
-    : null;
-
-  if (!process.env.GEMINI_API_KEY) {
-    console.warn("[AI-Price-API] GEMINI_API_KEY is not defined in environment");
-  }
 
   // Simple in-memory cache to mitigate 429 errors from Yahoo
   const priceCache: Record<string, { price: number, timestamp: number }> = {};
@@ -31,43 +21,155 @@ async function startServer() {
     res.json({ status: "ok" });
   });
 
-  app.get("/api/price-ai/:symbol", async (req, res) => {
-    const { symbol } = req.params;
-    const normalizedSymbol = symbol.toUpperCase().trim().replace(/\s+/g, '');
+  // New Centralized Price Logic
+  app.get("/api/live-price", async (req, res) => {
+    const symbol = String(req.query.symbol || "NIFTY").toUpperCase();
+    const normalizedSymbol = symbol.trim().replace(/\s+/g, '');
+    
+    // 1. Check Cache
+    const cached = priceCache[normalizedSymbol];
+    if (cached && Date.now() - cached.timestamp < 10000) {
+      return res.json({ success: true, price: cached.price, source: 'Cache' });
+    }
 
-    if (!genAI) {
-      return res.status(500).json({ success: false, error: "Gemini API key not configured" });
+    // 2. Try Python Proxy if configured (e.g. AWS Mumbai)
+    const PROXY_URL = process.env.MARKET_PROXY_URL;
+    if (PROXY_URL) {
+      try {
+        const proxyRes = await axios.get(`${PROXY_URL}/price/${normalizedSymbol}`, { timeout: 4000 });
+        if (proxyRes.data?.success) {
+          const price = proxyRes.data.price;
+          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
+          return res.json({ success: true, price, source: proxyRes.data.source || 'Proxy' });
+        }
+      } catch (e) {
+        console.warn(`[Live-Price] Proxy check failed for ${normalizedSymbol}`);
+      }
+    }
+
+    // 3. Chain fallback logic
+    // We already have /api/price-mc and /api/price logic. Let's reuse them or their logic.
+    
+    // Internal Helper for MC
+    async function tryMC(sym: string) {
+      const indexMap: Record<string, string> = { "NIFTY": "in%3BNSX", "NIFTY50": "in%3BNSX", "BANKNIFTY": "in%3BNBK" };
+      const url = indexMap[sym] ? 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[sym]}` : 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${sym}`;
+      
+      const response = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
+      const data = response.data?.data;
+      const priceStr = data?.lastprice || data?.price;
+      if (priceStr) return parseFloat(String(priceStr).replace(/,/g, ''));
+      return null;
+    }
+
+    // Internal Helper for Yahoo
+    async function tryYahoo(sym: string) {
+      const symbolMap: Record<string, string> = { "NIFTY": "^NSEI", "BANKNIFTY": "^NSEBANK" };
+      const ySym = symbolMap[sym] || `${sym}.NS`;
+      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ySym}?interval=1m&range=1d`, { timeout: 3000 });
+      return response.data?.chart?.result?.[0]?.meta?.regularMarketPrice;
     }
 
     try {
-      console.log(`[AI-Price-API] Attempting fetch for ${normalizedSymbol} via Gemini (1.5 Flash)`);
-      
-      const response = await (genAI as any).models.generateContent({ 
-        model: "gemini-1.5-flash",
-        contents: [{ role: "user", parts: [{ text: `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.` }] }],
-        config: {
-          tools: [{ googleSearch: {} }]
-        }
-      });
-
-      const text = response.text?.()?.trim() || response.text || "";
-      
-      console.log(`[AI-Price-API] Gemini response for ${normalizedSymbol}: ${text}`);
-      
-      const match = text.match(/[\d,]+(?:\.\d+)?/);
-      if (match) {
-        const price = parseFloat(match[0].replace(/,/g, ''));
-        if (!isNaN(price) && price > 0) {
-          // Also update Yahoo cache so fallback has data
-          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
-          return res.json({ price, instrument: normalizedSymbol, timestamp: Date.now(), success: true, ai: true });
-        }
+      const mcPrice = await tryMC(normalizedSymbol).catch(() => null);
+      if (mcPrice) {
+        priceCache[normalizedSymbol] = { price: mcPrice, timestamp: Date.now() };
+        return res.json({ success: true, price: mcPrice, source: 'MoneyControl' });
       }
+
+      const yahooPrice = await tryYahoo(normalizedSymbol).catch(() => null);
+      if (yahooPrice) {
+        priceCache[normalizedSymbol] = { price: yahooPrice, timestamp: Date.now() };
+        return res.json({ success: true, price: yahooPrice, source: 'Yahoo Finance' });
+      }
+
+      res.status(404).json({ success: false, error: "Price not found" });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  app.get("/api/price-mc/:symbol", async (req, res) => {
+    const { symbol } = req.params;
+    const normalizedSymbol = symbol.toUpperCase().trim().replace(/\s+/g, '');
+
+    // Mapping for MoneyControl
+    const indexMap: Record<string, string> = {
+      "NIFTY": "in%3BNSX",
+      "NIFTY50": "in%3BNSX",
+      "BANKNIFTY": "in%3BNBK",
+      "FINNIFTY": "in%3BNFS",
+      "MIDCPNIFTY": "in%3BNMS",
+      "NIFTYIT": "in%3BNIT"
+    };
+
+    const stockMap: Record<string, string> = {
+      "RELIANCE": "RELIANCE",
+      "HDFCBANK": "HDF01",
+      "ICICIBANK": "ICI02",
+      "INFY": "INF04",
+      "TCS": "TCS"
+    };
+
+    try {
+      let url = "";
+      let isIndex = !!indexMap[normalizedSymbol];
       
-      throw new Error("Could not extract valid price from AI response");
+      if (isIndex) {
+        url = `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[normalizedSymbol]}`;
+      } else {
+        const mcStockId = stockMap[normalizedSymbol] || normalizedSymbol;
+        url = `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${mcStockId}`;
+      }
+
+      console.log(`[Price-MC] Attempting fetch for ${normalizedSymbol} via ${url}`);
+      
+      // Attempt 1: Specific endpoint
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+          },
+          timeout: 3000
+        });
+
+        if (response.data?.data) {
+          const data = response.data.data;
+          const priceStr = data.lastprice || data.price || data.price_200days;
+          if (priceStr) {
+            const price = parseFloat(String(priceStr).replace(/,/g, ''));
+            if (!isNaN(price) && price > 0) {
+              priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
+              return res.json({ success: true, price, symbol: normalizedSymbol, source: 'MoneyControl' });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn(`[Price-MC] Primary attempt failed for ${normalizedSymbol}`);
+      }
+
+      // Attempt 2: "Notlisted" fallback for stocks
+      if (!isIndex) {
+         try {
+           const altUrl = `https://priceapi.moneycontrol.com/pricefeed/notlisted/stockprice/${normalizedSymbol}`;
+           const altRes = await axios.get(altUrl, { timeout: 3000 });
+           if (altRes.data?.data?.lastprice) {
+              const price = parseFloat(altRes.data.data.lastprice.replace(/,/g, ''));
+              if (!isNaN(price) && price > 0) {
+                 priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
+                 return res.json({ success: true, price, symbol: normalizedSymbol, source: 'MoneyControl-Alt' });
+              }
+           }
+         } catch (e) {}
+      }
+
+      // If we are here, MoneyControl failed or returned no data
+      res.json({ success: false, error: "Price data not found in MoneyControl" });
     } catch (error: any) {
-      console.error(`[AI-Price-API] Error for ${symbol}:`, error.message);
-      res.status(200).json({ success: false, error: error.message });
+      console.error(`[Price-MC] Error for ${symbol}:`, error.message);
+      res.json({ success: false, error: error.message });
     }
   });
 
