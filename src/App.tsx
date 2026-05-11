@@ -28,6 +28,8 @@ interface OptionChainRow {
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
+  const [liveSpotMap, setLiveSpotMap] = useState<Record<string, number>>({});
+  const [lastLiveUpdate, setLastLiveUpdate] = useState<string | null>(null);
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
   const [symbolName, setSymbolName] = useState<string | null>(null);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
@@ -52,20 +54,50 @@ export default function App() {
     setAnomalyStrikes([]);
     setError(null);
     setIsHovering(false);
-    // Ensure we scroll back to top
-    if (homeContainerRef.current) {
-      homeContainerRef.current.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
+  const fetchLiveData = useCallback(async () => {
+    try {
+      const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTA7we5_ncvlBlEr4KyFryQxQjFvFJvSOQqXf3LVYyVMzGFpfjkk6P3plCBiUHhml6VCRAkXogedRNs/pub?gid=0&single=true&output=csv');
+      const csvText = await response.text();
+      
+      Papa.parse(csvText, {
+        complete: (results) => {
+          const rows = results.data as string[][];
+          const newMap: Record<string, number> = {};
+          rows.forEach(row => {
+            if (row.length >= 2) {
+              const symbol = row[0]?.trim().toUpperCase();
+              const price = parseFloat(row[1]?.replace(/,/g, ''));
+              if (symbol && !isNaN(price)) {
+                newMap[symbol] = price;
+              }
+            }
+          });
+          setLiveSpotMap(newMap);
+          setLastLiveUpdate(new Date().toLocaleTimeString());
+        }
+      });
+    } catch (err) {
+      console.error('Failed to fetch live data:', err);
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   useEffect(() => {
-    if (data.length > 0 && spotPrice) {
-      setTimeout(() => {
+    fetchLiveData();
+    const interval = setInterval(fetchLiveData, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [fetchLiveData]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      // Small delay to ensure table is rendered
+      const timer = setTimeout(() => {
         spotRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 500);
+      }, 600);
+      return () => clearTimeout(timer);
     }
-  }, [data.length, spotPrice]);
+  }, [data.length, symbolName, liveSpotMap]);
 
   useEffect(() => {
     if (showScrollPopup) {
@@ -734,6 +766,31 @@ export default function App() {
                       </div>
                     </div>
 
+                    {/* Live Spot Price Display */}
+                    {(symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') ? (
+                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
+                        <span className="text-[7px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-0.5 animate-pulse">Live Spot Price</span>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
+                            {liveSpotMap[symbolName].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                          {spotPrice && (
+                            <span className={`text-[10px] font-bold tabular-nums ${liveSpotMap[symbolName] >= spotPrice ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {liveSpotMap[symbolName] >= spotPrice ? '▲' : '▼'} 
+                              {Math.abs(((liveSpotMap[symbolName] - spotPrice) / spotPrice) * 100).toFixed(2)}%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ) : spotPrice && (
+                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
+                        <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Static Spot Price</span>
+                        <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
+                          {spotPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    )}
+
                     {anomalyStrikes.length > 0 && (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
                         <div className="flex items-center gap-2 mb-0.5">
@@ -778,6 +835,13 @@ export default function App() {
                       <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-slate-100/50 rounded-lg border border-slate-100 text-[7px] font-bold text-slate-400">
                         <Clock size={8} className="text-slate-300" />
                         <span>Snap: {asOfTime}</span>
+                      </div>
+                    )}
+
+                    {lastLiveUpdate && (
+                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-100 text-[7px] font-bold text-emerald-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>Live Sync: {lastLiveUpdate}</span>
                       </div>
                     )}
                   </div>
@@ -826,7 +890,10 @@ export default function App() {
                   </thead>
                    <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                     {(() => {
-                      const effectiveSpot = spotPrice;
+                      // Use live price if available (except for MIDCPNIFTY as per request)
+                      const effectiveSpot = (symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') 
+                        ? liveSpotMap[symbolName] 
+                        : spotPrice;
                       
                       // Find the strike closest to the spot price
                       let closestStrike = -1;
@@ -851,9 +918,9 @@ export default function App() {
                               key={row.strikePrice} 
                               ref={isAtTheMoney ? spotRowRef : null}
                               data-strike={row.strikePrice}
-                              className={`group transition-all border-y ${
+                              className={`group transition-all border-y duration-500 ${
                                 isAtTheMoney 
-                                  ? 'bg-emerald-50/50 relative z-10 shadow-[0_0_15px_rgba(45,212,191,0.2)] border-brand-teal ring-1 ring-brand-teal/30 scale-[1.002]' 
+                                  ? 'bg-emerald-50/60 relative z-20 shadow-[0_10px_30px_-10px_rgba(45,212,191,0.3),0_4px_6px_-2px_rgba(45,212,191,0.1)] border-brand-teal ring-2 ring-brand-teal/20 scale-[1.008] -translate-y-[1px]' 
                                   : 'hover:bg-slate-100/50 border-slate-100'
                               }`}
                             >
