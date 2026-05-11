@@ -939,8 +939,16 @@ export default function App() {
                               {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400/50" />}
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
-                            <td className={`text-center border-r border-slate-100 transition-all ${row.cprOI >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.cprOI}</td>
-                            <td className={`text-center border-r-2 border-slate-200 transition-all ${row.cprVol >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.cprVol}</td>
+                            <td className={`text-center border-r border-slate-100 transition-all ${
+                              isCallHighlight 
+                                ? 'font-black text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.02]' 
+                                : 'font-bold text-slate-400'
+                            }`}>{row.cprOI}</td>
+                            <td className={`text-center border-r-2 border-slate-200 transition-all ${
+                              isCallHighlight 
+                                ? 'font-black text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.02]' 
+                                : 'font-bold text-slate-400'
+                            }`}>{row.cprVol}</td>
                             
                             <td className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
                               isAtTheMoney 
@@ -956,8 +964,16 @@ export default function App() {
                               {row.strikePrice.toLocaleString()}
                             </td>
                             
-                            <td className={`text-center border-r border-slate-100 transition-all ${row.pcrVol >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.pcrVol}</td>
-                            <td className={`text-center border-r border-slate-100 transition-all ${row.pcrOI >= 6 ? 'font-black text-slate-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] ring-1 ring-slate-200/50 relative z-10 scale-[1.02]' : 'font-bold text-slate-400'}`}>{row.pcrOI}</td>
+                            <td className={`text-center border-r border-slate-100 transition-all ${
+                              isPutHighlight 
+                                ? 'font-black text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.02]' 
+                                : 'font-bold text-slate-400'
+                            }`}>{row.pcrVol}</td>
+                            <td className={`text-center border-r border-slate-100 transition-all ${
+                              isPutHighlight 
+                                ? 'font-black text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.02]' 
+                                : 'font-bold text-slate-400'
+                            }`}>{row.pcrOI}</td>
                             <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
                               {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400/50" />}
                               <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
