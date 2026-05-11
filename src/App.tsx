@@ -90,7 +90,14 @@ export default function App() {
           rows.forEach(row => {
             if (row.length >= 2) {
               const symbol = row[0]?.trim().toUpperCase();
-              const price = parseFloat(row[1]?.replace(/,/g, ''));
+              
+              // Priority: D (index 3), then B (index 1), then C (index 2)
+              const pD = row[3] ? parseFloat(row[3].replace(/,/g, '')) : NaN;
+              const pB = row[1] ? parseFloat(row[1].replace(/,/g, '')) : NaN;
+              const pC = row[2] ? parseFloat(row[2].replace(/,/g, '')) : NaN;
+              
+              const price = !isNaN(pD) ? pD : (!isNaN(pB) ? pB : pC);
+
               if (symbol && !isNaN(price)) {
                 newMap[symbol] = price;
               }
