@@ -32,7 +32,23 @@ async function startServer() {
       return res.json({ success: true, price: cached.price, source: 'Cache' });
     }
 
-    // 2. Try Python Proxy if configured (e.g. AWS Mumbai)
+    // 2. High Priority: Google Apps Script Proxy (Bypass for Cloud IP Blocking)
+    const GAS_URL = process.env.GAS_PROXY_URL;
+    if (GAS_URL) {
+      try {
+        console.log(`[Live-Price] Routing ${normalizedSymbol} through GAS Proxy...`);
+        const gasRes = await axios.get(`${GAS_URL}?symbol=${normalizedSymbol}`, { timeout: 6000 });
+        if (gasRes.data?.success) {
+          const price = gasRes.data.price;
+          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
+          return res.json({ success: true, price, source: gasRes.data.source || 'GAS Proxy' });
+        }
+      } catch (e: any) {
+        console.warn(`[Live-Price] GAS Proxy failed: ${e.message}`);
+      }
+    }
+
+    // 3. Medium Priority: Python Proxy if configured
     const PROXY_URL = process.env.MARKET_PROXY_URL;
     if (PROXY_URL) {
       try {
