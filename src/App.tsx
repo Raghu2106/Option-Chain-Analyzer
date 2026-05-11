@@ -2,9 +2,6 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface OptionChainRow {
   strikePrice: number;
@@ -76,29 +73,17 @@ export default function App() {
       }
       
       try {
-        // Use Gemini with Google Search grounding for real-time prices
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`,
-          config: {
-            tools: [{ googleSearch: {} }]
-          }
-        });
-
-        const text = response.text?.trim() || "";
-        // Extract pure number from potential extra text
-        const match = text.match(/[\d,]+(?:\.\d+)?/);
-        if (match) {
-          const price = parseFloat(match[0].replace(/,/g, ''));
-          if (!isNaN(price) && price > 0) {
-            setLivePrice(price);
-            setIsLiveActive(true);
-            return;
-          }
-        }
+        // Call backend API which now handles Gemini with Search grounding
+        const aiRes = await fetch(`/api/price-ai/${symbolName}`);
+        const aiResult = await aiRes.json();
         
-        // Fallback to existing API if Gemini fails to give a valid number
-        console.warn("Gemini price detection failed, trying fallback API...");
+        if (aiResult.success && aiResult.price) {
+          setLivePrice(aiResult.price);
+          setIsLiveActive(true);
+          return;
+        }
+
+        // Fallback to traditional price API
         const res = await fetch(`/api/price/${symbolName}`);
         const result = await res.json();
         
@@ -116,7 +101,7 @@ export default function App() {
 
     if (symbolName) {
       fetchLivePrice();
-      interval = setInterval(fetchLivePrice, 45000); // Poll every 45s to avoid hitting Gemini rate limits too fast
+      interval = setInterval(fetchLivePrice, 45000); // Poll every 45s
     }
 
     return () => clearInterval(interval);
