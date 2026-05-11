@@ -2,6 +2,9 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface OptionChainRow {
   strikePrice: number;
@@ -73,28 +76,51 @@ export default function App() {
       }
       
       try {
-        // Call backend API which now handles Gemini with Search grounding
-        const aiRes = await fetch(`/api/price-ai/${symbolName}`);
-        const aiResult = await aiRes.json();
-        
-        if (aiResult.success && aiResult.price) {
-          setLivePrice(aiResult.price);
-          setIsLiveActive(true);
-          return;
-        }
+        // Use Gemini with Google Search grounding for real-time prices
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: [{ role: "user", parts: [{ text: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.` }] }],
+          config: {
+            tools: [{ googleSearch: {} }]
+          }
+        });
 
-        // Fallback to traditional price API
+        const text = response.text?.trim() || "";
+        console.log(`[AI-Price] Gemini response for ${symbolName}: ${text}`);
+        
+        // Extract pure number from potential extra text
+        const match = text.match(/[\d,]+(?:\.\d+)?/);
+        if (match) {
+          const price = parseFloat(match[0].replace(/,/g, ''));
+          if (!isNaN(price) && price > 0) {
+            setLivePrice(price);
+            setIsLiveActive(true);
+            return;
+          }
+        }
+        
+        // Fallback to traditional price API if Gemini fails
+        console.warn("Gemini price detection failed, trying fallback API...");
         const res = await fetch(`/api/price/${symbolName}`);
         const result = await res.json();
         
         if (result.success && result.price) {
           setLivePrice(result.price);
-          setIsLiveActive(true);
+          setIsLiveActive(false); // Not "Live" (AI) if we use the traditional fallback
         } else {
           setIsLiveActive(false);
         }
       } catch (err) {
-        console.error("Live price fetch failed:", err);
+        console.error("AI price fetch failed, trying fallback API:", err);
+        try {
+          const res = await fetch(`/api/price/${symbolName}`);
+          const result = await res.json();
+          if (result.success && result.price) {
+            setLivePrice(result.price);
+          }
+        } catch (fallbackErr) {
+          console.error("Fallback API also failed:", fallbackErr);
+        }
         setIsLiveActive(false);
       }
     };
@@ -940,12 +966,12 @@ export default function App() {
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.cprOI >= 6 
+                              isCallHighlight 
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all ${
-                              row.cprVol >= 6 
+                              isCallHighlight 
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
@@ -959,12 +985,12 @@ export default function App() {
                             </td>
                             
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.pcrVol >= 6 
+                              isPutHighlight 
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrVol}</td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.pcrOI >= 6 
+                              isPutHighlight 
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrOI}</td>
