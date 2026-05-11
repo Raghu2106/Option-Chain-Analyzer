@@ -2,6 +2,25 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from "@google/genai";
+
+const getGeminiKey = () => {
+  // Try to get key from process.env (platform injected) or import.meta.env
+  let key = "";
+  try {
+    if (typeof process !== 'undefined') {
+      key = (process.env as any).GEMINI_API_KEY || "";
+    }
+    if (!key && typeof (import.meta as any).env !== 'undefined') {
+      key = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
+    }
+  } catch (e) {
+    console.warn("Error accessing environment variables:", e);
+  }
+  return key;
+};
+
+const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
 
 interface OptionChainRow {
   strikePrice: number;
@@ -73,17 +92,36 @@ export default function App() {
       }
       
       try {
-        // Call backend API which now handles Gemini with Search grounding
-        const aiRes = await fetch(`/api/price-ai/${symbolName}`);
-        const aiResult = await aiRes.json();
+        console.log(`[AI-Price] Attempting AI fetch for ${symbolName}...`);
         
-        if (aiResult.success && aiResult.price) {
-          setLivePrice(aiResult.price);
-          setIsLiveActive(true);
-          return;
+        // Use Gemini with Google Search grounding for real-time prices in the frontend
+        const response = await ai.models.generateContent({
+          model: "gemini-3-flash-preview",
+          contents: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`,
+          config: {
+            tools: [{ googleSearch: {} }]
+          }
+        });
+
+        if (!response || !response.text) {
+          throw new Error("No response or text from Gemini");
         }
 
-        // Fallback to traditional price API
+        const text = response.text.trim();
+        console.log(`[AI-Price] Gemini response for ${symbolName}: ${text}`);
+        
+        // Extract pure number from potential extra text
+        const match = text.match(/[\d,]+(?:\.\d+)?/);
+        if (match) {
+          const price = parseFloat(match[0].replace(/,/g, ''));
+          if (!isNaN(price) && price > 0) {
+            setLivePrice(price);
+            setIsLiveActive(true);
+            return;
+          }
+        }
+        
+        // Fallback to traditional price API if Gemini fails
         console.warn("Gemini price detection failed, trying fallback API...");
         const res = await fetch(`/api/price/${symbolName}`);
         const result = await res.json();
