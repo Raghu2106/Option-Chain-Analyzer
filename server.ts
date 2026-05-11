@@ -18,7 +18,7 @@ async function startServer() {
 
   // Centralized Price Provider
   async function getPrice(symbol: string): Promise<{ price: number, source: string }> {
-    const sym = symbol.toUpperCase().trim();
+    const sym = symbol.toUpperCase().trim().replace(/\s+/g, '');
     
     // 1. Check Cache
     const cached = priceCache[sym];
@@ -26,48 +26,113 @@ async function startServer() {
       return { price: cached.price, source: 'Cache' };
     }
 
+    const errors: string[] = [];
+
     // 2. High Priority: Google Apps Script Proxy
     const GAS_URL = process.env.GAS_PROXY_URL;
     if (GAS_URL) {
       try {
-        const gasRes = await axios.get(`${GAS_URL}?symbol=${sym}`, { timeout: 5000 });
-        if (gasRes.data?.success && gasRes.data.price) {
-          const price = parseFloat(gasRes.data.price);
+        const gasRes = await axios.get(`${GAS_URL}${GAS_URL.includes('?') ? '&' : '?'}symbol=${sym}`, { timeout: 6000 });
+        if (gasRes.data?.success && (gasRes.data.price || gasRes.data.data?.price)) {
+          const price = parseFloat(String(gasRes.data.price || gasRes.data.data.price).replace(/,/g, ''));
           priceCache[sym] = { price, timestamp: Date.now() };
           return { price, source: gasRes.data.source || 'GAS Proxy' };
         }
-      } catch (e) {
-        console.warn(`[Price] GAS Proxy failed for ${sym}`);
+      } catch (e: any) {
+        errors.push(`GAS: ${e.message}`);
       }
     }
 
-    // 3. TradingView (Direct - works in some regions or via proxy)
+    // 3. TradingView (Scanner API - High Reliability for NSE)
     try {
-      const tickerMap: Record<string, string> = { "NIFTY": "NSE:NIFTY", "BANKNIFTY": "NSE:BANKNIFTY" };
+      const tickerMap: Record<string, string> = { 
+        "NIFTY": "NSE:NIFTY", 
+        "NIFTY50": "NSE:NIFTY", 
+        "BANKNIFTY": "NSE:BANKNIFTY",
+        "FINNIFTY": "NSE:FINNIFTY",
+        "MIDCPNIFTY": "NSE:MIDCPNIFTY",
+        "SENSEX": "BSE:SENSEX"
+      };
       const ticker = tickerMap[sym] || `NSE:${sym}`;
       const tvRes = await axios.post('https://scanner.tradingview.com/india/scan', {
         "symbols": { "tickers": [ticker], "query": { "types": [] } },
         "columns": ["close"]
-      }, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
+      }, { 
+        headers: { 
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+          'Referer': 'https://www.tradingview.com/'
+        }, 
+        timeout: 4000 
+      });
       
       if (tvRes.data?.data?.[0]?.d?.[0]) {
         const price = parseFloat(tvRes.data.data[0].d[0]);
         priceCache[sym] = { price, timestamp: Date.now() };
         return { price, source: 'TradingView' };
       }
-    } catch (e) {
-      console.warn(`[Price] TradingView failed for ${sym}`);
+    } catch (e: any) {
+      errors.push(`TV: ${e.message}`);
     }
 
-    // 4. AISearch (Reliable but slow)
+    // 4. MoneyControl Price API
+    try {
+      const indexMap: Record<string, string> = { 
+        "NIFTY": "in%3BNSX", 
+        "NIFTY50": "in%3BNSX",
+        "BANKNIFTY": "in%3BNBK",
+        "FINNIFTY": "in%3BNFS",
+        "MIDCPNIFTY": "in%3BNMS",
+        "SENSEX": "in%3BSNS"
+      };
+      const url = indexMap[sym] ? 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[sym]}` : 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${sym}`;
+      
+      const mcRes = await axios.get(url, { 
+        headers: { 'User-Agent': 'Mozilla/5.0' }, 
+        timeout: 4000 
+      });
+      const p = mcRes.data?.data?.lastprice || mcRes.data?.data?.price;
+      if (p) {
+        const price = parseFloat(String(p).replace(/,/g, ''));
+        priceCache[sym] = { price, timestamp: Date.now() };
+        return { price, source: 'MoneyControl' };
+      }
+    } catch (e: any) {
+      errors.push(`MC: ${e.message}`);
+    }
+
+    // 5. Yahoo Finance (v8 chart API)
+    try {
+      const yahooMap: Record<string, string> = { 
+        "NIFTY": "^NSEI", 
+        "NIFTY50": "^NSEI",
+        "BANKNIFTY": "^NSEBANK",
+        "SENSEX": "^BSESN" 
+      };
+      const ySym = yahooMap[sym] || `${sym}.NS`;
+      const yRes = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ySym}?interval=1m&range=1d`, { 
+        timeout: 4000,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      const price = yRes.data?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (price) {
+        priceCache[sym] = { price, timestamp: Date.now() };
+        return { price, source: 'Yahoo Finance' };
+      }
+    } catch (e: any) {
+      errors.push(`Yahoo: ${e.message}`);
+    }
+
+    // 6. AISearch (Final Fallback - Grounded search)
     if (process.env.GEMINI_API_KEY) {
       try {
-        const { GoogleGenAI } = await import("@google/genai");
-        const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         const result = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: `Current price of ${sym} on NSE India? Return ONLY number.` }] }],
-          tools: [{ googleSearch: {} }]
+          contents: [{ role: "user", parts: [{ text: `Real-time spot price of ${sym} on NSE Index/Stock? Return only the number.` }] }],
+          tools: [{ googleSearch: {} } as any]
         });
         const match = result.response.text().match(/[\d,]+(?:\.\d+)?/);
         if (match) {
@@ -75,27 +140,12 @@ async function startServer() {
           priceCache[sym] = { price, timestamp: Date.now() };
           return { price, source: 'AI Search' };
         }
-      } catch (e) {
-        console.warn(`[Price] AI Search failed for ${sym}`);
+      } catch (e: any) {
+        errors.push(`AI: ${e.message}`);
       }
     }
 
-    // 5. MoneyControl
-    try {
-      const indexMap: Record<string, string> = { "NIFTY": "in%3BNSX", "BANKNIFTY": "in%3BNBK" };
-      const url = indexMap[sym] ? 
-        `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[sym]}` : 
-        `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${sym}`;
-      const mcRes = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
-      const p = mcRes.data?.data?.lastprice || mcRes.data?.data?.price;
-      if (p) {
-        const price = parseFloat(String(p).replace(/,/g, ''));
-        priceCache[sym] = { price, timestamp: Date.now() };
-        return { price, source: 'MoneyControl' };
-      }
-    } catch (e) {}
-
-    throw new Error("All price sources exhausted");
+    throw new Error(`Exhausted all sources. [${errors.join(' | ')}]`);
   }
 
   // API routes

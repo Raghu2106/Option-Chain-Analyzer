@@ -2,25 +2,26 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const getGeminiKey = () => {
-  // Try to get key from process.env (platform injected) or import.meta.env
-  let key = "";
+  // Try to get key safely for browser
   try {
-    if (typeof process !== 'undefined') {
-      key = (process.env as any).GEMINI_API_KEY || "";
-    }
-    if (!key && typeof (import.meta as any).env !== 'undefined') {
-      key = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
+    // Vite injections
+    const metaEnv = (import.meta as any).env;
+    if (metaEnv?.VITE_GEMINI_API_KEY) return metaEnv.VITE_GEMINI_API_KEY;
+    
+    // Fallback if platform injects process.env (rare in browser without polyfill)
+    if (typeof process !== 'undefined' && process.env && (process.env as any).GEMINI_API_KEY) {
+      return (process.env as any).GEMINI_API_KEY;
     }
   } catch (e) {
-    console.warn("Error accessing environment variables:", e);
+    // Ignore
   }
-  return key;
+  return "";
 };
 
-const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
+const ai = new GoogleGenerativeAI(getGeminiKey());
 
 interface OptionChainRow {
   strikePrice: number;
@@ -87,41 +88,84 @@ export default function App() {
     let interval: NodeJS.Timeout;
     
       const fetchLivePrice = async () => {
-      if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName)) {
+      if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName.toUpperCase())) {
         setIsLiveActive(false);
         return;
       }
       
-      try {
-        const res = await fetch(`/api/live-price?symbol=${symbolName}`);
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`Server returned ${res.status}: ${errText.substring(0, 50)}`);
+      const tryCentralApi = async () => {
+        try {
+          const res = await fetch(`/api/live-price?symbol=${encodeURIComponent(symbolName)}`, {
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-cache'
+          });
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`Server ${res.status}: ${errText.substring(0, 30)}`);
+          }
+          const result = await res.json();
+          if (result.success && result.price) {
+            return { price: result.price, source: result.source || 'Direct' };
+          }
+          throw new Error(result.error || "Price not available");
+        } catch (e: any) {
+          throw new Error(e.message || "Network Error");
         }
-        const result = await res.json();
+      };
+
+      const tryBrowserAi = async () => {
+        const key = getGeminiKey();
+        if (!key) throw new Error("API Key missing in browser");
         
-        if (result.success && result.price) {
-          setLivePrice(result.price);
-          setIsLiveActive(true); 
-          setLastSource(result.source || 'Direct');
-          setError(null); // Clear any previous transient errors
-        } else {
-          setIsLiveActive(false);
-          console.warn("Centralized price API returned fail:", result.error);
+        const localAi = new GoogleGenerativeAI(key);
+        const model = localAi.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+        const response = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: `Real-time spot price of ${symbolName} index/stock? Return only the numerical decimal. Context: ${new Date().toISOString()}` }] }],
+          tools: [{ googleSearch: {} } as any]
+        });
+        const match = response.response.text().match(/[\d,]+(?:\.\d+)?/);
+        if (match) {
+          return { price: parseFloat(match[0].replace(/,/g, '')), source: 'AI Search (User)' };
+        }
+        throw new Error("AI price extraction failed");
+      };
+
+      try {
+        // Attempt 1: Backend
+        try {
+          const data = await tryCentralApi();
+          setLivePrice(data.price);
+          setLastSource(data.source);
+          setIsLiveActive(true);
+          setError(null);
+        } catch (be) {
+          console.warn("[Backend-Fail]", be);
+          // Attempt 2: Browser AI
+          const data = await tryBrowserAi();
+          setLivePrice(data.price);
+          setLastSource(data.source);
+          setIsLiveActive(true);
+          setError(null);
         }
       } catch (err: any) {
-        console.error("Live price fetching failed:", err);
+        console.error("[Live-Price-Error]", err.message);
+        // Don't show "Failed to fetch" globally if we can help it
         setIsLiveActive(false);
       }
-
     };
 
     if (symbolName) {
       fetchLivePrice();
       interval = setInterval(fetchLivePrice, 45000); // Poll every 45s
+      
+      const refreshHandler = () => fetchLivePrice();
+      window.addEventListener('manual-refresh-price', refreshHandler);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('manual-refresh-price', refreshHandler);
+      };
     }
-
-    return () => clearInterval(interval);
   }, [symbolName]);
 
   useEffect(() => {
@@ -796,6 +840,21 @@ export default function App() {
                         <h3 className="text-lg font-black uppercase tracking-tighter text-brand-teal leading-none">
                           {symbolName || "Market Index"}
                         </h3>
+                        <button 
+                          onClick={() => {
+                            if (symbolName) {
+                              setIsLiveActive(false);
+                              setLivePrice(null);
+                              // Trigger update
+                              const event = new CustomEvent('manual-refresh-price');
+                              window.dispatchEvent(event);
+                            }
+                          }}
+                          className="hover:rotate-180 transition-transform duration-500 text-brand-teal/30 hover:text-brand-teal"
+                          title="Refresh Price"
+                        >
+                          <Zap size={14} />
+                        </button>
                       </div>
                     </div>
 
