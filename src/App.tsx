@@ -419,7 +419,7 @@ export default function App() {
               <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">3</div>
               <div>
                 <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Analyze Matrix</h4>
-                <p className="text-sm leading-relaxed text-slate-500 font-medium">Review the Strike Map. The tool automatically flags strikes where Open Interest exceeds the 6.0x institutional barrier.</p>
+                <p className="text-sm leading-relaxed text-slate-500 font-medium">Review the Strike Map. Institutional SR levels (6.0x barrier) are color-mapped in 4 distinct shades. The levels closest to market price are prioritized with a 3D pop-out effect.</p>
               </div>
             </div>
           </div>
@@ -429,16 +429,16 @@ export default function App() {
           <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
           <div className="space-y-6">
             <div className="group">
-              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What is the 6.0x Threshold?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">It identifies levels where one side (Calls or Puts) is 600% stronger than the other, indicating a significant institutional 'wall'.</p>
+              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What are Strike Highlights?</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">We map institutional SR levels (6x barrier) using 4 shades. The level closest to spot price gets a 3D effect to show immediate resistance or support.</p>
             </div>
             <div className="group">
-              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">How to read PCR OI?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">Put-Call Ratio (PCR) above 1.0 at a strike suggests bullish bias (support), while below 1.0 suggests bearish bias (resistance).</p>
+              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Where is the IV Status?</h4>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">The analysis header tracks IV anomalies in real-time, instantly flagging strikes where 'market fear' or institutional premiums are abnormally high.</p>
             </div>
             <div className="group">
               <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Is my data secure?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">Yes. The analyzer runs 100% locally in your browser. Your CSV data is never uploaded to any server or database.</p>
+              <p className="text-sm text-slate-500 leading-relaxed font-medium">Yes. The analyzer runs 100% locally. Your CSV data is never uploaded; the analysis happens entirely within your browser's private memory.</p>
             </div>
           </div>
         </section>
@@ -450,7 +450,7 @@ export default function App() {
           <div className="relative z-10">
             <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3">Understanding IV Anomalies</h3>
             <p className="text-[13px] text-amber-900/80 leading-relaxed max-w-4xl font-medium">
-              <strong>Implied Volatility (IV)</strong> represents the market's expectation of price movement. Think of it as the <strong>"Fear Index"</strong> for specific strikes.
+              <strong>Implied Volatility (IV)</strong> represents the market's expectation of price movement. Think of it as the <strong>"Fear Index"</strong> for specific strikes, now tracked in real-time in the analysis header.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
               <div className="bg-white/60 p-4 rounded-xl">
@@ -488,10 +488,10 @@ export default function App() {
         <section className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-200">
           <h3 className="text-xs font-black uppercase tracking-widest text-brand-teal mb-3">Institutional Bias</h3>
           <p className="text-[13px] text-slate-600 leading-relaxed max-w-4xl mb-4 font-medium">
-            Institutions are typically option writers. Understanding these 6x strength zones allows you to avoid false breakouts and look for mean reversion setups.
+            Designed exclusively for NSE Indices and F&O-listed stocks, this analysis tracks institutional writing patterns. Understanding these 6x strength zones helps you avoid false breakouts and identify high-probability mean reversion setups.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-             {['NIFTY', 'BANKNIFTY', 'STOCKS', 'EXPIRY'].map(item => (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+             {['NIFTY', 'BANKNIFTY', 'STOCKS'].map(item => (
                <div key={item} className="p-2.5 bg-white rounded-xl border border-slate-100 text-center shadow-sm">
                  <span className="block text-[10px] font-black uppercase text-slate-400">{item}</span>
                </div>
@@ -744,7 +744,7 @@ export default function App() {
                 </h2>
                 
                 <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 max-w-2xl text-center font-medium">
-                  Upload your desired option chain CSV for <strong className="text-brand-teal">Indices (NIFTY, BANKNIFTY, FINNIFTY)</strong> or <strong className="text-slate-700">individual Stocks</strong> directly from the NSE website (<a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.nseindia.com/option-chain</a>) to identify institutional Support & Resistance levels based on real-time OI and Volume clusters.
+                  Upload Option Chain CSVs specifically for <strong className="text-brand-teal">NSE Indices</strong> and <strong className="text-slate-700">F&O-listed Stocks</strong> directly from the official <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">NSE website</a> to identify high-probability institutional Support & Resistance zones based on real-time OI and volume clusters.
                 </p>
                 
                 {error && (
