@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import axios from "axios";
 import { GoogleGenAI } from "@google/genai";
+import "dotenv/config";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,12 @@ async function startServer() {
   const genAI = process.env.GEMINI_API_KEY 
     ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) 
     : null;
+
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn("[AI-Price-API] GEMINI_API_KEY is not defined in environment");
+  } else {
+    console.log("[AI-Price-API] GEMINI_API_KEY is defined (length: " + process.env.GEMINI_API_KEY.length + ")");
+  }
 
   // Simple in-memory cache to mitigate 429 errors from Yahoo
   const priceCache: Record<string, { price: number, timestamp: number }> = {};
@@ -33,15 +40,18 @@ async function startServer() {
     try {
       console.log(`[AI-Price-API] Attempting fetch for ${normalizedSymbol} via Gemini`);
       
-      const response = await (genAI as any).models.generateContent({ 
-        model: "gemini-1.5-flash",
-        contents: `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`,
-        config: {
-          tools: [{ googleSearch: {} }]
-        }
+      const model = (genAI as any).getGenerativeModel({ 
+        model: "gemini-1.5-flash"
       });
 
-      const text = response.text?.()?.trim() || response.text || "";
+      const prompt = `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`;
+      
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        tools: [{ googleSearch: {} }]
+      });
+
+      const text = result.response.text().trim();
       
       console.log(`[AI-Price-API] Gemini response for ${normalizedSymbol}: ${text}`);
       
