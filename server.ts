@@ -47,9 +47,33 @@ async function startServer() {
       }
     }
 
-    // 3. Chain fallback logic
-    // We already have /api/price-mc and /api/price logic. Let's reuse them or their logic.
-    
+    // Internal Helper for TradingView (High Priority)
+    async function tryTradingView(sym: string) {
+      const tickerMap: Record<string, string> = { 
+        "NIFTY": "NSE:NIFTY", 
+        "NIFTY50": "NSE:NIFTY", 
+        "BANKNIFTY": "NSE:BANKNIFTY" 
+      };
+      
+      const ticker = tickerMap[sym] || `NSE:${sym}`;
+      const url = 'https://scanner.tradingview.com/india/scan';
+      
+      const payload = {
+          "symbols": { "tickers": [ticker], "query": { "types": [] } },
+          "columns": ["close"]
+      };
+
+      const response = await axios.post(url, payload, {
+          headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
+          timeout: 4000
+      });
+      
+      if (response.data?.data?.[0]?.d?.[0]) {
+        return parseFloat(response.data.data[0].d[0]);
+      }
+      return null;
+    }
+
     // Internal Helper for MC
     async function tryMC(sym: string) {
       const indexMap: Record<string, string> = { "NIFTY": "in%3BNSX", "NIFTY50": "in%3BNSX", "BANKNIFTY": "in%3BNBK" };
@@ -73,12 +97,21 @@ async function startServer() {
     }
 
     try {
+      // 1. Primary: TradingView
+      const tvPrice = await tryTradingView(normalizedSymbol).catch(() => null);
+      if (tvPrice) {
+        priceCache[normalizedSymbol] = { price: tvPrice, timestamp: Date.now() };
+        return res.json({ success: true, price: tvPrice, source: 'TradingView' });
+      }
+
+      // 2. Secondary: MC
       const mcPrice = await tryMC(normalizedSymbol).catch(() => null);
       if (mcPrice) {
         priceCache[normalizedSymbol] = { price: mcPrice, timestamp: Date.now() };
         return res.json({ success: true, price: mcPrice, source: 'MoneyControl' });
       }
 
+      // 3. Tertiary: Yahoo
       const yahooPrice = await tryYahoo(normalizedSymbol).catch(() => null);
       if (yahooPrice) {
         priceCache[normalizedSymbol] = { price: yahooPrice, timestamp: Date.now() };
