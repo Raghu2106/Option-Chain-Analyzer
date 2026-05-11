@@ -1,26 +1,7 @@
-import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
+import { useState, useCallback, DragEvent, useRef, useEffect, useMemo } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenAI } from "@google/genai";
-
-const getGeminiKey = () => {
-  // Try to get key from process.env (platform injected) or import.meta.env
-  let key = "";
-  try {
-    if (typeof process !== 'undefined') {
-      key = (process.env as any).GEMINI_API_KEY || "";
-    }
-    if (!key && typeof (import.meta as any).env !== 'undefined') {
-      key = (import.meta as any).env.VITE_GEMINI_API_KEY || "";
-    }
-  } catch (e) {
-    console.warn("Error accessing environment variables:", e);
-  }
-  return key;
-};
-
-const ai = new GoogleGenAI({ apiKey: getGeminiKey() });
 
 interface OptionChainRow {
   strikePrice: number;
@@ -49,6 +30,7 @@ export default function App() {
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
   const [livePrice, setLivePrice] = useState<number | null>(null);
   const [isLiveActive, setIsLiveActive] = useState(false);
+  const [priceStatus, setPriceStatus] = useState<'idle' | 'connecting' | 'live' | 'delayed' | 'fallback' | 'error'>('idle');
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
   const [symbolName, setSymbolName] = useState<string | null>(null);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
@@ -69,6 +51,7 @@ export default function App() {
     setSpotPrice(null);
     setLivePrice(null);
     setIsLiveActive(false);
+    setPriceStatus('idle');
     setAsOfTime(null);
     setSymbolName(null);
     setIvSentiment(null);
@@ -92,53 +75,41 @@ export default function App() {
       }
       
       try {
-        console.log(`[AI-Price] Attempting AI fetch for ${symbolName}...`);
+        setPriceStatus('connecting');
+        // Call backend API which now handles Gemini with Search grounding securely
+        const aiRes = await fetch(`/api/price-ai/${symbolName}`);
+        const aiResult = await aiRes.json();
         
-        // Use Gemini with Google Search grounding for real-time prices in the frontend
-        const response = await ai.models.generateContent({
-          model: "gemini-3-flash-preview",
-          contents: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`,
-          config: {
-            tools: [{ googleSearch: {} }]
-          }
-        });
-
-        if (!response || !response.text) {
-          throw new Error("No response or text from Gemini");
+        if (aiResult.success && aiResult.price) {
+          setLivePrice(aiResult.price);
+          setIsLiveActive(true);
+          setPriceStatus('live');
+          return;
         }
 
-        const text = response.text.trim();
-        console.log(`[AI-Price] Gemini response for ${symbolName}: ${text}`);
-        
-        // Extract pure number from potential extra text
-        const match = text.match(/[\d,]+(?:\.\d+)?/);
-        if (match) {
-          const price = parseFloat(match[0].replace(/,/g, ''));
-          if (!isNaN(price) && price > 0) {
-            setLivePrice(price);
-            setIsLiveActive(true);
-            return;
-          }
-        }
-        
-        // Fallback to traditional price API if Gemini fails
+        // Fallback to traditional price API
         console.warn("Gemini price detection failed, trying fallback API...");
+        setPriceStatus('fallback');
         const res = await fetch(`/api/price/${symbolName}`);
         const result = await res.json();
         
         if (result.success && result.price) {
           setLivePrice(result.price);
           setIsLiveActive(false); // Not "Live" (AI) if we use the traditional fallback
+          setPriceStatus('delayed');
         } else {
           setIsLiveActive(false);
+          setPriceStatus('error');
         }
       } catch (err) {
         console.error("AI price fetch failed, trying fallback API:", err);
+        setPriceStatus('error');
         try {
           const res = await fetch(`/api/price/${symbolName}`);
           const result = await res.json();
           if (result.success && result.price) {
             setLivePrice(result.price);
+            setPriceStatus('delayed');
           }
         } catch (fallbackErr) {
           console.error("Fallback API also failed:", fallbackErr);
@@ -843,21 +814,57 @@ export default function App() {
                               : '0.00'
                           })()}
                         </div>
-                        {isLiveActive && (
-                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest shrink-0">Live</span>
-                            <div className="w-[1px] h-2 bg-emerald-200 mx-0.5" />
-                            <Zap size={8} className="text-amber-500 fill-amber-500" />
-                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">AI Powered</span>
-                          </div>
-                        )}
-                        {!isLiveActive && symbolName && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded-lg">
-                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
-                             <span className="text-[7px] font-bold text-slate-400">OFFLINE</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          <AnimatePresence mode="wait">
+                            {priceStatus === 'live' && (
+                              <motion.div 
+                                key="live"
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm"
+                              >
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest shrink-0">Live</span>
+                                <div className="w-[1px] h-2 bg-emerald-200 mx-0.5" />
+                                <Zap size={8} className="text-amber-500 fill-amber-500" />
+                                <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">AI Powered</span>
+                              </motion.div>
+                            )}
+                            {priceStatus === 'connecting' && (
+                              <motion.div 
+                                key="connecting"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex items-center gap-1.5 px-2 py-1 bg-brand-teal/5 border border-brand-teal/20 rounded-full"
+                              >
+                                <div className="w-1 h-1 bg-brand-teal rounded-full animate-ping"></div>
+                                <span className="text-[7px] font-bold text-brand-teal/60 uppercase tracking-widest animate-pulse">Scanning NSE...</span>
+                              </motion.div>
+                            )}
+                            {(priceStatus === 'delayed' || priceStatus === 'fallback') && (
+                              <motion.div 
+                                key="delayed"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 border border-slate-200 rounded-full"
+                              >
+                                <Clock size={8} className="text-slate-400" />
+                                <span className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Delayed Price</span>
+                              </motion.div>
+                            )}
+                            {(priceStatus === 'idle' || priceStatus === 'error') && symbolName && !isLiveActive && (
+                              <motion.div 
+                                key="offline"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded-lg"
+                              >
+                                <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                <span className="text-[7px] font-bold text-slate-400">OFFLINE</span>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       </div>
                     </div>
 

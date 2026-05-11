@@ -3,6 +3,7 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
 import "dotenv/config";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,15 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Initialize Gemini
+  const genAI = process.env.GEMINI_API_KEY 
+    ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) 
+    : null;
+
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn("[AI-Price-API] GEMINI_API_KEY is not defined in environment");
+  }
+
   // Simple in-memory cache to mitigate 429 errors from Yahoo
   const priceCache: Record<string, { price: number, timestamp: number }> = {};
   const CACHE_TTL = 15000; // 15 seconds cache to avoid hitting rate limits too hard
@@ -19,6 +29,46 @@ async function startServer() {
   // API routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
+  });
+
+  app.get("/api/price-ai/:symbol", async (req, res) => {
+    const { symbol } = req.params;
+    const normalizedSymbol = symbol.toUpperCase().trim().replace(/\s+/g, '');
+
+    if (!genAI) {
+      return res.status(500).json({ success: false, error: "Gemini API key not configured" });
+    }
+
+    try {
+      console.log(`[AI-Price-API] Attempting fetch for ${normalizedSymbol} via Gemini (1.5 Flash)`);
+      
+      const response = await (genAI as any).models.generateContent({ 
+        model: "gemini-1.5-flash",
+        contents: [{ role: "user", parts: [{ text: `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.` }] }],
+        config: {
+          tools: [{ googleSearch: {} }]
+        }
+      });
+
+      const text = response.text?.()?.trim() || response.text || "";
+      
+      console.log(`[AI-Price-API] Gemini response for ${normalizedSymbol}: ${text}`);
+      
+      const match = text.match(/[\d,]+(?:\.\d+)?/);
+      if (match) {
+        const price = parseFloat(match[0].replace(/,/g, ''));
+        if (!isNaN(price) && price > 0) {
+          // Also update Yahoo cache so fallback has data
+          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
+          return res.json({ price, instrument: normalizedSymbol, timestamp: Date.now(), success: true, ai: true });
+        }
+      }
+      
+      throw new Error("Could not extract valid price from AI response");
+    } catch (error: any) {
+      console.error(`[AI-Price-API] Error for ${symbol}:`, error.message);
+      res.status(200).json({ success: false, error: error.message });
+    }
   });
 
   app.get("/api/price/:symbol", async (req, res) => {
