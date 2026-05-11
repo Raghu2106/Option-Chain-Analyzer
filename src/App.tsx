@@ -973,14 +973,14 @@ export default function App() {
                               {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400/50" />}
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
-                            <td className={`text-center border-r border-slate-100 transition-all ${
+                            <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.cprOI >= 6 && isCallOTM)
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_8px_20px_-4px_rgba(225,29,72,0.3),0_4px_8px_-4px_rgba(225,29,72,0.2)] ring-1 ring-rose-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] ring-1 ring-rose-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
-                            <td className={`text-center border-r-2 border-slate-200 transition-all ${
+                            <td className={`text-center border-r-2 border-slate-200 transition-all duration-300 ${
                               (row.cprVol >= 6 && isCallOTM) 
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_8px_20px_-4px_rgba(225,29,72,0.3),0_4px_8px_-4px_rgba(225,29,72,0.2)] ring-1 ring-rose-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_2px_10px_-3px_rgba(225,29,72,0.2)] ring-1 ring-rose-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
                             
@@ -992,14 +992,14 @@ export default function App() {
                                {row.strikePrice.toLocaleString()}
                             </td>
                             
-                            <td className={`text-center border-r border-slate-100 transition-all ${
+                            <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.pcrVol >= 6 && isPutOTM) 
-                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3),0_4px_8px_-4px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrVol}</td>
-                            <td className={`text-center border-r border-slate-100 transition-all ${
+                            <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.pcrOI >= 6 && isPutOTM)
-                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3),0_4px_8px_-4px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200 relative z-10' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrOI}</td>
                             <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
