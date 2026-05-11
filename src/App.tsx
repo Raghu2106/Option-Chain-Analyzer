@@ -1,27 +1,7 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Zap, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const getGeminiKey = () => {
-  // Try to get key safely for browser
-  try {
-    // Vite injections
-    const metaEnv = (import.meta as any).env;
-    if (metaEnv?.VITE_GEMINI_API_KEY) return metaEnv.VITE_GEMINI_API_KEY;
-    
-    // Fallback if platform injects process.env (rare in browser without polyfill)
-    if (typeof process !== 'undefined' && process.env && (process.env as any).GEMINI_API_KEY) {
-      return (process.env as any).GEMINI_API_KEY;
-    }
-  } catch (e) {
-    // Ignore
-  }
-  return "";
-};
-
-const ai = new GoogleGenerativeAI(getGeminiKey());
 
 interface OptionChainRow {
   strikePrice: number;
@@ -48,14 +28,11 @@ interface OptionChainRow {
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
-  const [livePrice, setLivePrice] = useState<number | null>(null);
-  const [isLiveActive, setIsLiveActive] = useState(false);
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
   const [symbolName, setSymbolName] = useState<string | null>(null);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastSource, setLastSource] = useState<string | null>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
@@ -69,8 +46,6 @@ export default function App() {
   const handleReset = useCallback(() => {
     setData([]);
     setSpotPrice(null);
-    setLivePrice(null);
-    setIsLiveActive(false);
     setAsOfTime(null);
     setSymbolName(null);
     setIvSentiment(null);
@@ -85,96 +60,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-      const fetchLivePrice = async () => {
-      if (!symbolName || ["ETERNAL", "TOTAL", "PRICE", "SYMBOL"].includes(symbolName.toUpperCase())) {
-        setIsLiveActive(false);
-        return;
-      }
-      
-      const tryCentralApi = async () => {
-        try {
-          const res = await fetch(`/api/live-price?symbol=${encodeURIComponent(symbolName)}`, {
-            headers: { 'Accept': 'application/json' },
-            cache: 'no-cache'
-          });
-          if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(`Server ${res.status}: ${errText.substring(0, 30)}`);
-          }
-          const result = await res.json();
-          if (result.success && result.price) {
-            return { price: result.price, source: result.source || 'Direct' };
-          }
-          throw new Error(result.error || "Price not available");
-        } catch (e: any) {
-          throw new Error(e.message || "Network Error");
-        }
-      };
-
-      const tryBrowserAi = async () => {
-        const key = getGeminiKey();
-        if (!key) throw new Error("API Key missing in browser");
-        
-        const localAi = new GoogleGenerativeAI(key);
-        const model = localAi.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-        const response = await model.generateContent({
-          contents: [{ role: "user", parts: [{ text: `Real-time spot price of ${symbolName} index/stock? Return only the numerical decimal. Context: ${new Date().toISOString()}` }] }],
-          tools: [{ googleSearch: {} } as any]
-        });
-        const match = response.response.text().match(/[\d,]+(?:\.\d+)?/);
-        if (match) {
-          return { price: parseFloat(match[0].replace(/,/g, '')), source: 'AI Search (User)' };
-        }
-        throw new Error("AI price extraction failed");
-      };
-
-      try {
-        // Attempt 1: Backend
-        try {
-          const data = await tryCentralApi();
-          setLivePrice(data.price);
-          setLastSource(data.source);
-          setIsLiveActive(true);
-          setError(null);
-        } catch (be) {
-          console.warn("[Backend-Fail]", be);
-          // Attempt 2: Browser AI
-          const data = await tryBrowserAi();
-          setLivePrice(data.price);
-          setLastSource(data.source);
-          setIsLiveActive(true);
-          setError(null);
-        }
-      } catch (err: any) {
-        console.error("[Live-Price-Error]", err.message);
-        // Don't show "Failed to fetch" globally if we can help it
-        setIsLiveActive(false);
-      }
-    };
-
-    if (symbolName) {
-      fetchLivePrice();
-      interval = setInterval(fetchLivePrice, 45000); // Poll every 45s
-      
-      const refreshHandler = () => fetchLivePrice();
-      window.addEventListener('manual-refresh-price', refreshHandler);
-      
-      return () => {
-        clearInterval(interval);
-        window.removeEventListener('manual-refresh-price', refreshHandler);
-      };
-    }
-  }, [symbolName]);
-
-  useEffect(() => {
-    if (data.length > 0 && (livePrice || spotPrice)) {
+    if (data.length > 0 && spotPrice) {
       setTimeout(() => {
         spotRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 500);
     }
-  }, [data.length, livePrice, spotPrice]);
+  }, [data.length, spotPrice]);
 
   useEffect(() => {
     if (showScrollPopup) {
@@ -840,52 +731,6 @@ export default function App() {
                         <h3 className="text-lg font-black uppercase tracking-tighter text-brand-teal leading-none">
                           {symbolName || "Market Index"}
                         </h3>
-                        <button 
-                          onClick={() => {
-                            if (symbolName) {
-                              setIsLiveActive(false);
-                              setLivePrice(null);
-                              // Trigger update
-                              const event = new CustomEvent('manual-refresh-price');
-                              window.dispatchEvent(event);
-                            }
-                          }}
-                          className="hover:rotate-180 transition-transform duration-500 text-brand-teal/30 hover:text-brand-teal"
-                          title="Refresh Price"
-                        >
-                          <Zap size={14} />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
-                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">
-                        {isLiveActive ? 'Live Market Price' : 'Detected Spot Price'}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg font-black text-slate-900 leading-none">
-                          {(() => {
-                            const val = livePrice || spotPrice;
-                            return val && val > 0 
-                              ? val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                              : '0.00'
-                          })()}
-                        </div>
-                        {isLiveActive && (
-                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 border border-emerald-200 rounded-full shadow-sm">
-                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                            <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest shrink-0">Live</span>
-                            <div className="w-[1px] h-2 bg-emerald-200 mx-0.5" />
-                            <Zap size={8} className="text-amber-500 fill-amber-500" />
-                            <span className="text-[7px] font-black text-slate-500 uppercase tracking-tighter">{lastSource || 'AI Powered'}</span>
-                          </div>
-                        )}
-                        {!isLiveActive && symbolName && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded-lg">
-                             <div className="w-1 h-1 bg-slate-300 rounded-full"></div>
-                             <span className="text-[7px] font-bold text-slate-400">OFFLINE</span>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -950,33 +795,38 @@ export default function App() {
                     <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
                     <caption className="sr-only">NSE Option Chain Analysis Data Table</caption>
                     <thead className="relative z-40 bg-white">
-                    {/* Level 1: Category Header */}
-                    <tr className="h-8 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
-                      <th colSpan={7} className="bg-brand-teal border-r border-white/5 px-4 sticky top-0 z-40 first:rounded-tl-lg">Call Analysis</th>
-                      <th rowSpan={2} className="bg-brand-teal border-x border-white/10 text-white w-28 border-b border-white/5 text-[10px] font-black sticky top-0 z-50 tracking-wider">STRIKE PRICE</th>
-                      <th colSpan={7} className="bg-brand-teal text-white px-4 sticky top-0 z-40 last:rounded-tr-lg">Put Analysis</th>
+                    {/* Level 1: Category Header (High Contrast & Opaque) */}
+                    <tr className="h-10 text-[10px] font-black uppercase text-white tracking-[0.2em] text-center">
+                      <th colSpan={7} className="bg-slate-950 border-r border-white/5 px-4 sticky top-0 z-40 first:rounded-tl-lg">Call Analysis</th>
+                      <th rowSpan={2} className="bg-brand-teal border-x border-brand-teal/20 text-white w-28 border-b-4 border-brand-teal/30 text-[11px] font-black sticky top-0 z-50 tracking-tight shadow-lg">
+                        <div className="flex flex-col items-center">
+                          <span className="text-[7px] text-white/50 tracking-[0.4em] font-black mb-0.5">Pivot</span>
+                          Strike Price
+                        </div>
+                      </th>
+                      <th colSpan={7} className="bg-slate-900 text-white px-4 sticky top-0 z-40 last:rounded-tr-lg">Put Analysis</th>
                     </tr>
-                    {/* Level 2: Metric Header */}
-                    <tr className="h-10 text-[9px] font-black uppercase text-center bg-white border-b border-slate-200 shadow-sm transition-shadow">
-                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CHG</th>
-                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
-                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
-                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
-                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">CPR OI</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r-2 border-slate-200 italic">CPR VOL</th>
-                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR VOL</th>
-                      <th className="w-12 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100 italic">PCR OI</th>
-                      <th className="w-16 text-amber-700 sticky top-8 z-30 bg-amber-50 border-r border-slate-100 font-black">IV %</th>
-                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">CHG OI</th>
-                      <th className="w-20 text-slate-500 sticky top-8 z-30 bg-white border-r border-slate-100">Volume</th>
-                      <th className="w-20 text-slate-700 sticky top-8 z-30 bg-white border-r border-slate-100">OI</th>
-                      <th className="w-16 text-slate-600 sticky top-8 z-30 bg-white italic">CHG</th>
+                    {/* Level 2: Metric Header (Solid & Darker Shadow) */}
+                    <tr className="h-10 text-[9px] font-black uppercase text-center bg-slate-200 border-b-2 border-slate-300">
+                      <th className="w-16 text-slate-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">CHG</th>
+                      <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">OI</th>
+                      <th className="w-20 text-slate-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">Volume</th>
+                      <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
+                      <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
+                      <th className="w-12 text-rose-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">CPR OI</th>
+                      <th className="w-12 text-rose-700 sticky top-10 z-30 bg-slate-200 border-r-2 border-slate-300 italic font-black">CP VOL</th>
+                      <th className="w-12 text-emerald-700 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic font-black">PC VOL</th>
+                      <th className="w-12 text-emerald-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">PCR OI</th>
+                      <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
+                      <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
+                      <th className="w-20 text-slate-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">Volume</th>
+                      <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">OI</th>
+                      <th className="w-16 text-slate-600 sticky top-10 z-30 bg-slate-200 italic">CHG</th>
                     </tr>
                   </thead>
                    <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                     {(() => {
-                      const effectiveSpot = livePrice || spotPrice;
+                      const effectiveSpot = spotPrice;
                       
                       // Find the strike closest to the spot price
                       let closestStrike = -1;
