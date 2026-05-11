@@ -94,40 +94,26 @@ export default function App() {
       
       try {
         const res = await fetch(`/api/live-price?symbol=${symbolName}`);
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server returned ${res.status}: ${errText.substring(0, 50)}`);
+        }
         const result = await res.json();
         
         if (result.success && result.price) {
           setLivePrice(result.price);
           setIsLiveActive(true); 
           setLastSource(result.source || 'Direct');
+          setError(null); // Clear any previous transient errors
         } else {
-          // If the specialized endpoint fails, try the AI Search as a session-friendly fallback
-          console.warn("Centralized price API failed, trying Gemini AI search...");
-          const response = await ai.models.generateContent({
-            model: "gemini-3-flash-preview",
-            contents: `What is the current real-time spot price of ${symbolName} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols. Current Date/Time context: ${new Date().toISOString()}`,
-            config: {
-              tools: [{ googleSearch: {} }]
-            }
-          });
-
-          if (response && response.text) {
-            const text = response.text.trim();
-            const match = text.match(/[\d,]+(?:\.\d+)?/);
-            if (match) {
-              const price = parseFloat(match[0].replace(/,/g, ''));
-              if (!isNaN(price) && price > 0) {
-                setLivePrice(price);
-                setIsLiveActive(true);
-                setLastSource('AI Search');
-              }
-            }
-          }
+          setIsLiveActive(false);
+          console.warn("Centralized price API returned fail:", result.error);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Live price fetching failed:", err);
         setIsLiveActive(false);
       }
+
     };
 
     if (symbolName) {

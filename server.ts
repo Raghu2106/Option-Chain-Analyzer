@@ -12,133 +12,107 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Simple in-memory cache to mitigate 429 errors from Yahoo
+  // Simple in-memory cache
   const priceCache: Record<string, { price: number, timestamp: number }> = {};
-  const CACHE_TTL = 15000; // 15 seconds cache to avoid hitting rate limits too hard
+  const CACHE_TTL = 30000; // 30 seconds cache for production stability
+
+  // Centralized Price Provider
+  async function getPrice(symbol: string): Promise<{ price: number, source: string }> {
+    const sym = symbol.toUpperCase().trim();
+    
+    // 1. Check Cache
+    const cached = priceCache[sym];
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return { price: cached.price, source: 'Cache' };
+    }
+
+    // 2. High Priority: Google Apps Script Proxy
+    const GAS_URL = process.env.GAS_PROXY_URL;
+    if (GAS_URL) {
+      try {
+        const gasRes = await axios.get(`${GAS_URL}?symbol=${sym}`, { timeout: 5000 });
+        if (gasRes.data?.success && gasRes.data.price) {
+          const price = parseFloat(gasRes.data.price);
+          priceCache[sym] = { price, timestamp: Date.now() };
+          return { price, source: gasRes.data.source || 'GAS Proxy' };
+        }
+      } catch (e) {
+        console.warn(`[Price] GAS Proxy failed for ${sym}`);
+      }
+    }
+
+    // 3. TradingView (Direct - works in some regions or via proxy)
+    try {
+      const tickerMap: Record<string, string> = { "NIFTY": "NSE:NIFTY", "BANKNIFTY": "NSE:BANKNIFTY" };
+      const ticker = tickerMap[sym] || `NSE:${sym}`;
+      const tvRes = await axios.post('https://scanner.tradingview.com/india/scan', {
+        "symbols": { "tickers": [ticker], "query": { "types": [] } },
+        "columns": ["close"]
+      }, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
+      
+      if (tvRes.data?.data?.[0]?.d?.[0]) {
+        const price = parseFloat(tvRes.data.data[0].d[0]);
+        priceCache[sym] = { price, timestamp: Date.now() };
+        return { price, source: 'TradingView' };
+      }
+    } catch (e) {
+      console.warn(`[Price] TradingView failed for ${sym}`);
+    }
+
+    // 4. AISearch (Reliable but slow)
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const { GoogleGenAI } = await import("@google/genai");
+        const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent({
+          contents: [{ role: "user", parts: [{ text: `Current price of ${sym} on NSE India? Return ONLY number.` }] }],
+          tools: [{ googleSearch: {} }]
+        });
+        const match = result.response.text().match(/[\d,]+(?:\.\d+)?/);
+        if (match) {
+          const price = parseFloat(match[0].replace(/,/g, ''));
+          priceCache[sym] = { price, timestamp: Date.now() };
+          return { price, source: 'AI Search' };
+        }
+      } catch (e) {
+        console.warn(`[Price] AI Search failed for ${sym}`);
+      }
+    }
+
+    // 5. MoneyControl
+    try {
+      const indexMap: Record<string, string> = { "NIFTY": "in%3BNSX", "BANKNIFTY": "in%3BNBK" };
+      const url = indexMap[sym] ? 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[sym]}` : 
+        `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${sym}`;
+      const mcRes = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
+      const p = mcRes.data?.data?.lastprice || mcRes.data?.data?.price;
+      if (p) {
+        const price = parseFloat(String(p).replace(/,/g, ''));
+        priceCache[sym] = { price, timestamp: Date.now() };
+        return { price, source: 'MoneyControl' };
+      }
+    } catch (e) {}
+
+    throw new Error("All price sources exhausted");
+  }
 
   // API routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
 
-  // New Centralized Price Logic
   app.get("/api/live-price", async (req, res) => {
-    const symbol = String(req.query.symbol || "NIFTY").toUpperCase();
-    const normalizedSymbol = symbol.trim().replace(/\s+/g, '');
-    
-    // 1. Check Cache
-    const cached = priceCache[normalizedSymbol];
-    if (cached && Date.now() - cached.timestamp < 10000) {
-      return res.json({ success: true, price: cached.price, source: 'Cache' });
-    }
-
-    // 2. High Priority: Google Apps Script Proxy (Bypass for Cloud IP Blocking)
-    const GAS_URL = process.env.GAS_PROXY_URL;
-    if (GAS_URL) {
-      try {
-        console.log(`[Live-Price] Routing ${normalizedSymbol} through GAS Proxy...`);
-        const gasRes = await axios.get(`${GAS_URL}?symbol=${normalizedSymbol}`, { timeout: 6000 });
-        if (gasRes.data?.success) {
-          const price = gasRes.data.price;
-          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
-          return res.json({ success: true, price, source: gasRes.data.source || 'GAS Proxy' });
-        }
-      } catch (e: any) {
-        console.warn(`[Live-Price] GAS Proxy failed: ${e.message}`);
-      }
-    }
-
-    // 3. Medium Priority: Python Proxy if configured
-    const PROXY_URL = process.env.MARKET_PROXY_URL;
-    if (PROXY_URL) {
-      try {
-        const proxyRes = await axios.get(`${PROXY_URL}/price/${normalizedSymbol}`, { timeout: 4000 });
-        if (proxyRes.data?.success) {
-          const price = proxyRes.data.price;
-          priceCache[normalizedSymbol] = { price, timestamp: Date.now() };
-          return res.json({ success: true, price, source: proxyRes.data.source || 'Proxy' });
-        }
-      } catch (e) {
-        console.warn(`[Live-Price] Proxy check failed for ${normalizedSymbol}`);
-      }
-    }
-
-    // Internal Helper for TradingView (High Priority)
-    async function tryTradingView(sym: string) {
-      const tickerMap: Record<string, string> = { 
-        "NIFTY": "NSE:NIFTY", 
-        "NIFTY50": "NSE:NIFTY", 
-        "BANKNIFTY": "NSE:BANKNIFTY" 
-      };
-      
-      const ticker = tickerMap[sym] || `NSE:${sym}`;
-      const url = 'https://scanner.tradingview.com/india/scan';
-      
-      const payload = {
-          "symbols": { "tickers": [ticker], "query": { "types": [] } },
-          "columns": ["close"]
-      };
-
-      const response = await axios.post(url, payload, {
-          headers: { 'Content-Type': 'application/json', 'User-Agent': 'Mozilla/5.0' },
-          timeout: 4000
-      });
-      
-      if (response.data?.data?.[0]?.d?.[0]) {
-        return parseFloat(response.data.data[0].d[0]);
-      }
-      return null;
-    }
-
-    // Internal Helper for MC
-    async function tryMC(sym: string) {
-      const indexMap: Record<string, string> = { "NIFTY": "in%3BNSX", "NIFTY50": "in%3BNSX", "BANKNIFTY": "in%3BNBK" };
-      const url = indexMap[sym] ? 
-        `https://priceapi.moneycontrol.com/pricefeed/nse/indices/${indexMap[sym]}` : 
-        `https://priceapi.moneycontrol.com/pricefeed/nse/stock_inventory/${sym}`;
-      
-      const response = await axios.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 3000 });
-      const data = response.data?.data;
-      const priceStr = data?.lastprice || data?.price;
-      if (priceStr) return parseFloat(String(priceStr).replace(/,/g, ''));
-      return null;
-    }
-
-    // Internal Helper for Yahoo
-    async function tryYahoo(sym: string) {
-      const symbolMap: Record<string, string> = { "NIFTY": "^NSEI", "BANKNIFTY": "^NSEBANK" };
-      const ySym = symbolMap[sym] || `${sym}.NS`;
-      const response = await axios.get(`https://query1.finance.yahoo.com/v8/finance/chart/${ySym}?interval=1m&range=1d`, { timeout: 3000 });
-      return response.data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    }
-
+    const symbol = String(req.query.symbol || "NIFTY");
     try {
-      // 1. Primary: TradingView
-      const tvPrice = await tryTradingView(normalizedSymbol).catch(() => null);
-      if (tvPrice) {
-        priceCache[normalizedSymbol] = { price: tvPrice, timestamp: Date.now() };
-        return res.json({ success: true, price: tvPrice, source: 'TradingView' });
-      }
-
-      // 2. Secondary: MC
-      const mcPrice = await tryMC(normalizedSymbol).catch(() => null);
-      if (mcPrice) {
-        priceCache[normalizedSymbol] = { price: mcPrice, timestamp: Date.now() };
-        return res.json({ success: true, price: mcPrice, source: 'MoneyControl' });
-      }
-
-      // 3. Tertiary: Yahoo
-      const yahooPrice = await tryYahoo(normalizedSymbol).catch(() => null);
-      if (yahooPrice) {
-        priceCache[normalizedSymbol] = { price: yahooPrice, timestamp: Date.now() };
-        return res.json({ success: true, price: yahooPrice, source: 'Yahoo Finance' });
-      }
-
-      res.status(404).json({ success: false, error: "Price not found" });
+      const data = await getPrice(symbol);
+      res.json({ success: true, ...data });
     } catch (err: any) {
-      res.status(500).json({ success: false, error: err.message });
+      res.status(502).json({ success: false, error: err.message });
     }
   });
+
 
   app.get("/api/price-mc/:symbol", async (req, res) => {
     const { symbol } = req.params;
