@@ -914,8 +914,8 @@ export default function App() {
                         const isAtTheMoney = row.strikePrice === closestStrike;
                         const isCallOTM = effectiveSpot !== null && row.strikePrice >= effectiveSpot;
                         const isPutOTM = effectiveSpot !== null && row.strikePrice <= effectiveSpot;
-                        const isCallHighlight = isCallOTM && (row.cprOI >= 6 || row.cprVol >= 6);
-                        const isPutHighlight = isPutOTM && (row.pcrOI >= 6 || row.pcrVol >= 6);
+                        const isCallHighlight = row.cprOI >= 6 || row.cprVol >= 6;
+                        const isPutHighlight = row.pcrOI >= 6 || row.pcrVol >= 6;
 
                         // Resistance = Call OTM = Strike >= Spot
                         // Support = Put OTM = Strike <= Spot
@@ -940,38 +940,32 @@ export default function App() {
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              isCallHighlight 
-                                ? 'font-black text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.02]' 
+                              row.cprOI >= 6 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all ${
-                              isCallHighlight 
-                                ? 'font-black text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.02]' 
+                              row.cprVol >= 6 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
                             
                             <td className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
                               isAtTheMoney 
                                 ? 'bg-brand-teal text-white ring-1 ring-white/10 z-20 shadow-lg scale-[1.005]' 
-                                : isCallHighlight && isPutHighlight
-                                  ? 'bg-gradient-to-r from-rose-100 to-emerald-100 text-slate-900 border-x-rose-200'
-                                  : isCallHighlight
-                                    ? 'bg-rose-100 text-rose-800 border-x-rose-200 shadow-sm'
-                                    : isPutHighlight
-                                      ? 'bg-emerald-100 text-emerald-800 border-x-emerald-200 shadow-sm'
-                                      : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
+                                : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
                             }`}>
-                              {row.strikePrice.toLocaleString()}
+                               {row.strikePrice.toLocaleString()}
                             </td>
                             
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              isPutHighlight 
-                                ? 'font-black text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.02]' 
+                              row.pcrVol >= 6 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrVol}</td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              isPutHighlight 
-                                ? 'font-black text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.02]' 
+                              row.pcrOI >= 6 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrOI}</td>
                             <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>

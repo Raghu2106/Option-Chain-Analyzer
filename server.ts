@@ -40,18 +40,15 @@ async function startServer() {
     try {
       console.log(`[AI-Price-API] Attempting fetch for ${normalizedSymbol} via Gemini`);
       
-      const model = (genAI as any).getGenerativeModel({ 
-        model: "gemini-1.5-flash"
+      const response = await (genAI as any).models.generateContent({ 
+        model: "gemini-1.5-flash",
+        contents: [{ role: "user", parts: [{ text: `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.` }] }],
+        config: {
+          tools: [{ googleSearch: {} }]
+        }
       });
 
-      const prompt = `What is the current real-time spot price of ${normalizedSymbol} stock index/symbol on NSE India (National Stock Exchange)? Return only the numerical decimal value. Do not add any text or currency symbols.`;
-      
-      const result = await model.generateContent({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        tools: [{ googleSearch: {} }]
-      });
-
-      const text = result.response.text().trim();
+      const text = response.text?.()?.trim() || response.text || "";
       
       console.log(`[AI-Price-API] Gemini response for ${normalizedSymbol}: ${text}`);
       
