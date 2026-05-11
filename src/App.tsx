@@ -776,7 +776,7 @@ export default function App() {
             <div className="flex-1 flex flex-col overflow-hidden bg-white">
               {/* Fixed Instrument Bar - Stays on top under page header */}
               <div className="bg-white border-b border-slate-200 z-50">
-                <div className="max-w-[1600px] mx-auto px-4 md:px-12 py-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-12 py-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col">
                       <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Instrument</span>
@@ -894,7 +894,7 @@ export default function App() {
                 ref={tableContainerRef}
                 className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth bg-slate-50"
               >
-                <div className="max-w-[1600px] w-full px-4 md:px-12 py-6">
+                <div className="max-w-[1400px] w-full px-4 md:px-12 py-6">
                   <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/40 relative text-slate-900 rounded-lg overflow-visible">
                     <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-teal/5 blur-[100px] -mr-48 -mt-48 pointer-events-none" />
                     <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
@@ -975,12 +975,12 @@ export default function App() {
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
                               (row.cprOI >= 6 && isCallOTM)
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_8px_20px_-4px_rgba(225,29,72,0.3),0_4px_8px_-4px_rgba(225,29,72,0.2)] ring-1 ring-rose-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all ${
                               (row.cprVol >= 6 && isCallOTM) 
-                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
+                                ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_8px_20px_-4px_rgba(225,29,72,0.3),0_4px_8px_-4px_rgba(225,29,72,0.2)] ring-1 ring-rose-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
                             
@@ -994,12 +994,12 @@ export default function App() {
                             
                             <td className={`text-center border-r border-slate-100 transition-all ${
                               (row.pcrVol >= 6 && isPutOTM) 
-                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3),0_4px_8px_-4px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrVol}</td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
                               (row.pcrOI >= 6 && isPutOTM)
-                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
+                                ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_8px_20px_-4px_rgba(16,185,129,0.3),0_4px_8px_-4px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.1] -translate-y-[1px]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrOI}</td>
                             <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
