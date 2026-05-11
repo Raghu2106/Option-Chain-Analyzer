@@ -861,13 +861,6 @@ export default function App() {
                         <span>Snap: {asOfTime}</span>
                       </div>
                     )}
-
-                    {lastLiveUpdate && (
-                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded-lg border border-amber-100 text-[7px] font-bold text-amber-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                        <span className="uppercase tracking-wide">{timeAgo}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
