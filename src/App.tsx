@@ -902,8 +902,8 @@ export default function App() {
                       <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
                       <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
                       <th className="w-12 text-rose-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">CPR OI</th>
-                      <th className="w-12 text-rose-700 sticky top-10 z-30 bg-slate-200 border-r-2 border-slate-300 italic font-black">CP VOL</th>
-                      <th className="w-12 text-emerald-700 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic font-black">PC VOL</th>
+                      <th className="w-12 text-rose-700 sticky top-10 z-30 bg-slate-200 border-r-2 border-slate-300 italic font-black">CPR VOL</th>
+                      <th className="w-12 text-emerald-700 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic font-black">PCR VOL</th>
                       <th className="w-12 text-emerald-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">PCR OI</th>
                       <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
                       <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
@@ -931,8 +931,8 @@ export default function App() {
                         const isAtTheMoney = row.strikePrice === closestStrike;
                         const isCallOTM = effectiveSpot !== null && row.strikePrice >= effectiveSpot;
                         const isPutOTM = effectiveSpot !== null && row.strikePrice <= effectiveSpot;
-                        const isCallHighlight = row.cprOI >= 6 || row.cprVol >= 6;
-                        const isPutHighlight = row.pcrOI >= 6 || row.pcrVol >= 6;
+                        const isCallHighlight = isCallOTM && (row.cprOI >= 6 || row.cprVol >= 6);
+                        const isPutHighlight = isPutOTM && (row.pcrOI >= 6 || row.pcrVol >= 6);
 
                         // Resistance = Call OTM = Strike >= Spot
                         // Support = Put OTM = Strike <= Spot
@@ -957,12 +957,12 @@ export default function App() {
                               <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.cprOI >= 6 
+                              (row.cprOI >= 6 && isCallOTM)
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all ${
-                              row.cprVol >= 6 
+                              (row.cprVol >= 6 && isCallOTM) 
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_1px_3px_rgba(225,29,72,0.1)] ring-1 ring-rose-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.cprVol}</td>
@@ -976,12 +976,12 @@ export default function App() {
                             </td>
                             
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.pcrVol >= 6 
+                              (row.pcrVol >= 6 && isPutOTM) 
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrVol}</td>
                             <td className={`text-center border-r border-slate-100 transition-all ${
-                              row.pcrOI >= 6 
+                              (row.pcrOI >= 6 && isPutOTM)
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_1px_3px_rgba(16,185,129,0.1)] ring-1 ring-emerald-200/50 relative z-10 scale-[1.05]' 
                                 : 'font-bold text-slate-400'
                             }`}>{row.pcrOI}</td>
