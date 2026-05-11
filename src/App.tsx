@@ -29,7 +29,28 @@ export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
   const [liveSpotMap, setLiveSpotMap] = useState<Record<string, number>>({});
-  const [lastLiveUpdate, setLastLiveUpdate] = useState<string | null>(null);
+  const [lastLiveUpdate, setLastLiveUpdate] = useState<Date | null>(null);
+  const [timeAgo, setTimeAgo] = useState<string>('');
+
+  const updateTimeAgo = useCallback(() => {
+    if (!lastLiveUpdate) return;
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - lastLiveUpdate.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      setTimeAgo(`Updated ${diffInSeconds}s ago`);
+    } else {
+      const mins = Math.floor(diffInSeconds / 60);
+      setTimeAgo(`Updated ${mins} min${mins > 1 ? 's' : ''} ago`);
+    }
+  }, [lastLiveUpdate]);
+
+  useEffect(() => {
+    const timer = setInterval(updateTimeAgo, 5000); // Update every 5 seconds
+    updateTimeAgo();
+    return () => clearInterval(timer);
+  }, [updateTimeAgo]);
+
   const [asOfTime, setAsOfTime] = useState<string | null>(null);
   const [symbolName, setSymbolName] = useState<string | null>(null);
   const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
@@ -75,7 +96,7 @@ export default function App() {
             }
           });
           setLiveSpotMap(newMap);
-          setLastLiveUpdate(new Date().toLocaleTimeString());
+          setLastLiveUpdate(new Date());
         }
       });
     } catch (err) {
@@ -769,7 +790,9 @@ export default function App() {
                     {/* Live Spot Price Display */}
                     {(symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') ? (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
-                        <span className="text-[7px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-0.5 animate-pulse">Live Spot Price</span>
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Spot Price</span>
+                        </div>
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
                             {liveSpotMap[symbolName].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -781,6 +804,7 @@ export default function App() {
                             </span>
                           )}
                         </div>
+                        <span className="text-[6px] font-bold text-slate-400 mt-0.5 uppercase tracking-wider">{timeAgo}</span>
                       </div>
                     ) : spotPrice && (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
@@ -839,9 +863,9 @@ export default function App() {
                     )}
 
                     {lastLiveUpdate && (
-                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-emerald-50 rounded-lg border border-emerald-100 text-[7px] font-bold text-emerald-600">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Live Sync: {lastLiveUpdate}</span>
+                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-amber-50 rounded-lg border border-amber-100 text-[7px] font-bold text-amber-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="uppercase tracking-wide">{timeAgo}</span>
                       </div>
                     )}
                   </div>
