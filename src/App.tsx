@@ -1,6 +1,6 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface OptionChainRow {
@@ -790,8 +790,17 @@ export default function App() {
                     {/* Live Spot Price Display */}
                     {(symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') ? (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
-                        <div className="flex items-center gap-1.5 mb-0.5">
+                        <div className="flex items-center gap-1.5 mb-0.5 group relative">
                           <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Spot Price</span>
+                          <div className="relative group">
+                            <Info className="w-2 h-2 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
+                            <div className="absolute left-0 top-full mt-1 w-40 p-2 bg-slate-900 border border-slate-800 rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] pointer-events-none">
+                              <p className="text-[8px] leading-relaxed text-slate-300 font-medium normal-case tracking-normal">
+                                Spot prices refresh periodically. Continuous real-time streaming is currently limited by API provider restrictions to ensure stability.
+                              </p>
+                              <div className="absolute -top-1 left-3 w-2 h-2 bg-slate-900 border-t border-l border-slate-800 rotate-45"></div>
+                            </div>
+                          </div>
                         </div>
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
@@ -814,6 +823,21 @@ export default function App() {
                         </span>
                       </div>
                     )}
+
+                    {/* Probable Zones Legend */}
+                    <div className="hidden sm:flex flex-col border-l border-slate-200 pl-6 ml-2">
+                      <span className="text-[7px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-0.5">Probability Zones</span>
+                      <div className="flex flex-col gap-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_4px_rgba(244,63,94,0.3)]"></div>
+                          <span className="text-[10px] font-black text-rose-700 tracking-tight uppercase">Resistance: CPR ≥ 6</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.3)]"></div>
+                          <span className="text-[10px] font-black text-emerald-700 tracking-tight uppercase">SUPPORT: PCR ≥ 6</span>
+                        </div>
+                      </div>
+                    </div>
 
                     {anomalyStrikes.length > 0 && (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
