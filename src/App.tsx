@@ -800,7 +800,7 @@ export default function App() {
                     </div>
 
                     {/* Live Spot Price Display */}
-                    {(symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') ? (
+                    {(symbolName && liveSpotMap[symbolName]) ? (
                       <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
                         <div className="flex items-center gap-1.5 mb-0.5 group relative">
                           <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Spot Price</span>
@@ -945,8 +945,8 @@ export default function App() {
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
                     {(() => {
-                      // Use live price if available (except for MIDCPNIFTY as per request)
-                      const effectiveSpot = (symbolName && liveSpotMap[symbolName] && symbolName !== 'MIDCPNIFTY') 
+                      // Use live price if available
+                      const effectiveSpot = (symbolName && liveSpotMap[symbolName]) 
                         ? liveSpotMap[symbolName] 
                         : (spotPrice || 0);
                       
