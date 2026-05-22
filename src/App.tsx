@@ -434,10 +434,10 @@ export default function App() {
       {/* Informative Title Header */}
       <div className="border-b-2 border-brand-teal pb-4">
         <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
-          Advanced Option Chain Analysis & Market Structure Framework
+          Option Chain Analyzer Operational Guide
         </h2>
         <p className="text-xs md:text-sm font-black text-brand-teal uppercase tracking-[0.25em] mt-1">
-          The Definitive Intraday & Swing Trading Guide for NSE Futures & Options
+          User manual & systematic workflow for interpreting institutional derivative positioning
         </p>
       </div>
 
