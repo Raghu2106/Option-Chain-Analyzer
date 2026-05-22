@@ -80,35 +80,74 @@ export default function App() {
 
   const fetchLiveData = useCallback(async () => {
     try {
-      const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTA7we5_ncvlBlEr4KyFryQxQjFvFJvSOQqXf3LVYyVMzGFpfjkk6P3plCBiUHhml6VCRAkXogedRNs/pub?gid=0&single=true&output=csv');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // Increased to 15 seconds
+
+      const response = await fetch(
+        `https://docs.google.com/spreadsheets/d/e/2PACX-1vTA7we5_ncvlBlEr4KyFryQxQjFvFJvSOQqXf3LVYyVMzGFpfjkk6P3plCBiUHhml6VCRAkXogedRNs/pub?output=csv&t=${Date.now()}`,
+        { signal: controller.signal }
+      );
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const csvText = await response.text();
+      if (!csvText || csvText.length < 10) {
+        console.warn('Received empty or invalid CSV data');
+        return;
+      }
       
       Papa.parse(csvText, {
         complete: (results) => {
           const rows = results.data as string[][];
-          const newMap: Record<string, number> = {};
-          rows.forEach(row => {
-            if (row.length >= 2) {
-              const symbol = row[0]?.trim().toUpperCase();
-              
-              // Priority: D (index 3), then B (index 1), then C (index 2)
-              const pD = row[3] ? parseFloat(row[3].replace(/,/g, '')) : NaN;
-              const pB = row[1] ? parseFloat(row[1].replace(/,/g, '')) : NaN;
-              const pC = row[2] ? parseFloat(row[2].replace(/,/g, '')) : NaN;
-              
-              const price = !isNaN(pD) ? pD : (!isNaN(pB) ? pB : pC);
+          if (!rows || rows.length === 0) return;
 
-              if (symbol && !isNaN(price)) {
-                newMap[symbol] = price;
+          const newMap: Record<string, number> = {};
+          
+          const parsePriceStr = (str?: string): number | null => {
+            if (!str) return null;
+            const cleaned = str.trim().toUpperCase().replace(/,/g, '');
+            if (cleaned === '' || cleaned === 'NOT FOUND' || cleaned === '#N/A' || cleaned.includes('N/A')) {
+              return null;
+            }
+            const val = parseFloat(cleaned);
+            return isNaN(val) ? null : val;
+          };
+
+          rows.forEach(row => {
+            if (row && row.length >= 1) {
+              const symbol = row[0]?.trim().toUpperCase();
+              if (symbol && symbol !== 'NSE SYMBOL' && symbol !== 'SYMBOL') {
+                let price = parsePriceStr(row[3]); // Column D is index 3
+                if (price === null) {
+                  price = parsePriceStr(row[1]); // Fallback Column B index 1
+                }
+                if (price === null) {
+                  price = parsePriceStr(row[2]); // Fallback Column C index 2
+                }
+
+                if (price !== null) {
+                  newMap[symbol] = price;
+                }
               }
             }
           });
-          setLiveSpotMap(newMap);
-          setLastLiveUpdate(new Date());
-        }
+
+          if (Object.keys(newMap).length > 0) {
+            setLiveSpotMap(newMap);
+            setLastLiveUpdate(new Date());
+          }
+        },
+        header: false,
+        skipEmptyLines: true
       });
     } catch (err) {
-      console.error('Failed to fetch live data:', err);
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.error('Fetch timed out');
+      } else {
+        console.error('Failed to fetch live data:', err);
+      }
     }
   }, []);
 
@@ -391,130 +430,163 @@ export default function App() {
   };
 
   const GuideContent = () => (
-    <div className="flex flex-col gap-12 text-left w-full py-6">
-      {/* Executive Summary Section */}
-      <section className="bg-brand-teal/5 p-8 rounded-[2rem] border border-brand-teal/10 relative overflow-hidden">
-        <div className="relative z-10">
-          <h2 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-3">NSE Option Chain Analysis Guide</h2>
-          <p className="text-base text-slate-600 leading-relaxed max-w-4xl font-medium">
-            The NSE Option Chain provides real-time data for Nifty, Bank Nifty, and stocks. The analyzer simplifies Open Interest (OI) into visual Support/Resistance maps using <strong className="text-brand-teal">6.0x institutional multipliers</strong> to identify key market barriers.
-          </p>
-        </div>
-        <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-brand-teal/5 blur-[100px] rounded-full" />
+    <div className="flex flex-col gap-12 text-left w-full py-12 border-t border-slate-200/80 mt-12 bg-white">
+      {/* Informative Title Header */}
+      <div className="border-b-2 border-brand-teal pb-4">
+        <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+          Advanced Option Chain Analysis & Market Structure Framework
+        </h2>
+        <p className="text-xs md:text-sm font-black text-brand-teal uppercase tracking-[0.25em] mt-1">
+          The Definitive Intraday & Swing Trading Guide for NSE Futures & Options
+        </p>
+      </div>
+
+      {/* Section 1: User Guide */}
+      <section className="space-y-6">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+          1. Comprehensive User Guide: How to Use the Option Chain Analyzer for Intraday Trading
+        </h3>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
+          The National Stock Exchange of India (NSE) hosts the world’s most liquid weekly derivatives segments, with highly active options contracts on major benchmark indices like Nifty 50, Bank Nifty, Financial Services Nifty (FINNIFTY), and Midcap Nifty (MIDCPNIFTY), alongside individual equity stock options. For retail traders, tracking these contracts can be overwhelmed by highly dense tabular spreadsheets. Our Option Chain Analyzer simplifies this complex dataset, converting raw, static CSV files into intuitive, live, color-mapped support and resistance zones right in your browser.
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          To extract high-probability setup clusters using the analyzer for intraday trading, follow this systematic operation:
+        </p>
+        <ul className="list-disc pl-6 space-y-3 text-sm md:text-base text-slate-600 font-medium">
+          <li>
+            <strong>Acquiring Clean Data:</strong> Begin by navigating directly to the official National Stock Exchange of India option chain dashboard (<a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-extrabold hover:scale-105 transition-transform inline-block">www.nseindia.com/option-chain</a>). Select your preferred contract—whether Nifty 50 or Bank Nifty—and click the "Download CSV" link to extract the latest snapshot.
+          </li>
+          <li>
+            <strong>Importing the File:</strong> Simply drag and drop the `.csv` file onto our drop zone on the main page, or click "Upload CSV File" to choose it manually. Our processing engine runs 100% locally in your browser memory, keeping your analytical data private and highly secure.
+          </li>
+          <li>
+            <strong>Locating the Spot Price & ATM Strike:</strong> The tool automatically extracts the current spot value and benchmarks the closest At-The-Money (ATM) strike. The ATM row acts as the key gravity center of the options chain and maps out a prominent highlighted container upon rendering so you never lose track of active market movements.
+          </li>
+          <li>
+            <strong>Reading the Color-Coded Multipliers:</strong> Look at the Call and Put ratio metrics. In high-stakes institutional trading, option write levels (selling) act as major defense points. If a strike exhibits a Call-to-Put or Put-to-Call ratio of <strong>6.0x or more</strong>, our tool recognizes this as an institutional barrier and color-highlights the strike in shades of green (strong Support) or red (strong Resistance).
+          </li>
+          <li>
+            <strong>Tracking Implied Volatility (IV) Anomalies:</strong> Implied Volatility (IV) measures market expectation of future movement. Our analyzer calculates the ATM-centered average IV. When a single strike experiences an IV spike exceeding 25% of this average, it highlights it as an anomaly. These premium spikes are institutional "hot-spots" where large block traders are anticipating or hedging against highly explosive breakouts.
+          </li>
+        </ul>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          By referencing these automated, highlighted zones throughout the market day, you can bypass manual calculations to pinpoint exactly where big money is establishing heavy block defenses.
+        </p>
       </section>
 
-      {/* Two-Column Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-2">
-        <section>
-          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Methodology & How-to-Use</h3>
-          <div className="space-y-6">
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">1</div>
-              <div>
-                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Download Source</h4>
-                <p className="text-sm leading-relaxed text-slate-500 font-medium italic">Important: Download official CSV files for <strong>Nifty, Bank Nifty</strong>, other indices like <strong>FINNIFTY, MIDCPNIFTY</strong> or individual <strong>Stocks</strong> directly from <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.nseindia.com/option-chain</a>.</p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">2</div>
-              <div>
-                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Upload Process</h4>
-                <p className="text-sm leading-relaxed text-slate-500 font-medium">Navigate to the Option Chain page on NSE for your instrument of choice, click 'Download CSV', and upload that file here using the selector or drag-drop.</p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-lg bg-brand-teal text-white text-xs font-black flex items-center justify-center shrink-0 shadow-lg">3</div>
-              <div>
-                <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-widest mb-1">Analyze Matrix</h4>
-                <p className="text-sm leading-relaxed text-slate-500 font-medium">Review the Strike Map. Institutional SR levels (6.0x barrier) are color-mapped in 4 distinct shades. The levels closest to market price are prioritized with a 3D pop-out effect.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-[12px] font-black uppercase tracking-[0.4em] text-brand-teal mb-6 border-b border-brand-teal/10 pb-4 inline-block">Proper FAQs</h3>
-          <div className="space-y-6">
-            <div className="group">
-              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">What are Strike Highlights?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">We map institutional SR levels (6x barrier) using 4 shades. The level closest to spot price gets a 3D effect to show immediate resistance or support.</p>
-            </div>
-            <div className="group">
-              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Where is the IV Status?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">The analysis header tracks IV anomalies in real-time, instantly flagging strikes where 'market fear' or institutional premiums are abnormally high.</p>
-            </div>
-            <div className="group">
-              <h4 className="text-[12px] font-black uppercase text-brand-teal mb-1 tracking-widest">Is my data secure?</h4>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">Yes. The analyzer runs 100% locally. Your CSV data is never uploaded; the analysis happens entirely within your browser's private memory.</p>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Deep Theory Section */}
-      <div className="border-t border-slate-100 pt-8 gap-6 flex flex-col">
-        <section className="bg-amber-50 p-6 rounded-[1.5rem] border border-amber-100 relative overflow-hidden">
-          <div className="relative z-10">
-            <h3 className="text-xs font-black uppercase tracking-widest text-amber-600 mb-3">Understanding IV Anomalies</h3>
-            <p className="text-[13px] text-amber-900/80 leading-relaxed max-w-4xl font-medium">
-              <strong>Implied Volatility (IV)</strong> represents the market's expectation of price movement. Think of it as the <strong>"Fear Index"</strong> for specific strikes, now tracked in real-time in the analysis header.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div className="bg-white/60 p-4 rounded-xl">
-                <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">Volatility Anomaly (Spike)</h4>
-                <p className="text-[11px] text-slate-600 leading-relaxed">When a specific strike's IV is <strong>25%+ higher</strong> than the current market average, it signals an <strong>"Institutional Magnet"</strong>. This suggests pros are paying huge premiums expecting a massive move to (or rejection from) that level.</p>
-              </div>
-              <div className="bg-white/60 p-4 rounded-xl">
-                <h4 className="text-[10px] font-black uppercase text-amber-700 mb-2">IV Skew Interpretation</h4>
-                <p className="text-[11px] text-slate-600 leading-relaxed">If Put IVs are much higher than Call IVs, the market is <strong>Bearish/Hedging</strong>. If Call IVs are spiking, the market anticipates an <strong>Explosive Breakout</strong>.</p>
-              </div>
-            </div>
-          </div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 blur-[60px] rounded-full -mr-16 -mt-16" />
-        </section>
-
-        <section className="max-w-4xl">
-          <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-6">Market Structure</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">OI Clusters</h4>
-              <p className="text-[12px] text-slate-600 leading-relaxed">Psychological Pivot Points identified visually without manual spreadsheet filtering.</p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Volume Defense</h4>
-              <p className="text-[12px] text-slate-600 leading-relaxed">High volume at mapped resistance confirms active defense by writers.</p>
-            </div>
-            <div className="space-y-2">
-              <h4 className="font-bold text-brand-teal text-[11px] uppercase tracking-wider">Strategic Map</h4>
-              <p className="text-[12px] text-slate-600 leading-relaxed">Track OI Spikes and Change in OI to anticipate the next trending move.</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-200">
-          <h3 className="text-xs font-black uppercase tracking-widest text-brand-teal mb-3">Institutional Bias</h3>
-          <p className="text-[13px] text-slate-600 leading-relaxed max-w-4xl mb-4 font-medium">
-            Designed exclusively for NSE Indices and F&O-listed stocks, this analysis tracks institutional writing patterns. Understanding these 6x strength zones helps you avoid false breakouts and identify high-probability mean reversion setups.
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-             {['NIFTY', 'BANKNIFTY', 'STOCKS'].map(item => (
-               <div key={item} className="p-2.5 bg-white rounded-xl border border-slate-100 text-center shadow-sm">
-                 <span className="block text-[10px] font-black uppercase text-slate-400">{item}</span>
-               </div>
-             ))}
-          </div>
-        </section>
-
-        <section className="bg-brand-teal text-white p-8 rounded-[2rem] relative overflow-hidden ring-1 ring-white/10 shadow-2xl">
-          <div className="relative z-10">
-            <h4 className="text-[11px] font-black uppercase mb-3 tracking-widest text-emerald-400">Risk Disclosure</h4>
-            <p className="text-[12px] text-slate-300 leading-relaxed max-w-2xl font-medium tracking-wide">
-              Trading derivatives involves high risk. This educational utility visualizes raw NSE data. The tool does not provide trading signals. Professional caution is advised.
+      {/* Section 2: PCR Deep Dive */}
+      <section className="space-y-6">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+          2. Deep Dive Into Put-Call Ratio (PCR): Quantitative Sentiment Mapping
+        </h3>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          The Put-Call Ratio (PCR) is one of the most effective, mathematically derived market sentiment indicators used in derivatives trading. While basic charts track price history, PCR maps out real-time position accumulation by market participants. In our analytical toolkit, PCR can be calculated across the entire index, or localized strike-by-strike, to show concentrated zones of dominance.
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          The core overall index Put-Call Ratio utilizes a simple, clean open interest calculation:
+        </p>
+        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 my-4 text-center font-mono text-sm text-slate-800">
+          PCR (Open Interest) = Total Outstanding Put Open Interest / Total Outstanding Call Open Interest
+        </div>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Because option writing (selling) requires substantial margin capital under SEBI guidelines—typically averaging over ₹1,00,000 per lot compared to the minimal premium required to buy options—the option chain must always be analyzed from the perspective of option writers. Option buyers are generally retail participants who are vulnerable to rapid time decay (theta), whereas option writers are well-capitalized institutions, mutual funds, and large prop desks.
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Understanding this institutional bias allows us to interpret key PCR thresholds as powerful contrarian gauges:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+          <div className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl">
+            <h4 className="font-bold text-emerald-800 text-sm uppercase tracking-wide mb-2">Extreme High PCR (&gt; 1.35)</h4>
+            <p className="text-xs text-emerald-950 leading-relaxed">
+              Highly Bullish. Indicates Put writers have set up heavy positions, expecting the market to hold or rally. However, once PCR ticks above 1.40 or 1.50, it reflects highly saturated optimism—meaning the index is overbought and due for an intraday profit-booking pullback or top reversal.
             </p>
           </div>
-        </section>
-      </div>
+          <div className="bg-slate-50 border border-slate-200 p-5 rounded-2xl">
+            <h4 className="font-bold text-slate-800 text-sm uppercase tracking-wide mb-2">Balanced neutral PCR (0.85 - 1.15)</h4>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Balanced Market. Suggests neither the bulls nor the bears have taken decisive control. The market is highly likely to drift in horizontal consolidated channels or follow narrow rotational swings between prominent support and resistance layers.
+            </p>
+          </div>
+          <div className="bg-rose-50 border border-rose-100 p-5 rounded-2xl">
+            <h4 className="font-bold text-rose-800 text-sm uppercase tracking-wide mb-2">Extreme Low PCR (&lt; 0.60)</h4>
+            <p className="text-xs text-rose-950 leading-relaxed">
+              Extremely Bearish. Reflects aggressive Call writers saturating active strikes, expecting the market to slide further. When the PCR slides under 0.55 or 0.50, panic and fear peak across retail desks, often signaling an oversold state ripe for a violent intraday "Short Squeeze" rally.
+            </p>
+          </div>
+        </div>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Our Option Chain Analyzer takes this sentiment map a step further with computerized, strike-specific PCR calculations. If an Out-Of-The-Money (OTM) Put strike carries a local PCR score of 6.0x or higher, it indicates Put sellers are aggressively committing capital to construct an ironclad price floor at that level. This signals a defensive support shield backed by institutional underwriting resources.
+        </p>
+      </section>
+
+      {/* Section 3: CPR Dynamics */}
+      <section className="space-y-6">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+          3. Call-Put Ratio (CPR) Dynamics: Sector Resistance & Institutional Walls
+        </h3>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          While retail platforms typically focus strictly on Put-Call relationships, professional institutional desks heavily monitor the reciprocal relationship: the **Call-Put Ratio (CPR)**. In our option chain interface, CPR is mapped as a high-conviction resistance indicator.
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          When examining option writing trends, the Call-Put Ratio computes exactly how dominant call contracts are over put contracts at any specific strike:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <span className="block text-xs font-black uppercase text-brand-teal mb-1">Open Interest Call-Put Ratio (CPR OI)</span>
+            <span className="block font-mono text-[13px] text-slate-800 font-bold">CPR OI = Call Outstanding Open Interest / Put Outstanding Open Interest</span>
+            <p className="text-[11px] text-slate-500 mt-2 font-medium">Tracks the build-up of massive overhead blocks. High CPR OI signifies that major funds are heavily underwriting call contracts, predicting the asset will not cross that strike price.</p>
+          </div>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <span className="block text-xs font-black uppercase text-brand-teal mb-1">Volume Call-Put Ratio (CPR Vol)</span>
+            <span className="block font-mono text-[13px] text-slate-800 font-bold">CPR Vol = Call Traded Volume / Put Traded Volume</span>
+            <p className="text-[11px] text-slate-500 mt-2 font-medium">Detects real-time action or institutional panic. Sudden spikes in CPR Vol show rapid intraday resistance formation, often capping breakout attempts before they gain steam.</p>
+          </div>
+        </div>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Understanding call option underwriting requires analyzing the premium-capture goals of market-makers. Call sellers pocket options premiums upfront, in exchange for agreeing to sell the underlying asset if requested. Because indices like Nifty or Bank Nifty can rise indefinitely, call writers face high risk. Thus, when institutional players write a heavy volume of call options at a strike, they do so with deep structural conviction:
+        </p>
+        <ul className="list-disc pl-6 space-y-3 text-sm md:text-base text-slate-600 font-medium pb-2">
+          <li>
+            <strong>The 6.0x Multiplier Benchmark:</strong> When our database monitors a CPR ratio (for Open Interest or Volume) crossing the <strong>6.0x barrier</strong>, our renderer triggers a prominent 3D-effect red highlighted alert. This reveals a heavily guarded institutional wall where sellers outnumber buyers 6-to-1, signaling exceptionally strong resistance.
+          </li>
+          <li>
+            <strong>Intraday Breakout Validation:</strong> If the index is trending upwards but approaches a strike highlighted with a high CPR OI (such as Bank Nifty nearing a major round number), intraday traders should watch the accompanying CPR Volume. If CPR Vol also exceeds 6.0x, it shows call writers are aggressively defending the level. Breaking through this wall requires a massive surge of buying volume in the spot market.
+          </li>
+          <li>
+            <strong>The Squeeze Trap (Short Squeeze):</strong> If the spot price manages to break above a high CPR barrier on heavy volume, the call option sellers are forced to buy back their short positions to cap their losses. This trigger can spark a violent intraday short-squeeze rally, driving prices higher in a short window.
+          </li>
+        </ul>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
+          By displaying PCR support walls and CPR resistance walls side-by-side with 3D color mapping, our Option Chain Analyzer helps you instantly spot active boundaries and avoid entering trend-following long trades into heavy institutional blocks.
+        </p>
+      </section>
+
+      {/* Section 4: Risk Management */}
+      <section className="space-y-6">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+          4. Professional Risk Management: Mastering Derivatives Volatility
+        </h3>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Futures and Options (F&O) trading in the Indian stock exchange is inherently high-risk and high-yield. While structured data analysis like PCR, institutional volume defense, and IV tracking can dramatically improve your trading edge, they are ultimately mathematical probabilities. No data model is infallible, and market conditions can change instantly during major global news events, unexpected macro releases, or sudden block trades by Foreign Institutional Investors (FIIs) and Domestic Institutional Investors (DIIs).
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
+          Securities regulatory reports (SEBI) reveal a stark statistic for retail derivative traders: <strong>9 out of 10 retail traders lose money in active option trading</strong>, with average losses often wiping out entire accounts. Capital preservation is the core hallmark separating veteran traders from beginners.
+        </p>
+        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-bold">
+          To trade safely in the NSE F&O segment, commit to these vital structural rules:
+        </p>
+        <ul className="list-disc pl-6 space-y-3 text-sm md:text-base text-slate-600 font-medium">
+          <li>
+            <strong>Never Trade Without a Stop-Loss:</strong> Every option contract is susceptible to time decay (theta) and implied volatility crushes (IV drop). Always enter a hard, non-negotiable stop-loss order with your broker on every single trade.
+          </li>
+          <li>
+            <strong>Enforce Uncompromising Position Sizing:</strong> You should never risk more than <strong>1% to 2%</strong> of your total trading capital on any single setup. Avoid excessive leverage and do not trade heavy lot sizes simply because a strike is highlighted as strong support.
+          </li>
+          <li>
+            <strong>Watch the Spot Chart:</strong> Option chain data is an accumulation of historical trades. While very predictive, it occasionally lags behind sudden, explosive, news-driven price spikes. Use our analyzer as a compass, but always align your setup with actual price action developments on your system charts.
+          </li>
+        </ul>
+      </section>
     </div>
   );
 
@@ -932,10 +1004,10 @@ export default function App() {
                       <th className="w-20 text-slate-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">Volume</th>
                       <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
                       <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
-                      <th className="w-12 text-rose-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">CPR OI</th>
-                      <th className="w-12 text-rose-700 sticky top-10 z-30 bg-slate-200 border-r-2 border-slate-300 italic font-black">CPR VOL</th>
-                      <th className="w-12 text-emerald-700 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic font-black">PCR VOL</th>
-                      <th className="w-12 text-emerald-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic">PCR OI</th>
+                      <th className="w-12 text-rose-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic cursor-help" title="Call-Put Ratio (Open Interest) = Call OI / Put OI. Used to show resistance level strength.">CPR OI</th>
+                      <th className="w-12 text-rose-700 sticky top-10 z-30 bg-slate-200 border-r-2 border-slate-300 italic font-black cursor-help" title="Call-Put Ratio (Volume) = Call Volume / Put Volume. Used to detect real-time resistance blocks.">CPR VOL</th>
+                      <th className="w-12 text-emerald-700 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic font-black cursor-help" title="Put-Call Ratio (Volume) = Put Volume / Call Volume. Used to detect real-time support zones.">PCR VOL</th>
+                      <th className="w-12 text-emerald-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300 italic cursor-help" title="Put-Call Ratio (Open Interest) = Put OI / Call OI. Used to show support level strength.">PCR OI</th>
                       <th className="w-16 text-amber-700 sticky top-10 z-30 bg-amber-200 border-r border-slate-300 font-black">IV %</th>
                       <th className="w-20 text-slate-800 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">CHG OI</th>
                       <th className="w-20 text-slate-600 sticky top-10 z-30 bg-slate-200 border-r border-slate-300">Volume</th>
