@@ -73,6 +73,15 @@ export default function App() {
   const [activePage, setActivePage] = useState<'tool' | 'blog'>('tool');
   const [openArticleId, setOpenArticleId] = useState<string | null>(null);
 
+  const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
+    setActiveModal(modal);
+    if (modal) {
+      window.history.replaceState(null, '', `?modal=${modal}`);
+    } else {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
   const selectArticle = useCallback((id: string | null) => {
     setOpenArticleId(id);
     if (id) {
@@ -87,6 +96,8 @@ export default function App() {
     if (page === 'tool') {
       setOpenArticleId(null);
       window.history.replaceState(null, '', window.location.pathname);
+    } else if (page === 'blog') {
+      window.history.replaceState(null, '', `?page=blog`);
     }
   }, []);
 
@@ -219,9 +230,19 @@ export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const article = params.get('article');
+    const page = params.get('page');
+    const modal = params.get('modal');
+
     if (article) {
       setActivePage('blog');
       setOpenArticleId(article);
+    } else if (page === 'blog') {
+      setActivePage('blog');
+      setOpenArticleId(null);
+    }
+
+    if (modal === 'privacy' || modal === 'terms' || modal === 'about') {
+      setActiveModal(modal as 'privacy' | 'terms' | 'about');
     }
   }, []);
 
@@ -721,9 +742,9 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => setActiveModal('about')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</button>
-              <button onClick={() => setActiveModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
-              <button onClick={() => setActiveModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
+              <button onClick={() => selectModal('about')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</button>
+              <button onClick={() => selectModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
+              <button onClick={() => selectModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
             </div>
           </div>
 
@@ -763,7 +784,7 @@ export default function App() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-teal/80 backdrop-blur-xl animate-in fade-in duration-200">
           <div className="bg-white rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-auto p-16 premium-shadow relative animate-in fade-in zoom-in duration-300 scrollbar-none">
             <button 
-              onClick={() => setActiveModal(null)} 
+              onClick={() => selectModal(null)} 
               className="absolute top-8 right-8 text-slate-400 hover:text-brand-teal transition-all hover:rotate-90 hover:scale-110 active:scale-95 flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 cursor-pointer" 
               aria-label="Close modal"
             >
