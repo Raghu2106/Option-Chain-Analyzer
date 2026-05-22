@@ -10,7 +10,7 @@
 
   <!-- Market Research & Derivatives Education Blog Index -->
   <url>
-    <loc>https://optionchainanalyzer.in/?page=blog</loc>
+    <loc>https://optionchainanalyzer.in/blog</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -18,7 +18,7 @@
 
   <!-- Article: What is an Option Chain and Why Do Traders Use It? -->
   <url>
-    <loc>https://optionchainanalyzer.in/?article=what-is-an-option-chain-and-why-do-traders-use-it</loc>
+    <loc>https://optionchainanalyzer.in/blog/what-is-an-option-chain-and-why-do-traders-use-it</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -26,7 +26,7 @@
 
   <!-- About Us Page for Confluence and Platform Guidance -->
   <url>
-    <loc>https://optionchainanalyzer.in/?modal=about</loc>
+    <loc>https://optionchainanalyzer.in/about</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -34,7 +34,7 @@
 
   <!-- Privacy & Data Security Protocol -->
   <url>
-    <loc>https://optionchainanalyzer.in/?modal=privacy</loc>
+    <loc>https://optionchainanalyzer.in/privacy</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -42,7 +42,7 @@
 
   <!-- Usage Terms & Legal Agreement -->
   <url>
-    <loc>https://optionchainanalyzer.in/?modal=terms</loc>
+    <loc>https://optionchainanalyzer.in/terms</loc>
     <lastmod>2026-05-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

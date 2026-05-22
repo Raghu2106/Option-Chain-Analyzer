@@ -76,18 +76,21 @@ export default function App() {
   const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
     setActiveModal(modal);
     if (modal) {
-      window.history.replaceState(null, '', `?modal=${modal}`);
+      window.history.pushState(null, '', `/${modal}`);
     } else {
-      window.history.replaceState(null, '', window.location.pathname);
+      const recoveryPath = activePage === 'blog' 
+        ? (openArticleId ? `/blog/${openArticleId}` : '/blog') 
+        : '/';
+      window.history.pushState(null, '', recoveryPath);
     }
-  }, []);
+  }, [activePage, openArticleId]);
 
   const selectArticle = useCallback((id: string | null) => {
     setOpenArticleId(id);
     if (id) {
-      window.history.replaceState(null, '', `?article=${id}`);
+      window.history.pushState(null, '', `/blog/${id}`);
     } else {
-      window.history.replaceState(null, '', window.location.pathname);
+      window.history.pushState(null, '', '/blog');
     }
   }, []);
 
@@ -95,9 +98,9 @@ export default function App() {
     setActivePage(page);
     if (page === 'tool') {
       setOpenArticleId(null);
-      window.history.replaceState(null, '', window.location.pathname);
+      window.history.pushState(null, '', '/');
     } else if (page === 'blog') {
-      window.history.replaceState(null, '', `?page=blog`);
+      window.history.pushState(null, '', '/blog');
     }
   }, []);
 
@@ -227,24 +230,62 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => {
+  const syncRouteFromUrl = useCallback(() => {
+    const rawPath = window.location.pathname;
+    const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
     const params = new URLSearchParams(window.location.search);
-    const article = params.get('article');
-    const page = params.get('page');
-    const modal = params.get('modal');
 
-    if (article) {
-      setActivePage('blog');
-      setOpenArticleId(article);
-    } else if (page === 'blog') {
+    if (pathname === '/blog') {
       setActivePage('blog');
       setOpenArticleId(null);
-    }
+      setActiveModal(null);
+    } else if (pathname.startsWith('/blog/')) {
+      const articleId = pathname.substring(6);
+      setActivePage('blog');
+      setOpenArticleId(articleId || null);
+      setActiveModal(null);
+    } else if (pathname === '/about') {
+      setActivePage('tool');
+      setActiveModal('about');
+    } else if (pathname === '/privacy') {
+      setActivePage('tool');
+      setActiveModal('privacy');
+    } else if (pathname === '/terms') {
+      setActivePage('tool');
+      setActiveModal('terms');
+    } else {
+      const articleParam = params.get('article');
+      const pageParam = params.get('page');
+      const modalParam = params.get('modal');
 
-    if (modal === 'privacy' || modal === 'terms' || modal === 'about') {
-      setActiveModal(modal as 'privacy' | 'terms' | 'about');
+      if (articleParam) {
+        setActivePage('blog');
+        setOpenArticleId(articleParam);
+        setActiveModal(null);
+      } else if (pageParam === 'blog') {
+        setActivePage('blog');
+        setOpenArticleId(null);
+        setActiveModal(null);
+      } else {
+        setActivePage('tool');
+        setOpenArticleId(null);
+
+        if (modalParam === 'privacy' || modalParam === 'terms' || modalParam === 'about') {
+          setActiveModal(modalParam as 'privacy' | 'terms' | 'about');
+        } else {
+          setActiveModal(null);
+        }
+      }
     }
   }, []);
+
+  useEffect(() => {
+    syncRouteFromUrl();
+    window.addEventListener('popstate', syncRouteFromUrl);
+    return () => {
+      window.removeEventListener('popstate', syncRouteFromUrl);
+    };
+  }, [syncRouteFromUrl]);
 
   useEffect(() => {
     fetchLiveData();

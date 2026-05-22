@@ -406,7 +406,7 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
   ], []);
 
   const handleShare = (id: string) => {
-    const url = `${window.location.origin}?article=${id}`;
+    const url = `${window.location.origin}/blog/${id}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
