@@ -29,7 +29,13 @@ async function startServer() {
 
       const response = await fetch(
         `https://docs.google.com/spreadsheets/d/e/2PACX-1vTA7we5_ncvlBlEr4KyFryQxQjFvFJvSOQqXf3LVYyVMzGFpfjkk6P3plCBiUHhml6VCRAkXogedRNs/pub?output=csv&t=${now}`,
-        { signal: controller.signal }
+        { 
+          signal: controller.signal,
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/csv,text/plain,*/*"
+          }
+        }
       );
       
       clearTimeout(timeoutId);

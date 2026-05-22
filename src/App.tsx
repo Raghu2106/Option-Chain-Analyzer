@@ -113,25 +113,57 @@ export default function App() {
   }, [selectPage, handleReset]);
 
   const fetchLiveData = useCallback(async () => {
+    let csvText = "";
+
+    // 1. Try to fetch directly from Google Sheets (per-user IP, fast & reliable)
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // Increased to 15 seconds
-
-      const response = await fetch(
-        `/api/live-data?t=${Date.now()}`,
-        { signal: controller.signal }
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 sec timeout for direct
+      const directResponse = await fetch(
+        `https://docs.google.com/spreadsheets/d/e/2PACX-1vTA7we5_ncvlBlEr4KyFryQxQjFvFJvSOQqXf3LVYyVMzGFpfjkk6P3plCBiUHhml6VCRAkXogedRNs/pub?output=csv&t=${Date.now()}`,
+        { 
+          signal: controller.signal,
+          headers: {
+            "Accept": "text/csv,text/plain,*/*"
+          }
+        }
       );
-      
       clearTimeout(timeoutId);
-      
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const csvText = await response.text();
-      if (!csvText || csvText.length < 10) {
-        console.warn('Received empty or invalid CSV data');
-        return;
+      if (directResponse.ok) {
+        const text = await directResponse.text();
+        if (text && text.length > 10) {
+          csvText = text;
+          console.log("Direct client-side fetch of live spot prices succeeded.");
+        }
       }
-      
+    } catch (e) {
+      console.warn("Direct Google Sheets fetch failed, falling back to server proxy:", e);
+    }
+
+    // 2. If direct fetch didn't yield a valid CSV, fall back to our server-side proxy
+    if (!csvText) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 sec timeout for proxy
+        const proxyResponse = await fetch(
+          `/api/live-data?t=${Date.now()}`,
+          { signal: controller.signal }
+        );
+        clearTimeout(timeoutId);
+        if (proxyResponse.ok) {
+          const text = await proxyResponse.text();
+          if (text && text.length > 10) {
+            csvText = text;
+            console.log("Server proxy fetch of live spot prices succeeded.");
+          }
+        }
+      } catch (err) {
+        console.error("Both direct fetch and server proxy failed to get live data:", err);
+      }
+    }
+
+    // If we have valid CSV text, parse it
+    if (csvText) {
       Papa.parse(csvText, {
         complete: (results) => {
           const rows = results.data as string[][];
@@ -181,12 +213,6 @@ export default function App() {
         header: false,
         skipEmptyLines: true
       });
-    } catch (err) {
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.error('Fetch timed out');
-      } else {
-        console.error('Failed to fetch live data:', err);
-      }
     }
   }, []);
 
