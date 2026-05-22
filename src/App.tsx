@@ -2,7 +2,6 @@ import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
 import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import BlogSection from './components/BlogSection';
 
 interface OptionChainRow {
   strikePrice: number;
@@ -61,27 +60,7 @@ export default function App() {
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
-  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | 'blog' | null>(null);
-  const [activePage, setActivePage] = useState<'tool' | 'blog'>('tool');
-  const [openArticleId, setOpenArticleId] = useState<string | null>(null);
-
-  const selectArticle = useCallback((id: string | null) => {
-    setOpenArticleId(id);
-    if (id) {
-      window.history.replaceState(null, '', `?article=${id}`);
-    } else {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  }, []);
-
-  const selectPage = useCallback((page: 'tool' | 'blog') => {
-    setActivePage(page);
-    if (page === 'tool') {
-      setOpenArticleId(null);
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  }, []);
-
+  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | null>(null);
   const [logoError, setLogoError] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
   const [hasShownPopupThisSession, setHasShownPopupThisSession] = useState(false);
@@ -98,11 +77,6 @@ export default function App() {
     setError(null);
     setIsHovering(false);
   }, []);
-
-  const handleLogoClick = useCallback(() => {
-    selectPage('tool');
-    handleReset();
-  }, [selectPage, handleReset]);
 
   const fetchLiveData = useCallback(async () => {
     try {
@@ -174,15 +148,6 @@ export default function App() {
       } else {
         console.error('Failed to fetch live data:', err);
       }
-    }
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const article = params.get('article');
-    if (article) {
-      setActivePage('blog');
-      setOpenArticleId(article);
     }
   }, []);
 
@@ -672,9 +637,8 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => { selectPage('tool'); handleReset(); }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
+              <button onClick={handleReset} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-              <button onClick={() => selectPage('blog')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog Articles</button>
             </div>
           </div>
 
@@ -734,8 +698,8 @@ export default function App() {
                 <Logo />
               </div>
               <div>
-                <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{activeModal === 'privacy' ? 'Privacy Policy' : activeModal === 'terms' ? 'Terms of Use' : activeModal === 'about' ? 'About Us' : 'Market Research Blog'}</h2>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1 block">{activeModal === 'about' ? 'Utility Information Detail' : activeModal === 'blog' ? 'Educational Insights & Articles' : 'Protocol Document'}</span>
+                <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{activeModal === 'privacy' ? 'Privacy Policy' : activeModal === 'terms' ? 'Terms of Use' : 'About Us'}</h2>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1 block">{activeModal === 'about' ? 'Utility Information Detail' : 'Protocol Document'}</span>
               </div>
             </div>
             <div className="prose prose-slate prose-lg max-w-none">
@@ -769,7 +733,7 @@ export default function App() {
                 <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">3. Anonymous Usage</h3>
                 <p className="leading-relaxed text-slate-600">PII (Personally Identifiable Information) is not collected. No sign-up or email is required to use the mapper.</p>
               </div>
-            ) : activeModal === 'terms' ? (
+            ) : (
               <div className="space-y-12 text-base">
                 <p className="font-bold border-b-2 pb-2 text-slate-900 border-brand-teal inline-block">Legal Agreement</p>
                 <p className="mt-6 text-slate-600 leading-relaxed font-medium">By using optionchainanalyzer.in, users agree to comply with the following terms:</p>
@@ -779,43 +743,6 @@ export default function App() {
                 <p className="p-8 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
                 <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">3. No Liability</h3>
                 <p className="leading-relaxed text-slate-600">There is no liability for financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
-              </div>
-            ) : (
-              <div className="space-y-12 text-base">
-                <div className="bg-brand-teal/5 border border-brand-teal/10 rounded-3xl p-8 text-center max-w-2xl mx-auto space-y-4">
-                  <TrendingUp className="w-12 h-12 text-brand-teal mx-auto animate-pulse" />
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide">Publishing Engine Configured!</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    The Option Chain Analyzer Knowledge Base is fully set up and ready to house your educational content. 
-                  </p>
-                  <div className="p-4 bg-white/80 rounded-2xl border border-slate-100 text-xs text-slate-600 font-semibold space-y-2">
-                    <p className="text-brand-teal font-black">Ready for Publication</p>
-                    <p>Provide your Articles or Blog text now, and they will be beautifully indexed, styled with bespoke typography, and published here instantly!</p>
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-100 pt-8">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 block mb-6">Preview of Feed Layout</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border border-slate-100 bg-slate-50/50 p-6 rounded-2xl space-y-3 opacity-60">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-bold bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded uppercase">Education</span>
-                        <span className="text-[10px] text-slate-400 font-bold">Pending Article #1</span>
-                      </div>
-                      <h4 className="font-black text-slate-800 text-sm">Understanding Strike-Specific PCR Multipliers</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed">How to check support floors using the 6.0x benchmark criteria against live charts...</p>
-                    </div>
-
-                    <div className="border border-slate-100 bg-slate-50/50 p-6 rounded-2xl space-y-3 opacity-60">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-bold bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded uppercase">Strategy</span>
-                        <span className="text-[10px] text-slate-400 font-bold">Pending Article #2</span>
-                      </div>
-                      <h4 className="font-black text-slate-800 text-sm">CPR Interpretation & Sector Resistance Walls</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed">Mastering Call-Put Ratios to detect overhead resistance ceilings and market caps...</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
             </div>
@@ -874,17 +801,11 @@ export default function App() {
       {/* Header */}
       <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
-          <button 
-            onClick={handleLogoClick}
-            className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
-            aria-label="Back to home"
-          >
+          <div className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group">
             <Logo className="w-full h-full object-contain" />
-          </button>
-          <div className="flex flex-col items-start">
-            <h1 className="text-xl font-black tracking-tighter uppercase text-brand-teal leading-none text-left">
-              Option Chain Analyzer
-            </h1>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-xl font-black tracking-tighter uppercase text-brand-teal leading-none">Option Chain Analyzer</h1>
             {asOfTime && <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Data: {asOfTime}</span>}
           </div>
         </div>
@@ -904,13 +825,7 @@ export default function App() {
 
       {/* Main Layout */}
       <main className="flex-1 flex flex-col overflow-hidden bg-white shadow-inner">
-        {activePage === 'blog' ? (
-          <BlogSection 
-            onBackToApp={() => selectPage('tool')}
-            openArticleId={openArticleId}
-            onSelectArticle={selectArticle}
-          />
-        ) : data.length === 0 ? (
+        {data.length === 0 ? (
             <div 
               ref={homeContainerRef}
               className="flex-1 flex flex-col items-center overflow-auto scrollbar-none bg-[#fafafa] p-4 md:p-6"
