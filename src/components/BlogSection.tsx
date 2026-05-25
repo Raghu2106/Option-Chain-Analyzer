@@ -402,6 +402,203 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
           </p>
         </div>
       )
+    },
+    {
+      id: 'what-is-put-call-ratio-pcr',
+      title: "What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders",
+      excerpt: "Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.",
+      category: 'Education',
+      date: 'May 25, 2026',
+      readTime: '6 min read',
+      author: 'Options Education Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            Put Call Ratio (PCR) is one of the most widely used sentiment indicators in options trading. By comparing put activity with call activity, traders attempt to understand how market participants are positioned. PCR is not a forecasting tool, but it can provide useful context when analysed alongside price action, open interest, volatility, and broader market conditions.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            What Is Put Call Ratio (PCR)?
+          </h2>
+          <p>
+            PCR is a ratio that compares the total number of put options to call options. It can be calculated using open interest or trading volume. The purpose of PCR is to provide a simplified view of sentiment in the options market.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            How Is Put Call Ratio Calculated?
+          </h2>
+          <p>
+            PCR based on Open Interest is calculated by dividing the total Put Open Interest by the total Call Open Interest. PCR can also be calculated using trading volume.
+          </p>
+          <div className="bg-slate-50 border-l-4 border-brand-teal rounded-r-2xl p-6 my-6">
+            <span className="block text-xs font-black uppercase text-brand-teal tracking-widest mb-1">PCR formula</span>
+            <div className="font-mono text-sm font-bold text-slate-800 bg-white/50 border border-slate-100 rounded-lg p-3 my-2 text-center">
+              PCR (OI) = Total Put Open Interest / Total Call Open Interest
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              For example, if put open interest is 15 lakh contracts and call open interest is 10 lakh contracts, the PCR would be 1.5.
+            </p>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Understanding PCR Values
+          </h2>
+          <p>
+            Lower PCR values generally indicate stronger call activity, while higher PCR values indicate stronger put activity. Traders often interpret these zones as guidelines of relative market positioning.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-emerald-500">
+              <span className="block text-[10px] font-black uppercase text-emerald-600 tracking-wider mb-1">Below 0.7</span>
+              <h4 className="font-black text-slate-900 text-sm uppercase">Relatively Bullish</h4>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates strong call interest relative to puts. Traders are aggressively buying or writing calls, reflecting positive sentiment.</p>
+            </div>
+            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-slate-400">
+              <span className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">Around 1.0</span>
+              <h4 className="font-black text-slate-900 text-sm uppercase">Neutral Sentiment</h4>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates a balanced distribution of puts and calls, showing no strong directional bias or dominance in the underlying asset.</p>
+            </div>
+            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-rose-500">
+              <span className="block text-[10px] font-black uppercase text-rose-600 tracking-wider mb-1">Above 1.3</span>
+              <h4 className="font-black text-slate-900 text-sm uppercase">Relatively Bearish</h4>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates stronger put activity or panic hedging. Put buyers/writers are active, reflecting cautious or negative sentiment.</p>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-400 italic">
+            Note: These values are guidelines rather than fixed, absolute rules. Each market, index, or equity may have its own natural baseline PCR range.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Why Do Traders Monitor PCR?
+          </h2>
+          <p>
+            Traders monitor PCR to gain multi-layered insights into general option chain configurations:
+          </p>
+          <ul className="space-y-3 pl-4">
+            <li className="flex gap-2.5 items-start text-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
+              <span><strong>Sentiment Assessment:</strong> To evaluate active momentum and notice where bullish or bearish biases dominate.</span>
+            </li>
+            <li className="flex gap-2.5 items-start text-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
+              <span><strong>Observe Institutional Positioning:</strong> Smart money is often on the writing side of the market; changes in open interest distributions reveal their actions.</span>
+            </li>
+            <li className="flex gap-2.5 items-start text-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
+              <span><strong>Option Chain Support:</strong> Reinforces key support and resistance zones identified through individual strike price concentrations.</span>
+            </li>
+            <li className="flex gap-2.5 items-start text-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
+              <span><strong>Potential Sentiment Extremes:</strong> Spotting overextended levels where momentum might be exhausting.</span>
+            </li>
+          </ul>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Can PCR Be Used as a Contrarian Indicator?
+          </h2>
+          <p>
+            Some traders view extreme PCR readings through a contrarian lens. Very high PCR values can signify that market fear has peaked—representing a potential capitulation bottom. Conversely, extremely low PCR values might suggest euphoria, indicating a market top.
+          </p>
+          <p>
+            However, context is absolutely essential. A high PCR can stay high for a sustained period in a severe downtrend, and PCR should never be used as a standalone entry or exit signal in isolation.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Limitations of Put Call Ratio
+          </h2>
+          <p>
+            Like all technical measurements, the Put Call Ratio has specific bounds:
+          </p>
+          <ul className="space-y-2 list-disc list-inside text-sm pl-2">
+            <li><strong>No predictive guarantee:</strong> PCR is a descriptor of existing contracts and does not forecast future price action.</li>
+            <li><strong>Ignores market context:</strong> It cannot account for critical macroeconomic events, company earnings, or black-swan catalysts.</li>
+            <li><strong>Occasionally misleading:</strong> Spikes in PCR can sometimes be driven by large, institutional hedging transactions rather than direct speculative sentiment.</li>
+          </ul>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            PCR vs Open Interest
+          </h2>
+          <p>
+            It is critical to distinguish these two: PCR is a comparative sentiment indicator assessing the relationship between puts and calls, while Open Interest (OI) is a participation indicator measuring total active contracts. Total OI shows how much interest belongs in a sector, whereas PCR shows its distribution.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Common Mistakes Beginners Make
+          </h2>
+          <p>
+            Avoid these critical pitfalls when integrating PCR into your routines:
+          </p>
+          <ul className="space-y-2.5 text-sm">
+            <li className="flex gap-2 items-center text-slate-650">
+              <span className="text-rose-500 font-bold shrink-0">✕</span>
+              <span>Treating PCR as an automated Buy/Sell buzzer.</span>
+            </li>
+            <li className="flex gap-2 items-center text-slate-650">
+              <span className="text-rose-500 font-bold shrink-0">✕</span>
+              <span>Ignoring the underlying price support/resistance zones.</span>
+            </li>
+            <li className="flex gap-2 items-center text-slate-650">
+              <span className="text-rose-500 font-bold shrink-0">✕</span>
+              <span>Focusing only on the PCR of volume instead of the more robust Open Interest PCR.</span>
+            </li>
+            <li className="flex gap-2 items-center text-slate-650">
+              <span className="text-rose-500 font-bold shrink-0">✕</span>
+              <span>Misinterpreting extreme historical values as permanent rules.</span>
+            </li>
+          </ul>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            How to Learn PCR Through Real Option Chain Data
+          </h2>
+          <p>
+            Readers interested in understanding option chain concepts, support and resistance levels, open interest concentrations, and educational market analysis can explore <a href="https://optionchainanalyzer.in/" className="text-brand-teal hover:underline font-bold">OptionChainAnalyzer.in</a> as part of their learning process.
+          </p>
+          <p>
+            Using real-time option analytical systems allows you to trace PCR moves, resistance barriers, and custom IV anomalies dynamically next to actual index levels, transforming static theory into practical trading literacy.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-6">
+            <div className="space-y-1.5">
+              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">What is a good PCR value?</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                There is no single universally good value. Values vary based on indices and overall macro-hedging patterns.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-4 border-t border-slate-100">
+              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Is high PCR bullish or bearish?</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                Usually bearish (indicates more puts), though extremes can act as contrarian bullish indicators suggesting a market bottom.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-4 border-t border-slate-100">
+              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Can PCR predict direction?</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                No. It describes positioning only. It is a sentiment gauges, not a direct predictor.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 pt-4 border-t border-slate-100">
+              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Should beginners use PCR?</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                Yes, as a straightforward educational sentiment indicator alongside key support and resistance evaluations.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Conclusion
+          </h2>
+          <p>
+            Put Call Ratio is an exceptional asset for understanding sentiment in options markets. While it should not be treated as a predictive indicator in of itself, it provides valuable insight into how market participants are positioned. The most effective approach is to use PCR together with broader market analysis rather than in isolation.
+          </p>
+        </div>
+      )
     }
   ], []);
 
