@@ -24,6 +24,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Article: What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/what-is-put-call-ratio-pcr</loc>
+    <lastmod>2026-05-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- About Us Page for Confluence and Platform Guidance -->
   <url>
     <loc>https://optionchainanalyzer.in/about</loc>
