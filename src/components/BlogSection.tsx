@@ -600,7 +600,7 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
         </div>
       )
     }
-  ], []);
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), []);
 
   const handleShare = (id: string) => {
     const url = `${window.location.origin}/blog/${id}`;
