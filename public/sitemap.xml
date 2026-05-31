@@ -32,6 +32,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Article: What Is Open Interest (OI)? A Complete Beginner's Guide -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/what-is-open-interest-oi</loc>
+    <lastmod>2026-05-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- About Us Page for Confluence and Platform Guidance -->
   <url>
     <loc>https://optionchainanalyzer.in/about</loc>
