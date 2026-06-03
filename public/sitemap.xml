@@ -40,6 +40,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Article: Open Interest vs Volume: Understanding the Key Differences -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/open-interest-vs-volume</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- About Us Page for Confluence and Platform Guidance -->
   <url>
     <loc>https://optionchainanalyzer.in/about</loc>
