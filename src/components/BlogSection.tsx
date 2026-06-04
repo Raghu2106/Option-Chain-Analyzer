@@ -940,26 +940,36 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
         
         {/* Navigation / Header Area */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-          <button 
-            onClick={() => {
-              if (currentPost) {
-                onSelectArticle(null);
-              } else {
-                onBackToApp();
+          <a 
+            href={currentPost ? '/blog' : '/'}
+            onClick={(e) => {
+              if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                e.preventDefault();
+                if (currentPost) {
+                  onSelectArticle(null);
+                } else {
+                  onBackToApp();
+                }
               }
             }}
-            className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-brand-teal transition-all active:scale-95 group"
+            className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-brand-teal transition-all active:scale-95 group cursor-pointer"
           >
             <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
             {currentPost ? 'Back to Articles' : 'Exit Blog'}
-          </button>
+          </a>
 
-          <button 
-            onClick={onBackToApp} 
-            className="px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] bg-brand-teal/5 text-brand-teal hover:bg-brand-teal hover:text-white transition-all rounded-full border border-brand-teal/10 cursor-pointer"
+          <a 
+            href="/"
+            onClick={(e) => {
+              if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                e.preventDefault();
+                onBackToApp();
+              }
+            }} 
+            className="px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] bg-brand-teal/5 text-brand-teal hover:bg-brand-teal hover:text-white transition-all rounded-full border border-brand-teal/10 cursor-pointer block text-center"
           >
             Go to Dashboard
-          </button>
+          </a>
         </div>
 
         <AnimatePresence mode="wait">
@@ -1085,12 +1095,18 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
 
               {/* Articles Grid list */}
               {filteredPosts.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 gap-6 text-left">
                   {filteredPosts.map((post) => (
-                    <div 
+                    <a 
                       key={post.id}
-                      onClick={() => onSelectArticle(post.id)}
-                      className="group border border-slate-100 bg-white hover:bg-slate-50/40 p-6 md:p-8 rounded-[2rem] transition-all hover:border-brand-teal/40 hover:shadow-xl hover:shadow-brand-teal/[0.02] cursor-pointer flex flex-col md:flex-row items-stretch gap-6 relative"
+                      href={`/blog/${post.id}`}
+                      onClick={(e) => {
+                        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                          e.preventDefault();
+                          onSelectArticle(post.id);
+                        }
+                      }}
+                      className="group border border-slate-100 bg-white hover:bg-slate-50/40 p-6 md:p-8 rounded-[2rem] transition-all hover:border-brand-teal/40 hover:shadow-xl hover:shadow-brand-teal/[0.02] cursor-pointer flex flex-col md:flex-row items-stretch gap-6 relative block no-underline"
                     >
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center gap-2">
@@ -1127,7 +1143,7 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
                           </span>
                         </div>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               ) : (

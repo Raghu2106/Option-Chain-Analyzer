@@ -774,18 +774,18 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => { selectPage('tool'); handleReset(); }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</button>
+              <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Reset Platform</a>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-              <button onClick={() => selectPage('blog')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog Articles</button>
+              <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 animate-pulse">Blog Articles</a>
             </div>
           </div>
 
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => selectModal('about')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</button>
-              <button onClick={() => selectModal('privacy')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</button>
-              <button onClick={() => selectModal('terms')} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</button>
+              <a href="/about" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('about'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</a>
+              <a href="/privacy" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('privacy'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</a>
+              <a href="/terms" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('terms'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</a>
             </div>
           </div>
 
@@ -976,13 +976,14 @@ export default function App() {
       {/* Header */}
       <header className="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
         <div className="flex items-center gap-6">
-          <button 
-            onClick={handleLogoClick}
+          <a 
+            href="/"
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); handleLogoClick(); } }}
             className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
             aria-label="Back to home"
           >
             <Logo className="w-full h-full object-contain" />
-          </button>
+          </a>
           <div className="flex flex-col items-start">
             <h1 className="text-xl font-black tracking-tighter uppercase text-brand-teal leading-none text-left">
               Option Chain Analyzer
