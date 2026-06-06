@@ -288,6 +288,98 @@ export default function App() {
   }, [syncRouteFromUrl]);
 
   useEffect(() => {
+    let title = "Option Chain Analyzer - NSE Nifty & Bank Nifty Support/Resistance Tool";
+    let desc = "Free NSE Option Chain Analyzer for Nifty and Bank Nifty. Instantly identify resistance and support levels using Open Interest (OI), Volume clusters, PCR, and CPR OI mapping for intraday trading.";
+    let canonicalUrl = "https://optionchainanalyzer.in/";
+
+    if (activePage === 'blog') {
+      if (openArticleId === 'what-is-an-option-chain-and-why-do-traders-use-it') {
+        title = "What Is an Option Chain and Why Do Traders Use It? A complete beginner's guide";
+        desc = "If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-an-option-chain-and-why-do-traders-use-it";
+      } else if (openArticleId === 'what-is-put-call-ratio-pcr') {
+        title = "What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders";
+        desc = "Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-put-call-ratio-pcr";
+      } else if (openArticleId === 'what-is-open-interest-oi') {
+        title = "What Is Open Interest (OI)? A Complete Beginner's Guide";
+        desc = "Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-open-interest-oi";
+      } else if (openArticleId === 'open-interest-vs-volume') {
+        title = "Open Interest vs Volume: Understanding the Key Differences";
+        desc = "Learn the difference between Open Interest and Volume, how traders use each metric, and why understanding both is important for option chain analysis.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/open-interest-vs-volume";
+      } else {
+        title = "Market Research & Derivatives Education Blog - Option Chain Analyzer";
+        desc = "Learn option chain analysis, Put Call Ratio (PCR), Open Interest (OI) clustering, and other essential derivatives trading metrics with our expert-crafted guides.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog";
+      }
+    } else if (activeModal === 'about') {
+      title = "About Us - Option Chain Analyzer";
+      desc = "Discover the mission and background of Option Chain Analyzer, our visual support and resistance methodology, and how we help retail traders interpret live NSE option chain data.";
+      canonicalUrl = "https://optionchainanalyzer.in/about";
+    } else if (activeModal === 'privacy') {
+      title = "Privacy Protocol - Option Chain Analyzer";
+      desc = "Read our comprehensive privacy policy governing data protection, cookies, and local browser storage security guidelines.";
+      canonicalUrl = "https://optionchainanalyzer.in/privacy";
+    } else if (activeModal === 'terms') {
+      title = "Usage Terms & Legal Agreement - Option Chain Analyzer";
+      desc = "Review the usage terms and regulatory disclaimers governing your access to the Option Chain Analyzer software, spreadsheets, and educational blogs.";
+      canonicalUrl = "https://optionchainanalyzer.in/terms";
+    }
+
+    // Update document title
+    document.title = title;
+
+    // Update canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) {
+      canonical.setAttribute('href', canonicalUrl);
+    } else {
+      const link = document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      link.setAttribute('href', canonicalUrl);
+      document.head.appendChild(link);
+    }
+
+    // Update meta description
+    let metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', desc);
+    }
+
+    // Update og description
+    let ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', desc);
+
+    // Update og title
+    let ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+
+    // Update og url
+    let ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', canonicalUrl);
+
+    // Update twitter description
+    let twDesc = document.querySelector('meta[name="twitter:description"]');
+    if (twDesc) twDesc.setAttribute('content', desc);
+    let twDescProp = document.querySelector('meta[property="twitter:description"]');
+    if (twDescProp) twDescProp.setAttribute('content', desc);
+
+    // Update twitter title
+    let twTitle = document.querySelector('meta[name="twitter:title"]');
+    if (twTitle) twTitle.setAttribute('content', title);
+    let twTitleProp = document.querySelector('meta[property="twitter:title"]');
+    if (twTitleProp) twTitleProp.setAttribute('content', title);
+
+    // Update twitter url
+    let twUrl = document.querySelector('meta[name="twitter:url"]');
+    if (twUrl) twUrl.setAttribute('content', canonicalUrl);
+    let twUrlProp = document.querySelector('meta[property="twitter:url"]');
+    if (twUrlProp) twUrlProp.setAttribute('content', canonicalUrl);
+  }, [activePage, openArticleId, activeModal]);
+
+  useEffect(() => {
     fetchLiveData();
     const interval = setInterval(fetchLiveData, 60000); // Update every minute
     return () => clearInterval(interval);
