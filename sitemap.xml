@@ -11,8 +11,16 @@
   <!-- Market Research & Derivatives Education Blog Index -->
   <url>
     <loc>https://optionchainanalyzer.in/blog</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-06-10</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: How Traders Identify Support and Resistance Using Option Chain Data -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/how-traders-identify-support-and-resistance-using-option-chain-data</loc>
+    <lastmod>2026-06-10</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
