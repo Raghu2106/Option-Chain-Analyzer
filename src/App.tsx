@@ -293,7 +293,11 @@ export default function App() {
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
-      if (openArticleId === 'what-is-an-option-chain-and-why-do-traders-use-it') {
+      if (openArticleId === 'how-traders-identify-support-and-resistance-using-option-chain-data') {
+        title = "How Traders Identify Support and Resistance Using Option Chain Data";
+        desc = "Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/how-traders-identify-support-and-resistance-using-option-chain-data";
+      } else if (openArticleId === 'what-is-an-option-chain-and-why-do-traders-use-it') {
         title = "What Is an Option Chain and Why Do Traders Use It? A complete beginner's guide";
         desc = "If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-an-option-chain-and-why-do-traders-use-it";
