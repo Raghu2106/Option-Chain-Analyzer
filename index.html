@@ -32,8 +32,8 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://optionchainanalyzer.in/" />
-    <meta property="og:title" content="Option Chain Analyzer - NSE Nifty & Bank Nifty Support/Resistance" />
-    <meta property="og:description" content="Free NSE Option Chain Analyzer. Identify resistance and support levels using OI clusters, Volume, PCR, and CPR OI mapping." />
+    <meta property="og:title" content="Option Chain Analyzer - NSE Nifty & Bank Nifty Support/Resistance Tool" />
+    <meta property="og:description" content="Free NSE Option Chain Analyzer for Nifty and Bank Nifty. Instantly identify resistance and support levels using Open Interest (OI), Volume clusters, PCR, and CPR OI mapping for intraday trading." />
     <meta property="og:image" content="/logo.svg" />
 
     <!-- Twitter -->
@@ -45,11 +45,253 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9842476646609926"
      crossorigin="anonymous"></script>
-    <script type="module" crossorigin src="/assets/index-CWyFT45y.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BW1UcyAG.css">
+    <script type="module" crossorigin src="/assets/index-BOu8CWj0.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CtCtILJ6.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+        <div class="flex flex-col min-h-screen bg-white">
+          
+<header class="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
+  <div class="flex items-center gap-6">
+    <a href="/" class="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group">
+      <img src="/logo.svg" alt="Option Chain Analyzer Logo" class="w-full h-full object-contain" width="48" height="48" />
+    </a>
+    <div class="flex flex-col items-start">
+      <h1 class="text-xl font-black tracking-tighter uppercase text-slate-800 leading-none">Option Chain Analyzer</h1>
+      <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Live Derivative Dashboard</span>
+    </div>
+  </div>
+  <nav class="hidden md:flex items-center gap-6">
+    <a href="/" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Analyzer Dashboard</a>
+    <a href="/blog" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Blog Articles</a>
+    <a href="/about" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">About Us</a>
+    <a href="/privacy" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Privacy Protocol</a>
+    <a href="/terms" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Terms of Use</a>
+  </nav>
+</header>
+
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-12">
+            <!-- Hero matches exactly with the visual output -->
+            <div class="text-center space-y-6">
+              <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#0f4e5a] uppercase leading-[1.1]">
+                Analyze NSE Option Chain <br class="hidden md:block" /> data effortlessly
+              </h2>
+              <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-medium">
+                Upload Option Chain CSVs specifically for <strong class="text-brand-teal">NSE Indices</strong> and <strong class="text-slate-705">F&O-listed Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
+              </p>
+            </div>
+
+            <!-- Pre-render instructions for crawler indexing -->
+            <div class="border border-slate-200/80 bg-slate-50 rounded-3xl p-8 max-w-xl mx-auto text-center space-y-4 shadow-sm">
+              <div class="w-12 h-12 bg-[#0f4e5a]/10 text-[#0f4e5a] rounded-2xl flex items-center justify-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+              </div>
+              <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Interactive Option Chain Mapper Tool</h3>
+              <p class="text-xs text-slate-600 leading-relaxed font-semibold">
+                To start, download the option chain .CSV file or search table from the National Stock Exchange of India (nseindia.com) for Nifty, Bank Nifty, or stock assets. Drag your file here or click "Upload CSV File" to instantly generate color-mapped support, resistance, Spot Price markers, and Volatility outlier alerts.
+              </p>
+              <div class="inline-block px-4 py-2 border border-slate-200 rounded-xl bg-white text-xs font-black uppercase tracking-wider text-slate-400">
+                Awaiting Local File Upload (Client-Side)
+              </div>
+            </div>
+
+            <!-- Complete index link list of Educational Blog for powerful crawler index connectivity -->
+            <div class="border-t border-slate-200 pt-12 space-y-8">
+              <div class="flex justify-between items-end border-b border-slate-100 pb-4">
+                <div>
+                  <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Derivatives Education & Option Chain Blog</h3>
+                  <p class="text-xs text-[#0f4e5a] font-bold uppercase tracking-wider mt-1">Comprehensive tutorials on Open Interest, PCR, and Volume clusters</p>
+                </div>
+                <a href="/blog" class="text-xs font-black uppercase text-[#0f4e5a] hover:underline whitespace-nowrap">View All Articles &rarr;</a>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
+                  <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
+                    <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="hover:text-[#0f4e5a] transition-colors">How Traders Identify Support and Resistance Using Option Chain Data</a>
+                  </h4>
+                  <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.</p>
+                  <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                </div>
+
+                <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
+                  <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
+                    <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="hover:text-[#0f4e5a] transition-colors">What Is an Option Chain and Why Do Traders Use It? A Complete Beginner's Guide</a>
+                  </h4>
+                  <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.</p>
+                  <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                </div>
+
+                <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
+                  <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
+                    <a href="/blog/what-is-put-call-ratio-pcr" class="hover:text-[#0f4e5a] transition-colors">What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders</a>
+                  </h4>
+                  <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.</p>
+                  <a href="/blog/what-is-put-call-ratio-pcr" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                </div>
+
+                <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
+                  <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
+                    <a href="/blog/what-is-open-interest-oi" class="hover:text-[#0f4e5a] transition-colors">What Is Open Interest (OI)? A Complete Beginner's Guide</a>
+                  </h4>
+                  <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.</p>
+                  <a href="/blog/what-is-open-interest-oi" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Complete Option Chain operational guide rendered in clean HTML to ensure thousands of words of high-quality copy is crawled on / -->
+            <div class="border-t border-slate-200/80 pt-16 flex flex-col gap-12 text-left">
+              <div class="border-b-2 border-[#0f4e5a] pb-4">
+                <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
+                  Option Chain Analyzer Operational Guide
+                </h3>
+                <p class="text-xs md:text-sm font-black text-[#0f4e5a] uppercase tracking-[0.25em] mt-1">
+                  User manual & systematic workflow for interpreting derivative open interest positioning
+                </p>
+              </div>
+
+              <section class="space-y-6">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+                  1. Comprehensive Research Guide: Supplementary Analysis alongside Technical Charting
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
+                  The National Stock Exchange of India (NSE) hosts highly active derivatives segments, with liquid options contracts on major benchmark indices like Nifty 50, Bank Nifty, Financial Services Nifty (FINNIFTY), and Midcap Nifty (MIDCPNIFTY), alongside individual equity stock options. For research analysts, tracking these contracts in dense tabular layouts can be challenging. Our Option Chain Analyzer serves as a supplementary analytical dashboard, converting raw, static CSV files into intuitive, live, color-mapped visualizations. This utility should be used as a corroborative data source alongside your primary price charting platform.
+                </p>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                  To analyze and locate potential support and resistance benchmarks as a confluence filter in conjunction with your chart analysis, follow this systematic workflow:
+                </p>
+                <ul class="list-disc pl-6 space-y-3 text-sm md:text-base text-slate-600 font-medium">
+                  <li>
+                    <strong>Acquiring Clean Data:</strong> Begin by navigating directly to the official National Stock Exchange of India option chain dashboard (nseindia.com/option-chain). Select your preferred contract—whether Nifty 50 or Bank Nifty—and click the "Download CSV" link to extract the latest snapshot.
+                  </li>
+                  <li>
+                    <strong>Importing the File:</strong> Simply drag and drop the .csv file onto our drop zone on the main page, or click "Upload CSV File" to choose it manually. Our processing engine runs 100% locally in your browser memory, keeping your analytical data private and highly secure.
+                  </li>
+                  <li>
+                    <strong>Locating the Spot Price & ATM Strike:</strong> The tool automatically extracts the current spot value and benchmarks the closest At-The-Money (ATM) strike. The ATM row acts as the key gravity center of the options chain and maps out a prominent highlighted container upon rendering so you never lose track of active market movements.
+                  </li>
+                  <li>
+                    <strong>Reading the Color-Coded Multipliers:</strong> Look at the Call and Put ratio metrics. In corporate risk management and options analysis, heavy concentration of short open interest can signal significant resistance and support layers. If a strike exhibits a Call-to-Put or Put-to-Call ratio of 6.0x or more, our tool recognizes this as a high probable zone and color-highlights the strike in shades of green (strong Support) or red (strong Resistance).
+                  </li>
+                  <li>
+                    <strong>Tracking Implied Volatility (IV) Anomalies:</strong> Implied Volatility (IV) measures market expectation of future movement. Our analyzer calculates the ATM-centered average IV. When a single strike experiences an IV spike exceeding 25% of this average, it highlights it as an anomaly. These premium spikes are statistical "hot-spots" where market participants are anticipating or hedging against price fluctuations.
+                  </li>
+                </ul>
+              </section>
+
+              <section class="space-y-6">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+                  2. Deep Dive Into Put-Call Ratio (PCR): Quantitative Sentiment Mapping
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                  The Put-Call Ratio (PCR) is one of the most effective, mathematically derived market sentiment indicators used in derivatives analysis. While basic charts track price history, PCR maps out real-time position accumulation by market participants. In our analytical toolkit, PCR can be calculated across the entire index, or localized strike-by-strike, to show concentrated zones of dominance.
+                </p>
+                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 my-4 text-center font-mono text-sm text-slate-800">
+                  PCR (Open Interest) = Total Outstanding Put Open Interest / Total Outstanding Call Open Interest
+                </div>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
+                  Because option writing (selling) requires substantial margin capital under SEBI guidelines—typically averaging over ₹1,00,000 per lot compared to the minimal premium required to buy options—the option chain is traditionally analyzed from the perspective of option writers. Option buyers are generally retail participants who are vulnerable to rapid time decay (theta), whereas option writers are well-capitalized institutions, mutual funds, and large prop desks.
+                </p>
+              </section>
+
+              <section class="space-y-6">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+                  3. Call-Put Ratio (CPR) Dynamics: Sector Resistance & High Probable Overhead Barriers
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                  While retail platforms typically focus strictly on Put-Call relationships, experienced market analysts heavily monitor the reciprocal relationship: the Call-Put Ratio (CPR). In our option chain interface, CPR is mapped as a high-conviction resistance indicator.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                  <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <span class="block text-xs font-black uppercase text-brand-teal mb-1">Open Interest Call-Put Ratio (CPR OI)</span>
+                    <span class="block font-mono text-[13px] text-slate-800 font-bold">CPR OI = Call Outstanding Open Interest / Put Outstanding Open Interest</span>
+                    <p class="text-[11px] text-slate-500 mt-2">Tracks the build-up of massive overhead blocks. High CPR OI database indicates that major funds are heavily underwriting call contracts.</p>
+                  </div>
+                  <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <span class="block text-xs font-black uppercase text-brand-teal mb-1">Volume Call-Put Ratio (CPR Vol)</span>
+                    <span class="block font-mono text-[13px] text-slate-800 font-bold">CPR Vol = Call Traded Volume / Put Traded Volume</span>
+                    <p class="text-[11px] text-slate-500 mt-2">Detects real-time volume build-up. Sudden spikes in CPR Vol show rapid resistance formation, often coinciding with capped price breakouts.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="space-y-6">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
+                  4. Professional Risk Management: Mastering Derivatives Volatility
+                </h4>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+                  Futures and Options (F&O) analysis in the Indian stock exchange is inherently high-risk. While structured data analysis like PCR, volume concentration zone analysis, and IV tracking can dramatically improve your understanding of market structure, they are ultimately mathematical probabilities. No data model is infallible, and market conditions can change instantly.
+                </p>
+                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
+                  Securities regulatory reports (SEBI) reveal a stark statistic for retail derivative traders: 9 out of 10 retail traders lose money in active option trading, with average losses often wiping out entire accounts. Capital preservation is the core hallmark separating veteran analysts from beginners.
+                </p>
+              </section>
+            </div>
+          </main>
+          
+          
+<footer class="w-full bg-slate-50 border-t border-slate-200 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+      <div class="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
+        <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-200">
+          <img src="/logo.svg" alt="Option Chain Analyzer Logo" class="w-full h-full object-contain" width="48" height="48" />
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
+          <p class="text-[12px] text-slate-600 font-medium leading-relaxed max-w-[200px]">High-probability NSE data mapping and OI visualization tool.</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Resources</h4>
+        <div class="flex flex-col gap-3">
+          <a href="/" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Analyzer Tool</a>
+          <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
+          <a href="/blog" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog Articles</a>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
+        <div class="flex flex-col gap-3">
+          <a href="/about" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</a>
+          <a href="/privacy" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</a>
+          <a href="/terms" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</a>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support</h4>
+        <div class="flex flex-col gap-3">
+          <a href="mailto:support@optionchainanalyzer.in" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
+          <span class="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest text-left">v1.2.0 Stable Build</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="pt-10 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+      <p class="text-[11px] text-slate-500 font-black tracking-[0.4em] uppercase text-center md:text-left">
+        © 2026 OptionChainAnalyzer.in • All Rights Reserved
+      </p>
+      <div class="flex gap-8 items-center">
+        <p class="text-[10px] text-slate-400 font-semibold max-w-sm leading-relaxed text-center md:text-right">
+          Disclaimer: Education only. Option trading involves substantial market risk. Please evaluate using primary regulatory charts.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
   </body>
 </html>
 
