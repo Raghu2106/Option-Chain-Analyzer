@@ -2,6 +2,7 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,7 +75,25 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+
+    // Custom middleware to serve clean URL SEO pre-rendered files directly,
+    // avoiding trailing-slash redirections and canonical conflicts for Google Search Console
+    app.use((req, res, next) => {
+      let cleanPath = req.path;
+      if (cleanPath.endsWith('/') && cleanPath !== '/') {
+        cleanPath = cleanPath.slice(0, -1);
+      }
+
+      if (cleanPath !== '/') {
+        const potentialFile = path.join(distPath, cleanPath, 'index.html');
+        if (fs.existsSync(potentialFile)) {
+          return res.sendFile(potentialFile);
+        }
+      }
+      next();
+    });
+
+    app.use(express.static(distPath, { redirect: false }));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
