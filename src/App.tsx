@@ -293,7 +293,11 @@ export default function App() {
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
-      if (openArticleId === 'how-traders-identify-support-and-resistance-using-option-chain-data') {
+      if (openArticleId === 'understanding-implied-volatility-iv-on-the-option-chain') {
+        title = "Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide";
+        desc = "Learn what Implied Volatility (IV) is, why it is crucial for pricing options, how to identify high/low IV on an option chain, and how to use it to optimize your options trading strategies.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/understanding-implied-volatility-iv-on-the-option-chain";
+      } else if (openArticleId === 'how-traders-identify-support-and-resistance-using-option-chain-data') {
         title = "How Traders Identify Support and Resistance Using Option Chain Data";
         desc = "Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/how-traders-identify-support-and-resistance-using-option-chain-data";
