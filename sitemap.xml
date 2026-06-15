@@ -11,8 +11,16 @@
   <!-- Market Research & Derivatives Education Blog Index -->
   <url>
     <loc>https://optionchainanalyzer.in/blog</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-06-15</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/understanding-implied-volatility-iv-on-the-option-chain</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
