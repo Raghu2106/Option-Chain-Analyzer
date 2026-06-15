@@ -76,16 +76,25 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
 
-    // Custom middleware to serve clean URL SEO pre-rendered files directly,
-    // avoiding trailing-slash redirections and canonical conflicts for Google Search Console
+    // Custom middleware to enforce clean URLs (no trailing slashes) for SEO and Google Search Console,
+    // explicitly redirecting trailing-slash requests to prevent redirect confusion and duplicate content
     app.use((req, res, next) => {
-      let cleanPath = req.path;
-      if (cleanPath.endsWith('/') && cleanPath !== '/') {
-        cleanPath = cleanPath.slice(0, -1);
+      const origPath = req.path;
+
+      // If path ends with a slash and is not root, 301 redirect to the non-trailing-slash counterpart
+      if (origPath.endsWith('/') && origPath !== '/') {
+        const cleanPath = origPath.slice(0, -1);
+        const queryString = req.url.slice(origPath.length);
+        const redirectUrl = cleanPath + queryString;
+        
+        console.log(`[SEO Redirect] 301: ${req.url} -> ${redirectUrl}`);
+        res.set("Cache-Control", "public, max-age=31536000"); // Standard SEO caching for redirections
+        return res.redirect(301, redirectUrl);
       }
 
-      if (cleanPath !== '/') {
-        const potentialFile = path.join(distPath, cleanPath, 'index.html');
+      // Serve pre-rendered SEO files directly for clean URLs
+      if (origPath !== '/') {
+        const potentialFile = path.join(distPath, origPath, 'index.html');
         if (fs.existsSync(potentialFile)) {
           return res.sendFile(potentialFile);
         }
