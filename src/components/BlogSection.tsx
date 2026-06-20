@@ -1420,15 +1420,15 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
               </div>
 
               {/* Search bar */}
-              <div className="bg-slate-50 p-4 border border-slate-100 rounded-3xl">
+              <div className="bg-slate-50/80 p-4 border border-slate-200/50 rounded-3xl shadow-inner backdrop-blur-md">
                 <div className="relative">
-                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black" />
                   <input 
                     type="text" 
                     placeholder="Search articles..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-4 py-2.5 text-xs font-bold text-slate-700 placeholder-slate-400 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:border-brand-teal transition-all md:max-w-md"
+                    className="w-full pl-11 pr-4 py-3 text-xs font-bold text-slate-700 placeholder-slate-400 bg-white border border-slate-200/85 rounded-2xl focus:outline-none focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/5 transition-all outline-none md:max-w-md shadow-sm"
                   />
                 </div>
               </div>
@@ -1446,7 +1446,7 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
                           onSelectArticle(post.id);
                         }
                       }}
-                      className="group border border-slate-100 bg-white hover:bg-slate-50/40 p-6 md:p-8 rounded-[2rem] transition-all hover:border-brand-teal/40 hover:shadow-xl hover:shadow-brand-teal/[0.02] cursor-pointer flex flex-col md:flex-row items-stretch gap-6 relative block no-underline"
+                      className="group border border-slate-100 bg-white hover:bg-slate-50/40 p-6 md:p-8 rounded-[2rem] transition-all hover:border-brand-teal/40 hover:shadow-xl hover:shadow-brand-teal/[0.02] cursor-pointer flex flex-col md:flex-row items-stretch gap-6 relative block no-underline premium-shadow-hover"
                     >
                       <div className="flex-1 space-y-4">
                         <div className="flex items-center gap-2">
