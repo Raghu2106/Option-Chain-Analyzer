@@ -13,6 +13,11 @@ const routeMeta = {
     desc: 'Learn option chain analysis, Put Call Ratio (PCR), Open Interest (OI) clustering, and other essential derivatives trading metrics with our expert-crafted guides.',
     canonical: 'https://optionchainanalyzer.in/blog'
   },
+  'blog/understanding-max-pain-theory-on-the-option-chain': {
+    title: 'Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry',
+    desc: 'Explore the Max Pain Theory: a derivatives analysis model showing how index/stock prices gravitate towards the strike price where option buyers face the greatest maximum financial loss on expiry day.',
+    canonical: 'https://optionchainanalyzer.in/blog/understanding-max-pain-theory-on-the-option-chain'
+  },
   'blog/understanding-implied-volatility-iv-on-the-option-chain': {
     title: 'Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide',
     desc: 'Learn what Implied Volatility (IV) is, why it is crucial for pricing options, how to identify high/low IV on an option chain, and how to use it to optimize your options trading strategies.',
