@@ -11,8 +11,16 @@
   <!-- Market Research & Derivatives Education Blog Index -->
   <url>
     <loc>https://optionchainanalyzer.in/blog</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/understanding-max-pain-theory-on-the-option-chain</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
