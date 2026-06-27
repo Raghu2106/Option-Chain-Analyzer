@@ -938,7 +938,7 @@ export default function App() {
   const FooterContent = () => (
     <footer className="w-full bg-slate-50/80 border-t border-slate-200/60 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden backdrop-blur-md z-1">
       {/* Decorative ambient elements in footer */}
-      <div className="absolute inset-0 dot-grid pointer-events-none z-0" opacity-60 />
+      <div className="absolute inset-0 dot-grid pointer-events-none z-0 opacity-60" />
       <div className="absolute top-0 right-1/4 w-80 h-80 bg-brand-teal/[0.025] blur-[100px] rounded-full pointer-events-none z-0" />
       
       <div className="max-w-7xl mx-auto relative z-10 font-sans">
