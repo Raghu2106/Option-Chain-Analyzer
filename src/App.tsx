@@ -425,63 +425,6 @@ export default function App() {
     }
   }, [data.length]);
 
-  const loadDemoData = useCallback(() => {
-    const demoSpot = 23512.45;
-    setSpotPrice(demoSpot);
-    setSymbolName("NIFTY");
-    setAsOfTime("29-Jun-2026 15:30:00 IST");
-    setAnomalyStrikes([23200, 23800]);
-    setIvSentiment({ skew: 1.06, mood: "Neutral" });
-    
-    const strikes = [
-      { strike: 23200, coi: 4120, cchg: 110, cvol: 8520, civ: 11.2, cchg_prc: -85.5, poi: 52400, pchng: 14500, pvol: 38200, piv: 19.5, pchng_prc: 12.3 },
-      { strike: 23250, coi: 2840, cchg: 80, cvol: 4150, civ: 11.4, cchg_prc: -78.2, poi: 28100, pchng: 8400, pvol: 19400, piv: 14.2, pchng_prc: 15.1 },
-      { strike: 23300, coi: 8500, cchg: 450, cvol: 14200, civ: 11.6, cchg_prc: -71.4, poi: 110000, pchng: 31200, pvol: 74200, piv: 13.8, pchng_prc: 18.4 },
-      { strike: 23350, coi: 6200, cchg: -120, cvol: 9800, civ: 11.8, cchg_prc: -63.1, poi: 45200, pchng: 11800, pvol: 29500, piv: 13.6, pchng_prc: 21.0 },
-      { strike: 23400, coi: 12000, cchg: -850, cvol: 22100, civ: 12.0, cchg_prc: -52.8, poi: 85000, pchng: 19500, pvol: 54100, piv: 13.4, pchng_prc: 25.6 },
-      { strike: 23450, coi: 14500, cchg: -1100, cvol: 31400, civ: 12.2, cchg_prc: -41.2, poi: 58200, pchng: 14200, pvol: 41200, piv: 13.2, pchng_prc: 32.1 },
-      { strike: 23500, coi: 48200, cchg: 12400, cvol: 95400, civ: 12.5, cchg_prc: -28.5, poi: 52100, pchng: 9500, pvol: 88200, piv: 13.3, pchng_prc: 41.5 },
-      { strike: 23550, coi: 34100, cchg: 11200, cvol: 68100, civ: 12.8, cchg_prc: -15.4, poi: 22400, pchng: -4500, pvol: 49100, piv: 13.5, pchng_prc: -12.4 },
-      { strike: 23600, coi: 95000, cchg: 28400, cvol: 112400, civ: 13.1, cchg_prc: -5.2, poi: 14000, pchng: -8200, pvol: 31200, piv: 13.7, pchng_prc: -31.8 },
-      { strike: 23650, coi: 51200, cchg: 19500, cvol: 54100, civ: 13.4, cchg_prc: 12.8, poi: 6100, pchng: -3100, pvol: 14500, piv: 13.9, pchng_prc: -48.2 },
-      { strike: 23700, coi: 125000, cchg: 41200, cvol: 142100, civ: 13.8, cchg_prc: 24.5, poi: 9000, pchng: -4200, pvol: 18200, piv: 14.1, pchng_prc: -62.5 },
-      { strike: 23750, coi: 42100, cchg: 18200, cvol: 39500, civ: 14.1, cchg_prc: 38.2, poi: 2100, pchng: -1200, pvol: 4800, piv: 14.4, pchng_prc: -74.1 },
-      { strike: 23800, coi: 88200, cchg: 34200, cvol: 79500, civ: 18.2, cchg_prc: 55.4, poi: 3400, pchng: -800, pvol: 6500, piv: 14.8, pchng_prc: -81.2 }
-    ];
-
-    const parsedRows: OptionChainRow[] = strikes.map(s => {
-      const pcrOI = s.coi > 0 ? Number((s.poi / s.coi).toFixed(2)) : (s.poi > 0 ? 999 : 0);
-      const pcrVol = s.cvol > 0 ? Number((s.pvol / s.cvol).toFixed(2)) : (s.pvol > 0 ? 999 : 0);
-      const cprOI = s.poi > 0 ? Number((s.coi / s.poi).toFixed(2)) : (s.coi > 0 ? 999 : 0);
-      const cprVol = s.pvol > 0 ? Number((s.cvol / s.pvol).toFixed(2)) : (s.cvol > 0 ? 999 : 0);
-
-      return {
-        strikePrice: s.strike,
-        callOI: s.coi,
-        callChngOI: s.cchg,
-        callVolume: s.cvol,
-        callIV: s.civ,
-        callChng: s.cchg_prc,
-        putOI: s.poi,
-        putChngOI: s.pchng,
-        putVolume: s.pvol,
-        putIV: s.piv,
-        putChng: s.pchng_prc,
-        pcrOI,
-        pcrVol,
-        cprOI,
-        cprVol,
-        isSupport: (pcrOI >= 6 || pcrVol >= 6),
-        isResistance: (cprOI >= 6 || cprVol >= 6),
-        isCallIVAnomaly: s.civ > 15,
-        isPutIVAnomaly: s.piv > 15
-      };
-    });
-
-    setData(parsedRows);
-    setError(null);
-  }, []);
-
   const processCSV = useCallback((file: File, method: 'file_upload' | 'drag_drop' = 'file_upload') => {
     // Initial extraction from filename as hint
     const fileName = file.name.toUpperCase();
@@ -505,7 +448,6 @@ export default function App() {
           let detectedTime: string | null = null;
           
           for (const row of rawData.slice(0, 30)) { // Check more rows
-            if (!row) continue;
             const rowStr = row.join(' ');
             
             // Look for Underlying Index/Stock info
@@ -555,9 +497,8 @@ export default function App() {
 
           // Backup: If still no spot, look for it in ANY row before the data starts
           if (!detectedSpot) {
-            const dataStartIndex = rawData.findIndex(row => row && row.some(cell => cell && typeof cell === 'string' && cell.toLowerCase().includes('strike')));
+            const dataStartIndex = rawData.findIndex(row => row.some(cell => cell.toLowerCase().includes('strike')));
             for (let i = 0; i < (dataStartIndex > -1 ? dataStartIndex : 20); i++) {
-               if (!rawData[i]) continue;
                const rowStr = rawData[i].join(' ');
                const numbers = rowStr.match(/[\d,]+\.\d{2}/g); // Look specifically for 2-decimal floats
                if (numbers) {
@@ -573,7 +514,7 @@ export default function App() {
           if (detectedTime) setAsOfTime(detectedTime);
 
           const dataStartIndex = rawData.findIndex(row => 
-            row && row.some(cell => cell && typeof cell === 'string' && cell.toLowerCase().includes('strike'))
+            row.some(cell => cell.toLowerCase().includes('strike'))
           );
 
           if (dataStartIndex === -1) {
@@ -1301,7 +1242,7 @@ export default function App() {
                   </motion.div>
                 )}
                 
-                <div className="flex flex-col gap-3 mb-10 w-full max-w-sm">
+                <div className="flex flex-col gap-3 mb-10">
                   <label 
                     className="px-8 py-5 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center"
                     aria-label="Upload NSE Option Chain CSV File"
@@ -1309,14 +1250,7 @@ export default function App() {
                     Upload CSV File
                     <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                   </label>
-                  <button
-                    onClick={loadDemoData}
-                    className="px-8 py-4 bg-white hover:bg-slate-50 text-[#0f4e5a] border border-slate-200 rounded-xl text-xs font-black uppercase tracking-[0.25em] transition-all cursor-pointer hover:shadow-md active:scale-[0.98] text-center"
-                    aria-label="Load Sample Option Chain Data"
-                  >
-                    Load Sample Demo Data
-                  </button>
-                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center mt-1">
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
                     or drop it anywhere on this page
                   </p>
                 </div>
