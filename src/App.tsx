@@ -993,8 +993,24 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Professional Regulatory Footer Disclaimer */}
+        <div className="mt-12 pt-8 border-t border-slate-200/50 text-slate-400 space-y-3 font-medium text-[11px] leading-relaxed">
+          <p className="uppercase font-black text-slate-500 tracking-wider text-[10px]">
+            REGULATORY RISK WARNING &amp; FINANCIAL DISCLAIMER (SEBI COMPLIANT)
+          </p>
+          <p>
+            Derivatives trading (Futures and Options - F&amp;O) in the equity, commodity, or currency segments involves substantial speculative leverage and carries extreme risk of capital loss. Per reports released by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail F&amp;O traders incurred net losses</strong>, with the average loss of loss-makers averaging around <strong>₹50,000 per year</strong>. Over and above these net trading losses, loss-makers spent an additional 28% of their trading losses on transaction costs, brokerage fees, and exchange taxes.
+          </p>
+          <p>
+            <strong>OptionChainAnalyzer.in</strong> is an offline-first, browser-local analytical software utility designed strictly for personal, educational, and research purposes. All calculations, highlights (including PCR and CPR multiplier filters of 6.0x or higher), anomaly alerts, or data visualizations are computed automatically based on user-supplied CSV datasets. This tool <strong>does not</strong> provide buy, sell, or hold recommendations, nor does it offer investment, financial, tax, or legal advice. We are not a SEBI-registered advisory entity, broker, or asset management firm. 
+          </p>
+          <p>
+            Users are solely responsible for verifying all parsed metrics, contract details, and strike calculations against official live stock exchange feeds before committing capital. Under no circumstances shall OptionChainAnalyzer.in, its authors, or affiliates be held liable for any financial losses or damages resulting from the use of this tool.
+          </p>
+        </div>
         
-        <div className="pt-10 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="pt-8 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[11px] text-slate-450 font-black tracking-[0.4em] uppercase">
             © 2026 OptionChainAnalyzer.in • All Rights Reserved
           </p>
@@ -1043,45 +1059,236 @@ export default function App() {
             </div>
             <div className="prose prose-slate prose-lg max-w-none">
             {activeModal === 'about' ? (
-              <div className="space-y-12 text-base">
-                <p className="font-bold border-b pb-1">Our Mission</p>
-                <p className="mt-4 leading-relaxed text-slate-600">
-                  The <strong>Option Chain Analyzer</strong> is built with a simple objective: to transform highly dense, static spreadsheet datasets from the National Stock Exchange of India (NSE) into human-friendly, high-probability visualizations.
-                </p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">How We Optimize Your Research</h3>
-                <p className="leading-relaxed text-slate-600">
-                  Derivatives analysis can be challenging when viewing standard option tables. Our analyzer parses real-time Open Interest (OI) and Traded Volume values, calculating Put-to-Call (PCR) and Call-to-Put (CPR) ratios strike-by-strike. When a multiplier of <strong>6.0x or higher</strong> is detected, the platform automatically color-codes that level to pinpoint prominent defense zones.
-                </p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">A Secondary Layer of Confluence</h3>
-                <p className="leading-relaxed text-slate-600 font-medium">
-                  We recommend using this analyzer as a supportive, corroborative filter in conjunction with your primary price charting tools. Check your candlesticks, verify your trendlines, and use our color-mapped highlights to see if they align with high-probability support or resistance levels.
-                </p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">Privacy & Security Built-In</h3>
-                <p className="leading-relaxed text-slate-600">
-                  No database synchronization, no server uploads, and no tracking. All uploaded or proxied CSV values are processed entirely client-side in your local browser, keeping your workspace private and secure.
-                </p>
+              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
+                    Our Core Mission
+                  </h3>
+                  <p>
+                    Welcome to <strong>OptionChainAnalyzer.in</strong>. Our mission is to democratize complex derivative data analysis by providing clear, visually intuitive, and highly functional tools for independent financial researchers, retail options traders, and market students. We believe that financial literacy and thorough quantitative analysis are foundational to surviving and thriving in today's sophisticated financial markets.
+                  </p>
+                  <p>
+                    Traditional option chain data can be incredibly overwhelming when viewed in dense, monochrome tables. By converting raw, static spreadsheets into interactive, color-mapped visualization dashboards, we help users see past the noise to identify structural market barriers, capital commitments, and volatility hotspots.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
+                    Bespoke High-Probability Mapping Engine
+                  </h3>
+                  <p>
+                    OptionChainAnalyzer.in employs proprietary algorithms designed to compute strike-by-strike open interest (OI) concentration metrics instantly. Our tool focuses on two critical mathematical indexes:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 text-sm">
+                    <li>
+                      <strong>Put-Call Ratio (PCR):</strong> Calculated as <em>Put Open Interest / Call Open Interest</em> at individual strike levels. Ratios above 6.0x are highlighted in vibrant green, representing powerful put underwriting defense walls that act as statistical support zones.
+                    </li>
+                    <li>
+                      <strong>Call-Put Ratio (CPR):</strong> Calculated as <em>Call Open Interest / Put Open Interest</em> at individual strike levels. Ratios above 6.0x are highlighted in crimson red, representing heavy overhead call underwriting walls that act as overhead resistance barriers.
+                    </li>
+                  </ul>
+                  <p>
+                    These highlighted layers serve as mathematical confluences. They are designed to supplement your primary technical analysis (such as support/resistance levels, trendlines, and candlestick charts) and should never be viewed as standalone execution signals.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
+                    Our Commitment to Transparency and Safety
+                  </h3>
+                  <p>
+                    We are dedicated to safety and local privacy. That is why <strong>OptionChainAnalyzer.in</strong> processes 100% of user-uploaded or dragged-and-dropped CSV files entirely client-side, right in your local browser memory. No proprietary financial information, uploaded spreadsheets, or specific ticker symbols are ever transmitted to external servers, ensuring absolute privacy for your research models.
+                  </p>
+                  <p>
+                    We actively promote cautious risk management. Derivatives markets involve substantial speculative risk, which is why we display regulatory statistics, educational articles, and detailed guides prominently throughout our interface. We want our users to stay informed, protect their capital, and analytical tools should be the first step on that journey.
+                  </p>
+                </section>
               </div>
             ) : activeModal === 'privacy' ? (
-              <div className="space-y-12 text-base">
-                <p className="font-bold border-b pb-1">Last Updated: April 23, 2026</p>
-                <p className="mt-4">Your privacy is important to us. It is NSE Option Chain Analyzer's policy to respect your privacy regarding any information we may collect from you across our website.</p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">1. Local Processing Only</h3>
-                <p className="leading-relaxed text-slate-600">The application analyzes data strictly locally in your browser. CSV files are not uploaded to any server. Proprietary financial data remains on your machine.</p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">2. Cookies & Ads</h3>
-                <p className="leading-relaxed text-slate-600">Third-party advertising services (Google AdSense) may be used to keep this tool free. These services may use cookies to serve personalized ads based on web browsing history.</p>
-                <h3 className="font-black text-brand-teal mt-8 mb-4 uppercase tracking-wider">3. Anonymous Usage</h3>
-                <p className="leading-relaxed text-slate-600">PII (Personally Identifiable Information) is not collected. No sign-up or email is required to use the mapper.</p>
+              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                  Last Updated: June 30, 2026
+                </p>
+                
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    1. Introduction and Scope
+                  </h3>
+                  <p>
+                    This Privacy Policy describes how <strong>OptionChainAnalyzer.in</strong> ("we", "our", or "us") collects, uses, protects, and discloses information when you use our website and local analysis tool. We are fully committed to protecting your privacy and ensuring you have a secure experience when visiting our platform. By accessing or using our website, you consent to the data practices described in this policy.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    2. Local Data Processing (Zero Upload Policy)
+                  </h3>
+                  <p>
+                    Our core application operates on an "offline-first, browser-local" model. When you upload, select, or drag-and-drop an NSE Option Chain CSV file onto our interface, the data is processed entirely in your web browser's local memory. 
+                  </p>
+                  <p>
+                    <strong>We do not upload, transmit, store, or share your CSV files, stock symbols, target strikes, or financial datasets on our servers or with any third party.</strong> Your research remains 100% private, isolated, and confidential to your local machine.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    3. Information We Collect Automatically
+                  </h3>
+                  <p>
+                    Like most standard website operators, we may collect non-personally identifying information of the sort that web browsers and servers typically make available, such as:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 text-sm">
+                    <li><strong>Log Files:</strong> We collect standard internet log files including Internet Protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring or exit pages, and clickstream data. These are analyzed collectively to understand general usage trends and maintain platform security.</li>
+                    <li><strong>Device Metadata:</strong> Basic information regarding your operating system, screen resolution, and language settings to ensure our responsive layout renders properly.</li>
+                  </ul>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    4. Cookies and Third-Party Advertising (Google AdSense Disclosure)
+                  </h3>
+                  <p>
+                    To keep our comprehensive option mapping utilities and analytical blog free of charge, we partner with third-party networks, including Google AdSense, to display relevant advertisements across our platform.
+                  </p>
+                  <div className="p-6 bg-slate-50 border border-slate-150 rounded-2xl space-y-3">
+                    <p className="text-xs font-black uppercase text-brand-teal tracking-wider">Crucial Cookie Disclosures</p>
+                    <ul className="list-disc pl-6 space-y-2 text-xs leading-relaxed text-slate-600">
+                      <li>
+                        <strong>Third-Party Vendors:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites on the Internet.
+                      </li>
+                      <li>
+                        <strong>DoubleClick DART Cookie:</strong> Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and/or other sites on the Internet.
+                      </li>
+                      <li>
+                        <strong>How to Opt-Out:</strong> Users may opt out of personalized advertising by visiting Google's ad setting configurations at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">https://policies.google.com/technologies/ads</a>. Alternatively, users can opt out of third-party vendors' use of cookies for personalized advertising by visiting <a href="http://www.aboutads.info/choices/" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.aboutads.info/choices</a>.
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    5. GDPR and CCPA Privacy Rights
+                  </h3>
+                  <p>
+                    We want to ensure you are fully aware of all your data protection rights. Every user is entitled to the following:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 text-sm">
+                    <li><strong>The Right to Access:</strong> You have the right to request copies of your personal data. (Since we do not store your data, we hold no records to provide).</li>
+                    <li><strong>The Right to Rectification & Erasure:</strong> You have the right to request that we correct or erase any personal information we may hold.</li>
+                    <li><strong>The Right to Object/Restrict Processing:</strong> You have the right to object to or request that we restrict the processing of your data under specific conditions.</li>
+                    <li><strong>CCPA "Do Not Sell" Compliance:</strong> Under the California Consumer Privacy Act, users have the right to opt-out of the sale of their personal information. We do not collect or sell any personal data.</li>
+                  </ul>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    6. Children's Online Privacy Protection
+                  </h3>
+                  <p>
+                    Protecting children's privacy online is of paramount importance to us. <strong>OptionChainAnalyzer.in</strong> does not knowingly collect or solicit any Personally Identifiable Information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us immediately so we can take steps to remove it from our systems.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    7. Contact and Support Information
+                  </h3>
+                  <p>
+                    If you have any questions, clarifications, or concerns regarding this Privacy Policy, please contact our support team at:
+                  </p>
+                  <p className="font-mono text-sm text-brand-teal font-extrabold">
+                    Email: support@optionchainanalyzer.in
+                  </p>
+                </section>
               </div>
             ) : activeModal === 'terms' ? (
-              <div className="space-y-12 text-base">
-                <p className="font-bold border-b-2 pb-2 text-slate-900 border-brand-teal inline-block">Legal Agreement</p>
-                <p className="mt-6 text-slate-600 leading-relaxed font-medium">By using optionchainanalyzer.in, users agree to comply with the following terms:</p>
-                <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">1. License for Personal Use</h3>
-                <p className="leading-relaxed text-slate-600">The tool is under temporary license for personal, non-commercial education. This tool is intended to simplify manual OI analysis.</p>
-                <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">2. Risk Disclosure</h3>
-                <p className="p-8 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 font-bold leading-relaxed shadow-sm">Financial markets involve high risk. Option trading is speculative. The levels generated by this tool are mathematical projections and not investment advice.</p>
-                <h3 className="font-black text-brand-teal mt-10 mb-4 uppercase tracking-[0.2em] border-l-4 border-brand-teal pl-4">3. No Liability</h3>
-                <p className="leading-relaxed text-slate-600">There is no liability for financial decisions or trading losses based on the output of this application. Always verify data with official exchange sources.</p>
+              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                  Last Updated: June 30, 2026
+                </p>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    1. Acceptance of Terms
+                  </h3>
+                  <p>
+                    By accessing, browsing, or utilizing the services provided on <strong>OptionChainAnalyzer.in</strong>, you agree to comply with and be bound by these Terms of Use, along with our Privacy Policy. If you do not agree with any part of these terms, you are strictly prohibited from using or accessing this website and must disconnect immediately.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    2. Use License and Limitations
+                  </h3>
+                  <p>
+                    Permission is granted to temporarily use the Option Chain Analyzer mapping tool and read our integrated Knowledge Base materials for personal, non-commercial, and educational research purposes only. This is the grant of a license, not a transfer of title, and under this license you may not:
+                  </p>
+                  <ul className="list-disc pl-6 space-y-2 text-sm">
+                    <li>Modify, copy, reverse engineer, or decompile any software code, visualization interfaces, or mathematical highlights of OptionChainAnalyzer.in;</li>
+                    <li>Use the materials or mapping tools for any commercial purpose or public display;</li>
+                    <li>Sublicense, lease, rent, or redistribute the application layout or algorithmic models;</li>
+                    <li>Attempt to breach local sandbox securities, manipulate iframe settings, or run unauthorized scripts.</li>
+                  </ul>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight text-rose-600">
+                    3. Critical Speculative Risk Warning (SEBI Statistics)
+                  </h3>
+                  <div className="p-6 bg-rose-50 border border-rose-100 rounded-2xl space-y-3">
+                    <p className="text-xs font-black uppercase text-rose-700 tracking-wider">Regulatory F&amp;O Trading Risk Disclosure</p>
+                    <p className="text-xs leading-relaxed text-slate-700 font-semibold">
+                      Futures and Options (F&amp;O) trading involves substantial speculative risk and can lead to immediate, irreversible loss of capital. According to reports published by the Securities and Exchange Board of India (SEBI):
+                    </p>
+                    <ul className="list-disc pl-6 space-y-1 text-[11px] leading-relaxed text-slate-650 font-bold">
+                      <li>9 out of 10 individual traders in the equity Options segment incurred net losses.</li>
+                      <li>On average, loss-makers registered net trading losses close to ₹50,000 per year.</li>
+                      <li>Over and above the net trading losses, loss-makers spent an additional 28% of net trading losses as transaction costs.</li>
+                      <li>Those with net profits redirected a significant portion of their earnings toward transaction fees and exchange taxes.</li>
+                    </ul>
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    4. No Investment Advice Disclaimer
+                  </h3>
+                  <p>
+                    <strong>The Option Chain Analyzer does not provide financial, investment, legal, tax, or trading advice.</strong> All calculations, ratios (such as PCR and CPR), color-coded strike indicators, or volatility spikes highlighted by our software are purely mathematical operations on user-supplied parameters. 
+                  </p>
+                  <p>
+                    They are created solely to assist in educational data sorting and should never be construed as recommendations, BUY/SELL signals, or endorsements of any security, index, or strategy. OptionChainAnalyzer.in is not a SEBI-registered advisory entity, broker, or financial custodian. Always perform your own research and consult a certified financial advisor before committing real capital.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    5. Accuracy of User-Supplied Data
+                  </h3>
+                  <p>
+                    This utility relies strictly on static, offline CSV files downloaded and supplied directly by the user from external web databases (such as www.nseindia.com). We do not warrant or guarantee the accuracy, completeness, timeliness, or validity of the files or parsed outputs. It is your sole responsibility to verify all technical metrics, spot prices, and contract values against official live exchange terminals before making decisions.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    6. Absolute Limitation of Liability
+                  </h3>
+                  <p>
+                    Under no circumstances (including negligence) will OptionChainAnalyzer.in, its developers, or affiliates be liable to you or any third party for any direct, indirect, special, incidental, punitive, or consequential damages (including, without limitation, trading losses, lost profits, loss of trading capital, or data corruption) arising from the use of, or inability to use, our mapping engine, even if we have been advised of the possibility of such damages.
+                  </p>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    7. Indemnification and Governing Law
+                  </h3>
+                  <p>
+                    You agree to indemnify, defend, and hold harmless the site administrators and developers from and against any claims, losses, or expenses resulting from your breach of these terms or your speculative market activities. These Terms of Use shall be governed by and construed in accordance with the laws of India, and any disputes shall be resolved exclusively within the relevant jurisdictions.
+                  </p>
+                </section>
               </div>
             ) : (
               <div className="space-y-12 text-base">

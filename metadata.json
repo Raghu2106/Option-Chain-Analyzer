@@ -2,5 +2,5 @@
   "name": "Option Chain Analyzer",
   "description": "Professional NSE Option Chain Analyzer for Nifty and Bank Nifty. Identify automated Support & Resistance levels based on PCR/CPR Open Interest and Volume data.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
