@@ -1424,7 +1424,7 @@ export default function App() {
         ) : data.length === 0 ? (
             <div 
               ref={homeContainerRef}
-              className="flex-1 flex flex-col items-center overflow-auto scrollbar-none bg-[#fafafa] p-4 md:p-6"
+              className="flex-1 flex flex-col items-center overflow-auto scrollbar-thin bg-[#fafafa] p-4 md:p-6"
             >
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
