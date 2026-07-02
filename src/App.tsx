@@ -970,7 +970,7 @@ export default function App() {
               <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer">Reset Platform</a>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
               <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer flex items-center gap-1.5 w-fit">
-                <span>Blog Articles</span>
+                <span>Blog</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-teal animate-pulse" />
               </a>
             </div>
@@ -1406,7 +1406,7 @@ export default function App() {
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} 
             className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'blog' && !activeModal ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
           >
-            Blog Articles
+            Blog
           </a>
           <a 
             href="/about" 
