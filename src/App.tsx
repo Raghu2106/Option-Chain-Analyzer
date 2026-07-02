@@ -1399,18 +1399,37 @@ export default function App() {
             {asOfTime && <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Data: {asOfTime}</span>}
           </div>
         </div>
-        {data.length > 0 && (
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={handleReset}
-              aria-label="Reset Analysis"
-              className="px-6 py-3 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-rose-100 active:scale-95 rounded-xl shadow-sm shadow-rose-100/50 flex items-center gap-2 border border-rose-200"
-            >
-              <AlertCircle size={14} className="text-rose-500" />
-              Reset
-            </button>
-          </div>
-        )}
+
+        <nav className="hidden md:flex items-center gap-6 ml-auto">
+          <a 
+            href="/blog" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'blog' && !activeModal ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Blog Articles
+          </a>
+          <a 
+            href="/about" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('about'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'about' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            About Us
+          </a>
+          <a 
+            href="/privacy" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('privacy'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'privacy' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Privacy Protocol
+          </a>
+          <a 
+            href="/terms" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('terms'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'terms' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Terms of Use
+          </a>
+        </nav>
       </header>
 
       {/* Main Layout */}
@@ -1584,6 +1603,15 @@ export default function App() {
                         <span>Snap: {asOfTime}</span>
                       </div>
                     )}
+
+                    <button 
+                      onClick={handleReset}
+                      aria-label="Reset Analysis"
+                      className="px-3 py-1.5 bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-wider transition-all hover:bg-rose-100 active:scale-95 rounded-lg shadow-sm flex items-center gap-1 border border-rose-200 cursor-pointer"
+                    >
+                      <AlertCircle size={11} className="text-rose-500" />
+                      Reset
+                    </button>
                   </div>
                 </div>
               </div>
