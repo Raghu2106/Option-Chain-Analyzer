@@ -522,18 +522,85 @@ export default function App() {
             return;
           }
 
-          // NSE Column indices
-          const strikeIdx = 11;
-          const callOIIdx = 1;
-          const callChngOIIdx = 2;
-          const callVolIdx = 3;
-          const callIVIdx = 4;
-          const callChngIdx = 6;
-          const putChngIdx = 16;
-          const putIVIdx = 18;
-          const putVolIdx = 19;
-          const putChngOIIdx = 20;
-          const putOIIdx = 21;
+          // Dynamic NSE Column indices detection
+          const headerRow = rawData[dataStartIndex];
+          let strikeIdx = headerRow.findIndex(cell => (cell || '').toLowerCase().includes('strike'));
+          if (strikeIdx === -1) {
+            strikeIdx = 11; // fallback
+          }
+
+          // Initial guess offsets based on strike location
+          let callOIIdx = strikeIdx - 10;
+          let callChngOIIdx = strikeIdx - 9;
+          let callVolIdx = strikeIdx - 8;
+          let callIVIdx = strikeIdx - 7;
+          let callChngIdx = strikeIdx - 5;
+
+          let putChngIdx = strikeIdx + 5;
+          let putIVIdx = strikeIdx + 7;
+          let putVolIdx = strikeIdx + 8;
+          let putChngOIIdx = strikeIdx + 9;
+          let putOIIdx = strikeIdx + 10;
+
+          // Perform dynamic search on headers for robust matching
+          for (let i = 0; i < headerRow.length; i++) {
+            const cell = (headerRow[i] || '').trim().toUpperCase();
+            if (!cell) continue;
+
+            if (i < strikeIdx) {
+              // CALLS (left side of strike)
+              if (cell === 'OI' || cell === 'O.I.') {
+                callOIIdx = i;
+              } else if (
+                cell.includes('CHNG IN OI') || 
+                cell.includes('CHNG IN O.I') || 
+                cell.includes('CHANGE IN OI') || 
+                cell.includes('CHG IN OI') || 
+                cell.includes('CHNGIN_OI') || 
+                cell.includes('CHNG_IN_OI')
+              ) {
+                callChngOIIdx = i;
+              } else if (cell.includes('VOLUME') || cell === 'VOL') {
+                callVolIdx = i;
+              } else if (cell === 'IV') {
+                callIVIdx = i;
+              } else if (
+                cell === 'CHNG' || 
+                cell === 'CHANGE' || 
+                cell.includes('NET CHNG') || 
+                cell === 'CHG' || 
+                cell.includes('NET_CHNG')
+              ) {
+                callChngIdx = i;
+              }
+            } else if (i > strikeIdx) {
+              // PUTS (right side of strike)
+              if (cell === 'OI' || cell === 'O.I.') {
+                putOIIdx = i;
+              } else if (
+                cell.includes('CHNG IN OI') || 
+                cell.includes('CHNG IN O.I') || 
+                cell.includes('CHANGE IN OI') || 
+                cell.includes('CHG IN OI') || 
+                cell.includes('CHNGIN_OI') || 
+                cell.includes('CHNG_IN_OI')
+              ) {
+                putChngOIIdx = i;
+              } else if (cell.includes('VOLUME') || cell === 'VOL') {
+                putVolIdx = i;
+              } else if (cell === 'IV') {
+                putIVIdx = i;
+              } else if (
+                cell === 'CHNG' || 
+                cell === 'CHANGE' || 
+                cell.includes('NET CHNG') || 
+                cell === 'CHG' || 
+                cell.includes('NET_CHNG')
+              ) {
+                putChngIdx = i;
+              }
+            }
+          }
 
           const parseNum = (val: string) => {
             if (!val || val.trim() === '-' || val.trim() === '') return 0;
