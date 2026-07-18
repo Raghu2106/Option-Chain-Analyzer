@@ -69,9 +69,41 @@ export default function App() {
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
   const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
-  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | 'blog' | null>(null);
-  const [activePage, setActivePage] = useState<'tool' | 'blog'>('tool');
-  const [openArticleId, setOpenArticleId] = useState<string | null>(null);
+  const [activePage, setActivePage] = useState<'tool' | 'blog'>(() => {
+    if (typeof window === 'undefined') return 'tool';
+    const rawPath = window.location.pathname;
+    const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
+    if (pathname === '/blog' || pathname.startsWith('/blog/')) {
+      return 'blog';
+    }
+    return 'tool';
+  });
+
+  const [openArticleId, setOpenArticleId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const rawPath = window.location.pathname;
+    const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
+    if (pathname.startsWith('/blog/')) {
+      return pathname.substring(6) || null;
+    }
+    const params = new URLSearchParams(window.location.search);
+    return params.get('article') || null;
+  });
+
+  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | 'blog' | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const rawPath = window.location.pathname;
+    const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
+    if (pathname === '/about') return 'about';
+    if (pathname === '/privacy') return 'privacy';
+    if (pathname === '/terms') return 'terms';
+    const params = new URLSearchParams(window.location.search);
+    const modalParam = params.get('modal');
+    if (modalParam === 'privacy' || modalParam === 'terms' || modalParam === 'about') {
+      return modalParam as 'privacy' | 'terms' | 'about';
+    }
+    return null;
+  });
 
   const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
     setActiveModal(modal);
@@ -542,72 +574,87 @@ export default function App() {
           let putChngOIIdx = strikeIdx + 9;
           let putOIIdx = strikeIdx + 10;
 
-          // Perform dynamic search on headers for robust matching
-          for (let i = 0; i < headerRow.length; i++) {
-            const cell = (headerRow[i] || '').trim().toUpperCase();
-            if (!cell) continue;
+          // Perform dynamic search on headers for robust matching across single or dual header structures
+          const headerRowsToSearch = [rawData[dataStartIndex]];
+          if (dataStartIndex + 1 < rawData.length) {
+            headerRowsToSearch.push(rawData[dataStartIndex + 1]);
+          }
 
-            if (i < strikeIdx) {
-              // CALLS (left side of strike)
-              if (cell === 'OI' || cell === 'O.I.') {
-                callOIIdx = i;
-              } else if (
-                cell.includes('CHNG IN OI') || 
-                cell.includes('CHNG IN O.I') || 
-                cell.includes('CHANGE IN OI') || 
-                cell.includes('CHG IN OI') || 
-                cell.includes('CHNGIN_OI') || 
-                cell.includes('CHNG_IN_OI')
-              ) {
-                callChngOIIdx = i;
-              } else if (cell.includes('VOLUME') || cell === 'VOL') {
-                callVolIdx = i;
-              } else if (cell === 'IV') {
-                callIVIdx = i;
-              } else if (
-                cell === 'CHNG' || 
-                cell === 'CHANGE' || 
-                cell.includes('NET CHNG') || 
-                cell === 'CHG' || 
-                cell.includes('NET_CHNG')
-              ) {
-                callChngIdx = i;
-              }
-            } else if (i > strikeIdx) {
-              // PUTS (right side of strike)
-              if (cell === 'OI' || cell === 'O.I.') {
-                putOIIdx = i;
-              } else if (
-                cell.includes('CHNG IN OI') || 
-                cell.includes('CHNG IN O.I') || 
-                cell.includes('CHANGE IN OI') || 
-                cell.includes('CHG IN OI') || 
-                cell.includes('CHNGIN_OI') || 
-                cell.includes('CHNG_IN_OI')
-              ) {
-                putChngOIIdx = i;
-              } else if (cell.includes('VOLUME') || cell === 'VOL') {
-                putVolIdx = i;
-              } else if (cell === 'IV') {
-                putIVIdx = i;
-              } else if (
-                cell === 'CHNG' || 
-                cell === 'CHANGE' || 
-                cell.includes('NET CHNG') || 
-                cell === 'CHG' || 
-                cell.includes('NET_CHNG')
-              ) {
-                putChngIdx = i;
+          headerRowsToSearch.forEach(hRow => {
+            for (let i = 0; i < hRow.length; i++) {
+              const cell = (hRow[i] || '').trim().toUpperCase();
+              if (!cell) continue;
+
+              if (i < strikeIdx) {
+                // CALLS (left side of strike)
+                if (cell === 'OI' || cell === 'O.I.') {
+                  callOIIdx = i;
+                } else if (
+                  cell.includes('CHNG IN OI') || 
+                  cell.includes('CHNG IN O.I') || 
+                  cell.includes('CHANGE IN OI') || 
+                  cell.includes('CHG IN OI') || 
+                  cell.includes('CHNGIN_OI') || 
+                  cell.includes('CHNG_IN_OI')
+                ) {
+                  callChngOIIdx = i;
+                } else if (cell.includes('VOLUME') || cell === 'VOL') {
+                  callVolIdx = i;
+                } else if (cell === 'IV') {
+                  callIVIdx = i;
+                } else if (
+                  cell === 'CHNG' || 
+                  cell === 'CHANGE' || 
+                  cell.includes('NET CHNG') || 
+                  cell === 'CHG' || 
+                  cell.includes('NET_CHNG')
+                ) {
+                  callChngIdx = i;
+                }
+              } else if (i > strikeIdx) {
+                // PUTS (right side of strike)
+                if (cell === 'OI' || cell === 'O.I.') {
+                  putOIIdx = i;
+                } else if (
+                  cell.includes('CHNG IN OI') || 
+                  cell.includes('CHNG IN O.I') || 
+                  cell.includes('CHANGE IN OI') || 
+                  cell.includes('CHG IN OI') || 
+                  cell.includes('CHNGIN_OI') || 
+                  cell.includes('CHNG_IN_OI')
+                ) {
+                  putChngOIIdx = i;
+                } else if (cell.includes('VOLUME') || cell === 'VOL') {
+                  putVolIdx = i;
+                } else if (cell === 'IV') {
+                  putIVIdx = i;
+                } else if (
+                  cell === 'CHNG' || 
+                  cell === 'CHANGE' || 
+                  cell.includes('NET CHNG') || 
+                  cell === 'CHG' || 
+                  cell.includes('NET_CHNG')
+                ) {
+                  putChngIdx = i;
+                }
               }
             }
-          }
+          });
 
           const parseNum = (val: string) => {
             if (!val || val.trim() === '-' || val.trim() === '') return 0;
             return parseFloat(val.replace(/,/g, '')) || 0;
           };
 
-          const rows = rawData.slice(dataStartIndex + 1);
+          let dataStartIndexActual = dataStartIndex + 1;
+          if (dataStartIndex + 1 < rawData.length) {
+            const nextRowStr = rawData[dataStartIndex + 1].join(' ').toLowerCase();
+            if (nextRowStr.includes('oi') || nextRowStr.includes('ltp') || nextRowStr.includes('volume') || nextRowStr.includes('bid')) {
+              dataStartIndexActual = dataStartIndex + 2;
+            }
+          }
+
+          const rows = rawData.slice(dataStartIndexActual);
           
           // Calculate average IV near spot for anomaly detection
           let atmCallIV = 0;

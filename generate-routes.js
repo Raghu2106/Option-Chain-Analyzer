@@ -77,8 +77,7 @@ const navigationHTML = `
     </div>
   </div>
   <nav class="hidden md:flex items-center gap-6">
-    <a href="/" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Analyzer Dashboard</a>
-    <a href="/blog" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Blog Articles</a>
+    <a href="/blog" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Blog</a>
     <a href="/about" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">About Us</a>
     <a href="/privacy" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Privacy Protocol</a>
     <a href="/terms" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Terms of Use</a>
@@ -105,7 +104,7 @@ const footerHTML = `
         <div class="flex flex-col gap-3">
           <a href="/" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Analyzer Tool</a>
           <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-          <a href="/blog" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog Articles</a>
+          <a href="/blog" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog</a>
         </div>
       </div>
 
