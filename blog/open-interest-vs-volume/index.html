@@ -45,11 +45,26 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9842476646609926"
      crossorigin="anonymous"></script>
+    <script>
+      document.documentElement.classList.add('js-enabled');
+    </script>
+    <style>
+      .js-enabled .seo-pre-render {
+        display: none !important;
+      }
+      .js-enabled .seo-loading-indicator {
+        display: flex !important;
+      }
+      @keyframes seo-logo-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.04); opacity: 0.85; }
+      }
+    </style>
     <script type="module" crossorigin src="/assets/index-abuVW56B.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-B1DMr_yR.css">
   </head>
   <body>
-    <div id="root">
+    <div id="root"><div class="seo-pre-render">
         <div class="flex flex-col min-h-screen bg-white">
           
 <header class="h-20 border-b border-slate-200 bg-slate-100 px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
@@ -174,6 +189,18 @@
 
         </div>
       </div>
+<div class="seo-loading-indicator" style="display: none; position: fixed; inset: 0; background: #fafafa; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+    <div style="width: 64px; height: 64px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(15, 78, 90, 0.05), 0 8px 10px -6px rgba(15, 78, 90, 0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; animation: seo-logo-pulse 1.5s infinite ease-in-out; padding: 10px; box-sizing: border-box;">
+      <img src="/logo.svg" alt="Loading Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+      <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: #0f4e5a;">Option Chain Analyzer</span>
+      <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; color: #94a3b8;">Initializing Analyzer Dashboard...</span>
+    </div>
+  </div>
+</div>
+</div>
   </body>
 </html>
 
