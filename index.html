@@ -45,6 +45,21 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9842476646609926"
      crossorigin="anonymous"></script>
+    <script>
+      document.documentElement.classList.add('js-enabled');
+    </script>
+    <style>
+      .js-enabled .seo-pre-render {
+        display: none !important;
+      }
+      .js-enabled .seo-loading-indicator {
+        display: flex !important;
+      }
+      @keyframes seo-logo-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.04); opacity: 0.85; }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

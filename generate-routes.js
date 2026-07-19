@@ -809,6 +809,20 @@ const getPageBodyContent = (route) => {
 };
 
 // 1. Process standard route subfolders
+const loadingIndicatorHTML = `
+<div class="seo-loading-indicator" style="display: none; position: fixed; inset: 0; background: #fafafa; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+    <div style="width: 64px; height: 64px; background: white; border-radius: 20px; box-shadow: 0 20px 25px -5px rgba(15, 78, 90, 0.05), 0 8px 10px -6px rgba(15, 78, 90, 0.05); display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; animation: seo-logo-pulse 1.5s infinite ease-in-out; padding: 10px; box-sizing: border-box;">
+      <img src="/logo.svg" alt="Loading Logo" style="width: 100%; height: 100%; object-fit: contain;" />
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+      <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: #0f4e5a;">Option Chain Analyzer</span>
+      <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; color: #94a3b8;">Initializing Analyzer Dashboard...</span>
+    </div>
+  </div>
+</div>
+`;
+
 Object.keys(routeMeta).forEach(route => {
   if (route === 'index') return; // Handled separately directly at root-level index.html
 
@@ -867,9 +881,10 @@ Object.keys(routeMeta).forEach(route => {
 
   // Inject rich pre-rendered HTML into <div id="root"></div> for crawlers
   const pageBody = getPageBodyContent(route);
+  const wrappedBody = `<div class="seo-pre-render">${pageBody}</div>${loadingIndicatorHTML}`;
   customizedHTML = customizedHTML.replace(
     /<div id="root"><\/div>/,
-    `<div id="root">${pageBody}</div>`
+    `<div id="root">${wrappedBody}</div>`
   );
 
   fs.writeFileSync(path.join(dirPath, 'index.html'), customizedHTML);
@@ -908,9 +923,10 @@ try {
 
   // Inject beautiful text and guides inside the homepage <div id="root"></div> as well!
   const homeBody = getPageBodyContent('index');
+  const wrappedHome = `<div class="seo-pre-render">${homeBody}</div>${loadingIndicatorHTML}`;
   homeHTML = homeHTML.replace(
     /<div id="root"><\/div>/,
-    `<div id="root">${homeBody}</div>`
+    `<div id="root">${wrappedHome}</div>`
   );
 
   fs.writeFileSync(indexPath, homeHTML);
