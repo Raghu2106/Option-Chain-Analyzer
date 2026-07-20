@@ -753,19 +753,49 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">Privacy Protocol</h1>
-            <p class="font-bold text-slate-500 uppercase tracking-widest text-xs">Last Updated: April 23, 2026</p>
+            <p class="font-bold text-slate-500 uppercase tracking-widest text-xs">Last Updated: June 30, 2026</p>
             
             <div class="border-t border-slate-150 pt-8 space-y-6 text-slate-700 leading-relaxed text-base bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/60">
-              <p>Your privacy is important to us. It is Option Chain Analyzer's policy to respect your privacy regarding any data we may handle from you across our website, <a href="https://optionchainanalyzer.in" class="text-brand-teal underline font-semibold">https://optionchainanalyzer.in</a>.</p>
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide">1. Introduction and Scope</h2>
+              <p>This Privacy Policy describes how <strong>OptionChainAnalyzer.in</strong> ("we", "our", or "us") collects, uses, protects, and discloses information when you use our website and local analysis tool. We are fully committed to protecting your privacy and ensuring you have a secure experience when visiting our platform. By accessing or using our website, you consent to the data practices described in this policy.</p>
               
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">1. Local-Only Processing Memory</h2>
-              <p>The application analyzes data strictly locally inside your web browser. CSV files you upload are not sent to any database, synchronization portal, or outer server. All parsing runs client-side, keeping your proprietary sheets and files safe and confidential.</p>
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">2. Local Data Processing (Zero Upload Policy)</h2>
+              <p>Our core application operates on an "offline-first, browser-local" model. When you upload, select, or drag-and-drop an NSE Option Chain CSV file onto our interface, the data is processed entirely in your web browser's local memory.</p>
+              <p><strong>We do not upload, transmit, store, or share your CSV files, stock symbols, target strikes, or financial datasets on our servers or with any third party.</strong> Your research remains 100% private, isolated, and confidential to your local machine.</p>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">2. Cookies and Advertising Partners</h2>
-              <p>Third-party advertising services (specifically Google AdSense) may be used to serve personalized and/or non-personalized ads to keep this educational tool free. These advertising partners may use digital cookies, web beacons, and unique identifiers to collect anonymous browsing behavior data to optimize advertisements based on your search history.</p>
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">3. Information We Collect Automatically</h2>
+              <p>Like most standard website operators, we may collect non-personally identifying information of the sort that web browsers and servers typically make available, such as:</p>
+              <ul class="list-disc pl-6 space-y-2 text-sm">
+                <li><strong>Log Files:</strong> We collect standard internet log files including Internet Protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring or exit pages, and clickstream data. These are analyzed collectively to understand general usage trends and maintain platform security.</li>
+                <li><strong>Device Metadata:</strong> Basic information regarding your operating system, screen resolution, and language settings to ensure our responsive layout renders properly.</li>
+              </ul>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">3. Absence of Personally Identifiable Information</h2>
-              <p>We do not collect names, phone numbers, or email addresses. No registration, user accounts, password, or financial credentials are required to use this analyzer. This tool is completely open-access for anonymous learning and study purposes.</p>
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">4. Cookies and Third-Party Advertising (Google AdSense Disclosure)</h2>
+              <p>To keep our comprehensive option mapping utilities and analytical blog free of charge, we partner with third-party networks, including Google AdSense, to display relevant advertisements across our platform.</p>
+              <div class="p-6 bg-slate-50 border border-slate-150 rounded-2xl space-y-3">
+                <p class="text-xs font-black uppercase text-brand-teal tracking-wider">Crucial Cookie Disclosures</p>
+                <ul class="list-disc pl-6 space-y-2 text-xs leading-relaxed text-slate-600">
+                  <li><strong>Third-Party Vendors:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites on the Internet.</li>
+                  <li><strong>DoubleClick DART Cookie:</strong> Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and/or other sites on the Internet.</li>
+                  <li><strong>How to Opt-Out:</strong> Users may opt out of personalized advertising by visiting Google's ad setting configurations at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer" class="text-blue-600 hover:text-blue-700 underline font-semibold">https://policies.google.com/technologies/ads</a>. Alternatively, users can opt out of third-party vendors' use of cookies for personalized advertising by visiting <a href="http://www.aboutads.info/choices/" target="_blank" rel="noreferrer" class="text-blue-600 hover:text-blue-700 underline font-semibold">www.aboutads.info/choices</a>.</li>
+                </ul>
+              </div>
+
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">5. GDPR and CCPA Privacy Rights</h2>
+              <p>We want to ensure you are fully aware of all your data protection rights. Every user is entitled to the following:</p>
+              <ul class="list-disc pl-6 space-y-2 text-sm">
+                <li><strong>The Right to Access:</strong> You have the right to request copies of your personal data. (Since we do not store your data, we hold no records to provide).</li>
+                <li><strong>The Right to Rectification & Erasure:</strong> You have the right to request that we correct or erase any personal information we may hold.</li>
+                <li><strong>The Right to Object/Restrict Processing:</strong> You have the right to object to or request that we restrict the processing of your data under specific conditions.</li>
+                <li><strong>CCPA "Do Not Sell" Compliance:</strong> Under the California Consumer Privacy Act, users have the right to opt-out of the sale of their personal information. We do not collect or sell any personal data.</li>
+              </ul>
+
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">6. Children's Online Privacy Protection</h2>
+              <p>Protecting children's privacy online is of paramount importance to us. <strong>OptionChainAnalyzer.in</strong> does not knowingly collect or solicit any Personally Identifiable Information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us immediately so we can take steps to remove it from our systems.</p>
+
+              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">7. Contact and Support Information</h2>
+              <p>If you have any questions, clarifications, or concerns regarding this Privacy Policy, please contact our support team at:</p>
+              <p class="font-mono text-sm text-[#0f4e5a] font-extrabold">Email: support@optionchainanalyzer.in</p>
             </div>
           </main>
           
@@ -881,7 +911,7 @@ Object.keys(routeMeta).forEach(route => {
 
   // Inject rich pre-rendered HTML into <div id="root"></div> for crawlers
   const pageBody = getPageBodyContent(route);
-  const wrappedBody = `<div class="seo-pre-render">${pageBody}</div>${loadingIndicatorHTML}`;
+  const wrappedBody = `<noscript><div class="seo-pre-render">${pageBody}</div></noscript>${loadingIndicatorHTML}`;
   customizedHTML = customizedHTML.replace(
     /<div id="root"><\/div>/,
     `<div id="root">${wrappedBody}</div>`
@@ -923,7 +953,7 @@ try {
 
   // Inject beautiful text and guides inside the homepage <div id="root"></div> as well!
   const homeBody = getPageBodyContent('index');
-  const wrappedHome = `<div class="seo-pre-render">${homeBody}</div>${loadingIndicatorHTML}`;
+  const wrappedHome = `<noscript><div class="seo-pre-render">${homeBody}</div></noscript>${loadingIndicatorHTML}`;
   homeHTML = homeHTML.replace(
     /<div id="root"><\/div>/,
     `<div id="root">${wrappedHome}</div>`

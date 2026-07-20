@@ -529,9 +529,9 @@ export default function App() {
 
           // Backup: If still no spot, look for it in ANY row before the data starts
           if (!detectedSpot) {
-            const dataStartIndex = rawData.findIndex(row => row.some(cell => cell.toLowerCase().includes('strike')));
+            const dataStartIndex = rawData.findIndex(row => row.some(cell => String(cell || '').toLowerCase().includes('strike')));
             for (let i = 0; i < (dataStartIndex > -1 ? dataStartIndex : 20); i++) {
-               const rowStr = rawData[i].join(' ');
+               const rowStr = (rawData[i] || []).join(' ');
                const numbers = rowStr.match(/[\d,]+\.\d{2}/g); // Look specifically for 2-decimal floats
                if (numbers) {
                  detectedSpot = parseFloat(numbers[0].replace(/,/g, ''));
@@ -546,7 +546,7 @@ export default function App() {
           if (detectedTime) setAsOfTime(detectedTime);
 
           const dataStartIndex = rawData.findIndex(row => 
-            row.some(cell => cell.toLowerCase().includes('strike'))
+            row.some(cell => String(cell || '').toLowerCase().includes('strike'))
           );
 
           if (dataStartIndex === -1) {
@@ -556,7 +556,7 @@ export default function App() {
 
           // Dynamic NSE Column indices detection
           const headerRow = rawData[dataStartIndex];
-          let strikeIdx = headerRow.findIndex(cell => (cell || '').toLowerCase().includes('strike'));
+          let strikeIdx = headerRow.findIndex(cell => String(cell || '').toLowerCase().includes('strike'));
           if (strikeIdx === -1) {
             strikeIdx = 11; // fallback
           }
@@ -641,9 +641,12 @@ export default function App() {
             }
           });
 
-          const parseNum = (val: string) => {
-            if (!val || val.trim() === '-' || val.trim() === '') return 0;
-            return parseFloat(val.replace(/,/g, '')) || 0;
+          const parseNum = (val: any) => {
+            if (val === undefined || val === null) return 0;
+            const strVal = String(val).trim();
+            if (strVal === '-' || strVal === '') return 0;
+            const parsed = parseFloat(strVal.replace(/,/g, ''));
+            return isNaN(parsed) ? 0 : parsed;
           };
 
           let dataStartIndexActual = dataStartIndex + 1;
