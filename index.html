@@ -60,8 +60,8 @@
         50% { transform: scale(1.04); opacity: 0.85; }
       }
     </style>
-    <script type="module" crossorigin src="/assets/index-CgZEoqik.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B1DMr_yR.css">
+    <script type="module" crossorigin src="/assets/index-CuXAuDsU.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BQFiAtPf.css">
   </head>
   <body>
     <div id="root"><noscript><div class="seo-pre-render">
@@ -160,92 +160,126 @@
               </div>
             </div>
 
-            <!-- Complete Option Chain operational guide rendered in clean HTML to ensure thousands of words of high-quality copy is crawled on / -->
-            <div class="border-t border-slate-200/80 pt-16 flex flex-col gap-12 text-left">
-              <div class="border-b-2 border-[#0f4e5a] pb-4">
-                <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase">
-                  Option Chain Analyzer Operational Guide
+            <!-- Complete Option Chain operational guide rendered in clean HTML to ensure high-quality copy is crawled on / -->
+            <div class="border-t border-slate-200/80 pt-12 flex flex-col gap-10 text-left">
+              <div class="border-b border-slate-200 pb-5">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-[#0f4e5a] mb-1.5 block">User Guide & Reference</span>
+                <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase leading-snug">
+                  How to Use Option Chain Analyzer
                 </h3>
-                <p class="text-xs md:text-sm font-black text-[#0f4e5a] uppercase tracking-[0.25em] mt-1">
-                  User manual & systematic workflow for interpreting derivative open interest positioning
+                <p class="text-xs md:text-sm font-semibold text-slate-500 mt-1">
+                  A concise guide to analyzing NSE Open Interest, Put-Call Ratios, and Volatility anomalies
                 </p>
               </div>
 
-              <section class="space-y-6">
-                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
-                  1. Comprehensive Research Guide: Supplementary Analysis alongside Technical Charting
+              <section class="space-y-4">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  1. Quick Start Workflow
                 </h4>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
-                  The National Stock Exchange of India (NSE) hosts highly active derivatives segments, with liquid options contracts on major benchmark indices like Nifty 50, Bank Nifty, Financial Services Nifty (FINNIFTY), and Midcap Nifty (MIDCPNIFTY), alongside individual equity stock options. For research analysts, tracking these contracts in dense tabular layouts can be challenging. Our Option Chain Analyzer serves as a supplementary analytical dashboard, converting raw, static CSV files into intuitive, live, color-mapped visualizations. This utility should be used as a corroborative data source alongside your primary price charting platform.
+                <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                  Option Chain Analyzer processes official National Stock Exchange of India (NSE) option chain CSV exports directly in your browser. All computations run 100% locally in your device memory—no data is uploaded or stored on any external server.
                 </p>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
-                  To analyze and locate potential support and resistance benchmarks as a confluence filter in conjunction with your chart analysis, follow this systematic workflow:
-                </p>
-                <ul class="list-disc pl-6 space-y-3 text-sm md:text-base text-slate-600 font-medium">
-                  <li>
-                    <strong>Acquiring Clean Data:</strong> Begin by navigating directly to the official National Stock Exchange of India option chain dashboard (nseindia.com/option-chain). Select your preferred contract—whether Nifty 50 or Bank Nifty—and click the "Download CSV" link to extract the latest snapshot.
-                  </li>
-                  <li>
-                    <strong>Importing the File:</strong> Simply drag and drop the .csv file onto our drop zone on the main page, or click "Upload CSV File" to choose it manually. Our processing engine runs 100% locally in your browser memory, keeping your analytical data private and highly secure.
-                  </li>
-                  <li>
-                    <strong>Locating the Spot Price & ATM Strike:</strong> The tool automatically extracts the current spot value and benchmarks the closest At-The-Money (ATM) strike. The ATM row acts as the key gravity center of the options chain and maps out a prominent highlighted container upon rendering so you never lose track of active market movements.
-                  </li>
-                  <li>
-                    <strong>Reading the Color-Coded Multipliers:</strong> Look at the Call and Put ratio metrics. In corporate risk management and options analysis, heavy concentration of short open interest can signal significant resistance and support layers. If a strike exhibits a Call-to-Put or Put-to-Call ratio of 6.0x or more, our tool recognizes this as a high probable zone and color-highlights the strike in shades of green (strong Support) or red (strong Resistance).
-                  </li>
-                  <li>
-                    <strong>Tracking Implied Volatility (IV) Anomalies:</strong> Implied Volatility (IV) measures market expectation of future movement. Our analyzer calculates the ATM-centered average IV. When a single strike experiences an IV spike exceeding 25% of this average, it highlights it as an anomaly. These premium spikes are statistical "hot-spots" where market participants are anticipating or hedging against price fluctuations.
-                  </li>
-                </ul>
-              </section>
-
-              <section class="space-y-6">
-                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
-                  2. Deep Dive Into Put-Call Ratio (PCR): Quantitative Sentiment Mapping
-                </h4>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
-                  The Put-Call Ratio (PCR) is one of the most effective, mathematically derived market sentiment indicators used in derivatives analysis. While basic charts track price history, PCR maps out real-time position accumulation by market participants. In our analytical toolkit, PCR can be calculated across the entire index, or localized strike-by-strike, to show concentrated zones of dominance.
-                </p>
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/80 my-4 text-center font-mono text-sm text-slate-800">
-                  PCR (Open Interest) = Total Outstanding Put Open Interest / Total Outstanding Call Open Interest
-                </div>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
-                  Because option writing (selling) requires substantial margin capital under SEBI guidelines—typically averaging over ₹1,00,000 per lot compared to the minimal premium required to buy options—the option chain is traditionally analyzed from the perspective of option writers. Option buyers are generally retail participants who are vulnerable to rapid time decay (theta), whereas option writers are well-capitalized institutions, mutual funds, and large prop desks.
-                </p>
-              </section>
-
-              <section class="space-y-6">
-                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
-                  3. Call-Put Ratio (CPR) Dynamics: Sector Resistance & High Probable Overhead Barriers
-                </h4>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
-                  While retail platforms typically focus strictly on Put-Call relationships, experienced market analysts heavily monitor the reciprocal relationship: the Call-Put Ratio (CPR). In our option chain interface, CPR is mapped as a high-conviction resistance indicator.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                  <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <span class="block text-xs font-black uppercase text-brand-teal mb-1">Open Interest Call-Put Ratio (CPR OI)</span>
-                    <span class="block font-mono text-[13px] text-slate-800 font-bold">CPR OI = Call Outstanding Open Interest / Put Outstanding Open Interest</span>
-                    <p class="text-[11px] text-slate-500 mt-2">Tracks the build-up of massive overhead blocks. High CPR OI database indicates that major funds are heavily underwriting call contracts.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">1</div>
+                    <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                      Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
+                    </p>
                   </div>
-                  <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <span class="block text-xs font-black uppercase text-brand-teal mb-1">Volume Call-Put Ratio (CPR Vol)</span>
-                    <span class="block font-mono text-[13px] text-slate-800 font-bold">CPR Vol = Call Traded Volume / Put Traded Volume</span>
-                    <p class="text-[11px] text-slate-500 mt-2">Detects real-time volume build-up. Sudden spikes in CPR Vol show rapid resistance formation, often coinciding with capped price breakouts.</p>
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">2</div>
+                    <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                      Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
+                    </p>
+                  </div>
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">3</div>
+                    <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h5>
+                    <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                      Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
+                    </p>
                   </div>
                 </div>
               </section>
 
-              <section class="space-y-6">
-                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4">
-                  4. Professional Risk Management: Mastering Derivatives Volatility
+              <section class="space-y-4 pt-2 border-t border-slate-100">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  2. Key Derivatives Indicators Explained
                 </h4>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed">
-                  Futures and Options (F&O) analysis in the Indian stock exchange is inherently high-risk. While structured data analysis like PCR, volume concentration zone analysis, and IV tracking can dramatically improve your understanding of market structure, they are ultimately mathematical probabilities. No data model is infallible, and market conditions can change instantly.
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Open Interest (OI) &amp; Change in OI</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                      Open Interest represents the total active, unsettled option contracts. High OI at specific strikes reflects institutional positioning. Increasing OI confirms new positions, while decreasing OI signals position unwinding or profit booking.
+                    </p>
+                  </div>
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">At-The-Money (ATM) Strike</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                      The strike price closest to the underlying spot price. It serves as the market pivot point where gamma and volatility changes have the most immediate impact on option prices.
+                    </p>
+                  </div>
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Put-Call Ratio (PCR)</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                      Calculated as <code class="font-semibold text-slate-800">Put Open Interest ÷ Call Open Interest</code>. A high PCR indicates stronger put open interest relative to calls, signaling that option writers are establishing support floors.
+                    </p>
+                  </div>
+                  <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Call-Put Ratio (CPR)</h5>
+                    <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                      Calculated as <code class="font-semibold text-slate-800">Call Open Interest ÷ Put Open Interest</code>. A high CPR indicates heavy call open interest relative to puts, signaling strong overhead resistance from option writers.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="space-y-4 pt-2 border-t border-slate-100">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  3. Automated Support &amp; Resistance Highlights (6.0x Rule)
+                </h4>
+                <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                  Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as defense barriers defended by institutional writers:
                 </p>
-                <p class="text-sm md:text-base text-slate-600 leading-relaxed font-semibold">
-                  Securities regulatory reports (SEBI) reveal a stark statistic for retail derivative traders: 9 out of 10 retail traders lose money in active option trading, with average losses often wiping out entire accounts. Capital preservation is the core hallmark separating veteran analysts from beginners.
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                      <h5 class="text-xs font-bold uppercase text-emerald-900 tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h5>
+                    </div>
+                    <p class="text-xs text-emerald-950 leading-relaxed font-medium">
+                      Highlighted in <strong>Green</strong>. Indicates Put Open Interest is at least 6 times greater than Call Open Interest at that strike, identifying an institutional put-writing floor.
+                    </p>
+                  </div>
+                  <div class="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                      <h5 class="text-xs font-bold uppercase text-rose-900 tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h5>
+                    </div>
+                    <p class="text-xs text-rose-950 leading-relaxed font-medium">
+                      Highlighted in <strong>Red</strong>. Indicates Call Open Interest is at least 6 times greater than Put Open Interest at that strike, identifying a heavy call-writing ceiling.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="space-y-4 pt-2 border-t border-slate-100">
+                <h4 class="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  4. Risk Management &amp; SEBI Compliance
+                </h4>
+                <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                  Derivatives trading carries significant financial risk. According to research published by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail traders in the equity futures and options segment incur net financial losses</strong>.
                 </p>
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600 leading-relaxed font-medium">
+                  <p>
+                    <strong>Confluence Only:</strong> Option chain open interest distribution should always be used as a secondary confirmation tool alongside primary price action and technical charts.
+                  </p>
+                  <p>
+                    <strong>No Investment Advice:</strong> Option Chain Analyzer is an independent analytical tool built strictly for educational and informational purposes. We do not provide trading recommendations, buy/sell calls, or financial advice.
+                  </p>
+                </div>
               </section>
             </div>
           </main>
