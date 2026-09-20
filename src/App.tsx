@@ -4,7 +4,7 @@ import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, C
 import { motion, AnimatePresence } from 'motion/react';
 import BlogSection from './components/BlogSection';
 
-interface OptionChainRow {
+export interface OptionChainRow {
   strikePrice: number;
   callOI: number;
   callChngOI: number;
@@ -29,6 +29,10 @@ interface OptionChainRow {
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
   const [spotPrice, setSpotPrice] = useState<number | null>(null);
+  const [symbolName, setSymbolName] = useState<string | null>(null);
+  const [asOfTime, setAsOfTime] = useState<string | null>(null);
+  const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
+  const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
   const [liveSpotMap, setLiveSpotMap] = useState<Record<string, number>>({});
   const [lastLiveUpdate, setLastLiveUpdate] = useState<Date | null>(null);
   const [timeAgo, setTimeAgo] = useState<string>('');
@@ -60,15 +64,11 @@ export default function App() {
     return () => clearInterval(timer);
   }, [updateTimeAgo]);
 
-  const [asOfTime, setAsOfTime] = useState<string | null>(null);
-  const [symbolName, setSymbolName] = useState<string | null>(null);
-  const [ivSentiment, setIvSentiment] = useState<{ skew: number, mood: string } | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
-  const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
   const [activePage, setActivePage] = useState<'tool' | 'blog'>(() => {
     if (typeof window === 'undefined') return 'tool';
     const rawPath = window.location.pathname;
@@ -105,17 +105,15 @@ export default function App() {
     return null;
   });
 
-  const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
-    setActiveModal(modal);
-    if (modal) {
-      window.history.pushState(null, '', `/${modal}`);
-    } else {
-      const recoveryPath = activePage === 'blog' 
-        ? (openArticleId ? `/blog/${openArticleId}` : '/blog') 
-        : '/';
-      window.history.pushState(null, '', recoveryPath);
+  const selectPage = useCallback((page: 'tool' | 'blog') => {
+    setActivePage(page);
+    if (page === 'tool') {
+      setOpenArticleId(null);
+      window.history.pushState(null, '', '/');
+    } else if (page === 'blog') {
+      window.history.pushState(null, '', '/blog');
     }
-  }, [activePage, openArticleId]);
+  }, []);
 
   const selectArticle = useCallback((id: string | null) => {
     setOpenArticleId(id);
@@ -126,15 +124,22 @@ export default function App() {
     }
   }, []);
 
-  const selectPage = useCallback((page: 'tool' | 'blog') => {
-    setActivePage(page);
-    if (page === 'tool') {
-      setOpenArticleId(null);
-      window.history.pushState(null, '', '/');
-    } else if (page === 'blog') {
-      window.history.pushState(null, '', '/blog');
+  const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
+    if (modal === 'blog') {
+      setActiveModal(null);
+      selectPage('blog');
+      return;
     }
-  }, []);
+    setActiveModal(modal);
+    if (modal) {
+      window.history.pushState(null, '', `/${modal}`);
+    } else {
+      const recoveryPath = activePage === 'blog' 
+        ? (openArticleId ? `/blog/${openArticleId}` : '/blog') 
+        : '/';
+      window.history.pushState(null, '', recoveryPath);
+    }
+  }, [activePage, openArticleId, selectPage]);
 
   const [logoError, setLogoError] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
@@ -788,241 +793,130 @@ export default function App() {
   };
 
   const GuideContent = () => (
-    <div className="flex flex-col gap-16 text-left w-full py-16 border-t border-slate-200/60 mt-16 bg-white rounded-[2rem] p-8 md:p-12 shadow-sm relative overflow-hidden">
-      {/* Decorative ambient elements index */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-brand-teal/[0.015] blur-3xl rounded-full" />
-      
+    <div className="flex flex-col gap-10 text-left w-full py-12 border-t border-slate-200 mt-12 bg-white rounded-2xl p-6 md:p-10 shadow-sm relative overflow-hidden">
       {/* Informative Title Header */}
-      <div className="border-b-2 border-brand-teal pb-6">
-        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-teal mb-2 block">TECHNICAL DOCUMENTATION</span>
-        <h2 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight uppercase leading-tight">
-          Option Chain Analyzer Operational Guide
+      <div className="border-b border-slate-200 pb-5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-brand-teal mb-1.5 block">User Guide & Reference</span>
+        <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase leading-snug">
+          How to Use Option Chain Analyzer
         </h2>
-        <p className="text-xs md:text-sm font-black text-slate-500 uppercase tracking-[0.2em] mt-1.5 leading-relaxed">
-          User manual & systematic workflow for interpreting derivative open interest positioning
+        <p className="text-xs md:text-sm font-semibold text-slate-500 mt-1">
+          A concise guide to analyzing NSE Open Interest, Put-Call Ratios, and Volatility anomalies
         </p>
       </div>
 
-      {/* Section 1: User Guide */}
-      <section className="space-y-8">
-        <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4 leading-none">
-          1. Comprehensive Research Guide: Supplementary Analysis alongside Technical Charting
+      {/* Section 1: Quick Start Workflow */}
+      <section className="space-y-4">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+          1. Quick Start Workflow
         </h3>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-semibold bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-          The National Stock Exchange of India (NSE) hosts highly active derivatives segments, with liquid options contracts on major benchmark indices like Nifty 50, Bank Nifty, Financial Services Nifty (FINNIFTY), and Midcap Nifty (MIDCPNIFTY), alongside individual equity stock options. For research analysts, tracking these contracts in dense tabular layouts can be challenging. Our Option Chain Analyzer serves as a supplementary analytical dashboard, converting raw, static CSV files into intuitive, live, color-mapped visualizations. This utility should be used as a corroborative data source alongside your primary price charting platform.
+        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+          Option Chain Analyzer processes official National Stock Exchange of India (NSE) option chain CSV exports directly in your browser. All computations run 100% locally in your device memory—no data is uploaded or stored on any external server.
         </p>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          To analyze and locate potential support and resistance benchmarks as a confluence filter in conjunction with your chart analysis, follow this systematic workflow:
-        </p>
-        <ul className="space-y-4 text-sm md:text-base text-slate-600 font-medium">
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              1
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Acquiring Clean Data:</strong> Begin by navigating directly to the official National Stock Exchange of India option chain dashboard (<a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-extrabold hover:scale-105 transition-transform inline-block">www.nseindia.com/option-chain</a>). Select your preferred contract—whether Nifty 50 or Bank Nifty—and click the "Download CSV" link to extract the latest snapshot.
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              2
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Importing the File:</strong> Simply drag and drop the `.csv` file onto our drop zone on the main page, or click "Upload CSV File" to choose it manually. Our processing engine runs 100% locally in your browser memory, keeping your analytical data private and highly secure.
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              3
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Locating the Spot Price & ATM Strike:</strong> The tool automatically extracts the current spot value and benchmarks the closest At-The-Money (ATM) strike. The ATM row acts as the key gravity center of the options chain and maps out a prominent highlighted container upon rendering so you never lose track of active market movements.
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              4
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Reading the Color-Coded Multipliers:</strong> Look at the Call and Put ratio metrics. In corporate risk management and options analysis, heavy concentration of short open interest can signal significant resistance and support layers. If a strike exhibits a Call-to-Put or Put-to-Call ratio of <strong>6.0x or more</strong>, our tool recognizes this as a high probable zone and color-highlights the strike in shades of green (strong Support) or red (strong Resistance).
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              5
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Tracking Implied Volatility (IV) Anomalies:</strong> Implied Volatility (IV) measures market expectation of future movement. Our analyzer calculates the ATM-centered average IV. When a single strike experiences an IV spike exceeding 25% of this average, it highlights it as an anomaly. These premium spikes are statistical "hot-spots" where market participants are anticipating or hedging against rapid price deviations.
-              </p>
-            </div>
-          </li>
-        </ul>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium pt-2">
-          By referencing these automated, highlighted zones as a supplementary layer alongside primary price action charts, analysts can quickly spot where potential high probable defense structures reside without manual calculations.
-        </p>
-      </section>
-
-      {/* Section 2: PCR Deep Dive */}
-      <section className="space-y-8 pt-4 border-t border-slate-100">
-        <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4 leading-none">
-          2. Deep Dive Into Put-Call Ratio (PCR): Quantitative Sentiment Mapping
-        </h3>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          The Put-Call Ratio (PCR) is one of the most effective, mathematically derived market sentiment indicators used in derivatives analysis. While basic charts track price history, PCR maps out real-time position accumulation by market participants. In our analytical toolkit, PCR can be calculated across the entire index, or localized strike-by-strike, to show concentrated zones of dominance.
-        </p>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          The core overall index Put-Call Ratio utilizes a simple, clean open interest calculation:
-        </p>
-        <div className="bg-slate-100/60 p-6 rounded-2xl border border-slate-200/50 my-6 text-center font-mono text-sm text-brand-teal font-extrabold relative shadow-inner overflow-hidden">
-          <div className="absolute top-0 left-0 text-[8px] font-black uppercase tracking-widest text-brand-teal/40 bg-white border-r border-b border-slate-200/40 px-2.5 py-0.5">MATH EQUATION</div>
-          PCR (Open Interest) = Total Outstanding Put Open Interest / Total Outstanding Call Open Interest
-        </div>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          Because option writing (selling) requires substantial margin capital under SEBI guidelines—typically averaging over ₹1,00,000 per lot compared to the minimal premium required to buy options—the option chain is traditionally analyzed from the perspective of option writers. Option buyers are generally retail participants who are vulnerable to rapid time decay (theta), whereas option writers are well-capitalized institutions, mutual funds, and large prop desks.
-        </p>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          To simplify complex tabular datasets, our analyzer dynamically calculates strike-specific ratios and automatically highlights Put-Call Ratio (PCR) and Call-Put Ratio (CPR) values of <strong>6.0 and above</strong> as high-probability support and resistance zones:
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-          <div className="bg-emerald-50/50 border border-emerald-100/80 p-6 rounded-2xl shadow-sm hover:scale-[1.01] transition-all">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-              <h4 className="font-extrabold text-emerald-800 text-sm uppercase tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h4>
-            </div>
-            <p className="text-xs text-emerald-950 leading-relaxed font-semibold">
-              Highlighted in <strong>Green</strong>. Indicates that outstanding Put Open Interest or Volume is at least 6 times greater than Call Open Interest/Volume at that specific strike. This represents significant concentrated underwriting of put contracts, signaling a high probable support zone or price floor to watch on your charts.
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">1</div>
+            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h4>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
             </p>
           </div>
-          <div className="bg-rose-50/50 border border-rose-100/80 p-6 rounded-2xl shadow-sm hover:scale-[1.01] transition-all">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" />
-              <h4 className="font-extrabold text-rose-800 text-sm uppercase tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h4>
-            </div>
-            <p className="text-xs text-rose-950 leading-relaxed font-semibold">
-              Highlighted in <strong>Red</strong>. Indicates that outstanding Call Open Interest or Volume is at least 6 times greater than Put Open Interest/Volume at that specific strike. This shows massive overhead underwriting of call contracts, signaling a high-probability resistance zone or price ceiling to monitor.
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">2</div>
+            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h4>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
+            </p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">3</div>
+            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h4>
+            <p className="text-xs text-slate-550 leading-relaxed font-medium">
+              Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
             </p>
           </div>
         </div>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          Rather than interpreting overall index-level general sentiment, targeting these specific strike-level multiplier highlights allows you to instantly pinpoint major mathematical barriers which you can match directly against your candlesticks or trendline analysis.
-        </p>
       </section>
 
-      {/* Section 3: CPR Dynamics */}
-      <section className="space-y-8 pt-4 border-t border-slate-100">
-        <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4 leading-none">
-          3. Call-Put Ratio (CPR) Dynamics: Sector Resistance & High Probable Overhead Barriers
+      {/* Section 2: Key Indicators Explained */}
+      <section className="space-y-4 pt-2 border-t border-slate-100">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+          2. Key Derivatives Indicators Explained
         </h3>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          While retail platforms typically focus strictly on Put-Call relationships, experienced market analysts heavily monitor the reciprocal relationship: the **Call-Put Ratio (CPR)**. In our option chain interface, CPR is mapped as a high-conviction resistance indicator.
-        </p>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          When examining option writing trends, the Call-Put Ratio computes exactly how dominant call contracts are over put contracts at any specific strike:
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-150 relative overflow-hidden shadow-inner flex flex-col justify-between">
-            <span className="absolute top-0 right-0 text-[7px] font-black uppercase tracking-widest text-brand-teal/40 bg-white px-2 py-0.5 border-l border-b border-slate-100">OPEN INTEREST MATRICES</span>
-            <div>
-              <span className="block text-xs font-black uppercase text-brand-teal mb-1 tracking-wider">Open Interest Call-Put Ratio (CPR OI)</span>
-              <span className="block font-mono text-xs md:text-sm text-slate-800 font-extrabold pb-2 border-b border-slate-100">CPR OI = Call Outstanding Open Interest / Put Outstanding Open Interest</span>
-            </div>
-            <p className="text-xs text-slate-550 mt-3 font-semibold leading-relaxed">Tracks the build-up of massive overhead blocks. High CPR OI signifies that major funds are heavily underwriting call contracts, predicting the asset will not cross that strike price.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Open Interest (OI) &amp; Change in OI</h4>
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              Open Interest represents the total active, unsettled option contracts. High OI at specific strikes reflects institutional positioning. Increasing OI confirms new positions, while decreasing OI signals position unwinding or profit booking.
+            </p>
           </div>
-          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-150 relative overflow-hidden shadow-inner flex flex-col justify-between">
-            <span className="absolute top-0 right-0 text-[7px] font-black uppercase tracking-widest text-brand-teal/40 bg-white px-2 py-0.5 border-l border-b border-slate-100">VOLUME METRICS</span>
-            <div>
-              <span className="block text-xs font-black uppercase text-brand-teal mb-1 tracking-wider">Volume Call-Put Ratio (CPR Vol)</span>
-              <span className="block font-mono text-xs md:text-sm text-slate-800 font-extrabold pb-2 border-b border-slate-100">CPR Vol = Call Traded Volume / Put Traded Volume</span>
-            </div>
-            <p className="text-xs text-slate-550 mt-3 font-semibold leading-relaxed">Detects real-time volume build-up. Sudden spikes in CPR Vol show rapid resistance formation, often coinciding with capped price breakouts.</p>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">At-The-Money (ATM) Strike</h4>
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              The strike price closest to the underlying spot price. It serves as the market pivot point where gamma and volatility changes have the most immediate impact on option prices.
+            </p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Put-Call Ratio (PCR)</h4>
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              Calculated as <code className="font-semibold text-slate-800">Put Open Interest ÷ Call Open Interest</code>. A high PCR indicates stronger put open interest relative to calls, signaling that option writers are establishing support floors.
+            </p>
+          </div>
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Call-Put Ratio (CPR)</h4>
+            <p className="text-xs text-slate-600 leading-relaxed font-medium">
+              Calculated as <code className="font-semibold text-slate-800">Call Open Interest ÷ Put Open Interest</code>. A high CPR indicates heavy call open interest relative to puts, signaling strong overhead resistance from option writers.
+            </p>
           </div>
         </div>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          Understanding call option underwriting requires analyzing the premium-capture goals of market-makers. Call sellers pocket options premiums upfront, in exchange for agreeing to sell the underlying asset if requested. Because indices like Nifty or Bank Nifty can rise indefinitely, call writers face high risk. Thus, when high-conviction sellers write a heavy volume of call options at a strike, they do so with deep structural conviction:
-        </p>
-        <ul className="space-y-4 text-sm md:text-base text-slate-600 font-medium">
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              A
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>The 6.0x Multiplier Benchmark:</strong> When our database monitors a CPR ratio (for Open Interest or Volume) crossing the <strong>6.0x barrier</strong>, our renderer triggers a prominent 3D-effect red highlighted alert. This reveals a heavily guarded high probable wall where sellers outnumber buyers 6-to-1, signaling exceptionally strong resistance.
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              B
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Breakout and Resistance Validation:</strong> If the index is heading upwards but approaches a strike highlighted with a high CPR OI (such as Bank Nifty nearing a major round number), analysts can check the accompanying CPR Volume. If CPR Vol also exceeds 6.0x, it is a trailing indicator that call writers are actively defending the level. Overcoming this level typically requires a substantial rise in spot-market buyer volume.
-              </p>
-            </div>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-8 h-8 rounded-full bg-brand-teal text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm shadow-brand-teal/20">
-              C
-            </div>
-            <div className="space-y-1">
-              <p className="leading-relaxed">
-                <strong>Short-Covering Characteristics (Short Squeeze):</strong> If the spot price moves above a high CPR barrier on heavy volume, call writers occasionally buy back their short positions to cap exposure. This dynamic can lead to rapid price expansion as short positions are covered, visible on primary charts.
-              </p>
-            </div>
-          </li>
-        </ul>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-semibold pt-2">
-          By displaying PCR support walls and CPR resistance walls side-by-side with 3D color mapping, our Option Chain Analyzer assists in identifying active market structures to supplement your primary technical charts.
-        </p>
       </section>
 
-      {/* Section 4: Risk Management */}
-      <section className="space-y-8 pt-4 border-t border-slate-100">
-        <h3 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-4 leading-none">
-          4. Professional Risk Management: Mastering Derivatives Volatility
+      {/* Section 3: Interpreting Support & Resistance Multipliers */}
+      <section className="space-y-4 pt-2 border-t border-slate-100">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+          3. Automated Support &amp; Resistance Highlights (6.0x Rule)
         </h3>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-medium">
-          Futures and Options (F&O) analysis in the Indian stock exchange is inherently high-risk. While structured data analysis like PCR, volume concentration zone analysis, and IV tracking can dramatically improve your understanding of market structure, they are ultimately mathematical probabilities. No data model is infallible, and market conditions can change instantly during major global news events, unexpected macro releases, or sudden block trades by Foreign Institutional Investors (FIIs) and Domestic Institutional Investors (DIIs).
+        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+          Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as defense barriers defended by institutional writers:
         </p>
-        <div className="p-8 bg-rose-50/65 border border-rose-100 rounded-3xl text-rose-850 relative overflow-hidden shadow-inner leading-relaxed">
-          <div className="absolute top-0 right-0 text-[7px] font-black uppercase tracking-widest text-rose-500/40 bg-white border-l border-b border-rose-100 px-2.5 py-0.5">REGULATORY DISCLOSURE</div>
-          <p className="text-sm md:text-base text-slate-700 leading-relaxed font-semibold">
-            Securities regulatory reports (SEBI) reveal a stark statistic for retail derivative traders: <strong className="text-rose-700 font-extrabold">9 out of 10 retail traders lose money in active option trading</strong>, with average losses often wiping out entire accounts. Capital preservation is the core hallmark separating veteran analysts from beginners.
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <h4 className="text-xs font-bold uppercase text-emerald-900 tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h4>
+            </div>
+            <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+              Highlighted in <strong>Green</strong>. Indicates Put Open Interest is at least 6 times greater than Call Open Interest at that strike, identifying an institutional put-writing floor.
+            </p>
+          </div>
+          <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <h4 className="text-xs font-bold uppercase text-rose-900 tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h4>
+            </div>
+            <p className="text-xs text-rose-950 leading-relaxed font-medium">
+              Highlighted in <strong>Red</strong>. Indicates Call Open Interest is at least 6 times greater than Put Open Interest at that strike, identifying a heavy call-writing ceiling.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 4: Risk Management & Compliance */}
+      <section className="space-y-4 pt-2 border-t border-slate-100">
+        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+          4. Risk Management &amp; SEBI Compliance
+        </h3>
+        <p className="text-sm text-slate-600 leading-relaxed font-medium">
+          Derivatives trading carries significant financial risk. According to research published by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail traders in the equity futures and options segment incur net financial losses</strong>.
+        </p>
+        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600 leading-relaxed font-medium">
+          <p>
+            <strong>Confluence Only:</strong> Option chain open interest distribution should always be used as a secondary confirmation tool alongside primary price action and technical charts.
+          </p>
+          <p>
+            <strong>No Investment Advice:</strong> Option Chain Analyzer is an independent analytical tool built strictly for educational and informational purposes. We do not provide trading recommendations, buy/sell calls, or financial advice.
           </p>
         </div>
-        <p className="text-sm md:text-base text-slate-600 leading-relaxed font-extrabold pt-2">
-          To safely study the NSE F&O segment, commit to these vital structural rules:
-        </p>
-        <ul className="space-y-4 text-sm md:text-base text-slate-600 font-medium">
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)] shrink-0 mt-2" />
-            <p className="leading-relaxed">
-              <strong>Use Option Chain Data for Confluence, Not Execution:</strong> This tool is a secondary analytical layer. Always anchor your primary execution decisions on robust charting tools and verified regulatory data streams.
-            </p>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)] shrink-0 mt-2" />
-            <p className="leading-relaxed">
-              <strong>Enforce Uncompromising Risk Controls:</strong> Never allocate significant visual conviction to single setups. Maintain strictly conservative risk limits, avoiding leverage or excessive capital commitment regardless of indicator highlighting.
-            </p>
-          </li>
-          <li className="flex gap-4 items-start bg-slate-50/40 p-5 rounded-2xl border border-slate-100/50 hover:bg-slate-50 hover-glow transition-all duration-200">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_6px_rgba(245,158,11,0.5)] shrink-0 mt-2" />
-            <p className="leading-relaxed">
-              <strong>Watch the Spot Chart:</strong> Option chain data is an accumulation of historical trades. While highly informative, it occasionally lags behind sudden, explosive, news-driven price spikes. Use our analyzer as a compass, but always prioritize actual price action developments on your primary spot charts.
-            </p>
-          </li>
-        </ul>
       </section>
     </div>
   );
@@ -1408,39 +1302,67 @@ export default function App() {
                 </section>
               </div>
             ) : (
-              <div className="space-y-12 text-base">
-                <div className="bg-brand-teal/5 border border-brand-teal/10 rounded-3xl p-8 text-center max-w-2xl mx-auto space-y-4">
-                  <TrendingUp className="w-12 h-12 text-brand-teal mx-auto animate-pulse" />
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide">Publishing Engine Configured!</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    The Option Chain Analyzer Knowledge Base is fully set up and ready to house your educational content. 
-                  </p>
-                  <div className="p-4 bg-white/80 rounded-2xl border border-slate-100 text-xs text-slate-600 font-semibold space-y-2">
-                    <p className="text-brand-teal font-black">Ready for Publication</p>
-                    <p>Provide your Articles or Blog text now, and they will be beautifully indexed, styled with bespoke typography, and published here instantly!</p>
+              <div className="space-y-8 text-base">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Market Research & Education Library</h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">Authoritative analytical guides on derivatives and NSE option chains</p>
                   </div>
+                  <button 
+                    onClick={() => { selectModal(null); selectPage('blog'); }}
+                    className="px-4 py-2 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-brand-teal/90 transition-all cursor-pointer shadow-sm w-fit"
+                  >
+                    Open Research Hub &rarr;
+                  </button>
                 </div>
 
-                <div className="border-t border-slate-100 pt-8">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 block mb-6">Preview of Feed Layout</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="border border-slate-100 bg-slate-50/50 p-6 rounded-2xl space-y-3 opacity-60">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-bold bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded uppercase">Education</span>
-                        <span className="text-[10px] text-slate-400 font-bold">Pending Article #1</span>
-                      </div>
-                      <h4 className="font-black text-slate-800 text-sm">Understanding Strike-Specific PCR Multipliers</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed">How to check support floors using the 6.0x benchmark criteria against live charts...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div 
+                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('how-traders-identify-support-and-resistance-using-option-chain-data'); }}
+                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
+                      <span className="text-[10px] text-slate-400 font-bold">5 min read</span>
                     </div>
+                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">How Traders Identify Support and Resistance Using Option Chain Data</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.</p>
+                  </div>
 
-                    <div className="border border-slate-100 bg-slate-50/50 p-6 rounded-2xl space-y-3 opacity-60">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[9px] font-bold bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded uppercase">Strategy</span>
-                        <span className="text-[10px] text-slate-400 font-bold">Pending Article #2</span>
-                      </div>
-                      <h4 className="font-black text-slate-800 text-sm">CPR Interpretation & Sector Resistance Walls</h4>
-                      <p className="text-xs text-slate-500 leading-relaxed">Mastering Call-Put Ratios to detect overhead resistance ceilings and market caps...</p>
+                  <div 
+                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('what-is-an-option-chain-and-why-do-traders-use-it'); }}
+                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Beginners</span>
+                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
                     </div>
+                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">What Is an Option Chain and Why Do Traders Use It?</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">A complete guide to understanding option chain structure, calls, puts, strike prices, and open interest metrics.</p>
+                  </div>
+
+                  <div 
+                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('what-is-put-call-ratio-pcr'); }}
+                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Strategy</span>
+                      <span className="text-[10px] text-slate-400 font-bold">5 min read</span>
+                    </div>
+                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">What Is Put Call Ratio (PCR)? Complete Beginner Guide</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Explore how Put-Call Ratio works, mathematical formulas, sentiment interpretation, and retail vs institutional positioning.</p>
+                  </div>
+
+                  <div 
+                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('understanding-implied-volatility-iv-on-the-option-chain'); }}
+                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Volatility</span>
+                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
+                    </div>
+                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">Understanding Implied Volatility (IV) on the Option Chain</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Understand why IV impacts options pricing, how to spot volatility skews, and how to identify IV anomalies.</p>
                   </div>
                 </div>
               </div>
@@ -1558,57 +1480,57 @@ export default function App() {
             onSelectArticle={selectArticle}
           />
         ) : data.length === 0 ? (
-            <div 
-              ref={homeContainerRef}
-              className="flex-1 flex flex-col items-center overflow-auto scrollbar-thin bg-[#fafafa] p-4 md:p-6"
+          <div 
+            ref={homeContainerRef}
+            className="flex-1 flex flex-col items-center overflow-auto scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth bg-[#fafafa] p-4 md:p-6"
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex flex-col items-center max-w-[1400px] w-full"
             >
-              <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center max-w-4xl w-full"
-              >
-                <h2 className="text-2xl md:text-4xl font-black mb-4 tracking-tighter text-brand-teal text-center leading-[1.1] uppercase max-w-3xl">
-                  Analyze NSE Option Chain <br className="hidden md:block" /> data effortlessly
-                </h2>
-                
-                <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 max-w-[2xl] text-center font-medium">
-                  Upload Option Chain CSVs specifically for <strong className="text-brand-teal">NSE Indices</strong> and <strong className="text-slate-700">F&O-listed Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
+              <h2 className="text-2xl md:text-4xl font-black mb-4 tracking-tighter text-brand-teal text-center leading-[1.1] uppercase max-w-3xl">
+                Analyze NSE Option Chain <br className="hidden md:block" /> data effortlessly
+              </h2>
+              
+              <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 max-w-[2xl] text-center font-medium">
+                Upload Option Chain CSVs specifically for <strong className="text-brand-teal">NSE Indices</strong> and <strong className="text-slate-700">F&O-listed Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
+              </p>
+              
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-black uppercase tracking-widest flex items-center gap-3 mb-6 shadow-sm"
+                >
+                  <AlertCircle size={18} /> {error}
+                </motion.div>
+              )}
+              
+              <div className="flex flex-col gap-3 mb-8">
+                <label 
+                  className="px-8 py-5 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center"
+                  aria-label="Upload NSE Option Chain CSV File"
+                >
+                  Upload CSV File
+                  <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
+                </label>
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
+                  or drop it anywhere on this page
                 </p>
-                
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-black uppercase tracking-widest flex items-center gap-3 mb-6 shadow-sm"
-                  >
-                    <AlertCircle size={18} /> {error}
-                  </motion.div>
-                )}
-                
-                <div className="flex flex-col gap-3 mb-10">
-                  <label 
-                    className="px-8 py-5 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center"
-                    aria-label="Upload NSE Option Chain CSV File"
-                  >
-                    Upload CSV File
-                    <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
-                  </label>
-                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
-                    or drop it anywhere on this page
-                  </p>
-                </div>
+              </div>
 
-                <div className="w-full border-t border-slate-200/60 mt-2 pt-10 px-4">
-                  <GuideContent />
-                  <FooterContent />
-                </div>
-              </motion.div>
-            </div>
-
-          ) : (
-            <div className="flex-1 flex flex-col overflow-hidden bg-white">
-              {/* Fixed Instrument Bar - Stays on top under page header */}
-              <div className="bg-white border-b border-slate-200 z-50">
+              <div className="w-full max-w-4xl mx-auto px-4 mt-6">
+                <GuideContent />
+              </div>
+              
+              <FooterContent />
+            </motion.div>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            {/* Fixed Instrument Bar - Stays on top under page header */}
+            <div className="bg-white border-b border-slate-200 z-50">
                 <div className="max-w-[1400px] mx-auto px-4 md:px-12 py-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-6">
                     <div className="flex flex-col">
@@ -1903,55 +1825,52 @@ export default function App() {
                 </tbody>
               </table>
             </div>
+          </div>
 
-            {/* SEBI Compliance Professional Disclaimer */}
-            <div className="bg-slate-50 rounded-3xl border border-slate-200 p-8 mb-16 relative overflow-hidden group">
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-1.5 h-6 bg-rose-500 rounded-full" />
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-800">Compliance & Regulatory Notice</h3>
+          {/* SEBI Compliance Professional Disclaimer */}
+          <div className="w-full max-w-[1400px] bg-white rounded-3xl border border-slate-200 p-8 my-8 relative overflow-hidden group shadow-sm">
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1.5 h-6 bg-rose-500 rounded-full" />
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-800">Compliance & Regulatory Notice</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <p className="text-[12px] font-bold text-slate-600 leading-relaxed uppercase tracking-tight">
+                    Standard Disclaimer: Investment in securities market are subject to market risks. Read all the related documents carefully before investing. 
+                  </p>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    This application is an <span className="font-bold text-brand-teal">Analytical Utility</span> provided for educational and data visualization purposes only. It retrieves and processes public domain data from the National Stock Exchange of India (NSE). 
+                  </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <p className="text-[12px] font-bold text-slate-600 leading-relaxed uppercase tracking-tight">
-                      Standard Disclaimer: Investment in securities market are subject to market risks. Read all the related documents carefully before investing. 
-                    </p>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">
-                      This application is an <span className="font-bold text-brand-teal">Analytical Utility</span> provided for educational and data visualization purposes only. It retrieves and processes public domain data from the National Stock Exchange of India (NSE). 
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm">
+                    <AlertCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                      <strong className="text-slate-800 uppercase text-[9px] mb-1 block tracking-widest">No Investment Advice</strong>
+                      The support/resistance levels and IV anomalies identified by this tool are mathematical derivations based on Open Interest trends. These are NOT buy/sell signals. The platform owner is NOT a SEBI Registered Investment Advisor.
                     </p>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 p-4 bg-white/60 rounded-2xl border border-slate-200/60 shadow-sm">
-                      <AlertCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />
-                      <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                        <strong className="text-slate-800 uppercase text-[9px] mb-1 block tracking-widest">No Investment Advice</strong>
-                        The support/resistance levels and IV anomalies identified by this tool are mathematical derivations based on Open Interest trends. These are NOT buy/sell signals. The platform owner is NOT a SEBI Registered Investment Advisor.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-8 pt-6 border-t border-slate-200/60 flex items-center justify-between">
-                   <div className="flex items-center gap-2">
-                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                     <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Calculated from NSE CSV Export (As of {asOfTime || 'N/A'})</span>
-                   </div>
-                   <div className="flex items-center gap-2">
-                     <span className="text-[9px] font-black uppercase text-slate-300 tracking-[0.2em]">Verified Analytical Framework</span>
-                   </div>
                 </div>
               </div>
-              <AlertCircle size={120} className="absolute -bottom-8 -right-8 text-slate-200/30 group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
+              <div className="mt-8 pt-6 border-t border-slate-200/60 flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Calculated from NSE CSV Export (As of {asOfTime || 'N/A'})</span>
+                 </div>
+                 <div className="flex items-center gap-2">
+                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Verified Analytical Framework</span>
+                 </div>
+              </div>
             </div>
+            <AlertCircle size={120} className="absolute -bottom-8 -right-8 text-slate-200/30 group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
+          </div>
 
-            <div className="max-w-4xl mx-auto px-4">
-              <GuideContent />
-            </div>
-            <FooterContent />
-                </div>
-              </div>
-            </div>
-          )}
-        </main>
+          <FooterContent />
+        </div>
       </div>
-    );
-  }
+    )}
+  </main>
+</div>
+  );
+}
