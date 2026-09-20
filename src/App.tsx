@@ -1493,8 +1493,8 @@ export default function App() {
                 Analyze NSE Option Chain <br className="hidden md:block" /> data effortlessly
               </h2>
               
-              <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 max-w-[2xl] text-center font-medium">
-                Upload Option Chain CSVs specifically for <strong className="text-brand-teal">NSE Indices</strong> and <strong className="text-slate-700">F&O-listed Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
+              <p className="text-slate-500 text-sm md:text-base leading-relaxed mb-6 max-w-2xl text-center font-medium mx-auto">
+                Upload Option Chain CSVs of <strong className="text-brand-teal">NSE Indices</strong> and <strong className="text-slate-700">F&O Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
               </p>
               
               {error && (

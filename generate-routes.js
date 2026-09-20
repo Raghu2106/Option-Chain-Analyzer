@@ -169,7 +169,7 @@ const getPageBodyContent = (route) => {
                 Analyze NSE Option Chain <br class="hidden md:block" /> data effortlessly
               </h2>
               <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-medium">
-                Upload Option Chain CSVs specifically for <strong class="text-brand-teal">NSE Indices</strong> and <strong class="text-slate-705">F&O-listed Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
+                Upload Option Chain CSVs of <strong class="text-brand-teal">NSE Indices</strong> and <strong class="text-slate-700">F&O Stocks</strong> directly from the official NSE website <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-blue-600 hover:text-blue-700 underline font-semibold whitespace-nowrap">https://www.nseindia.com/option-chain</a> to identify high probable Support & Resistance zones based on real-time OI and volume clusters.
               </p>
             </div>
 
