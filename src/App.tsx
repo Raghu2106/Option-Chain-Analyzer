@@ -1318,6 +1318,18 @@ export default function App() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div 
+                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('how-global-market-cues-impact-the-nse-option-chain'); }}
+                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded">Strategy</span>
+                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
+                    </div>
+                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Discover how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.</p>
+                  </div>
+
+                  <div 
                     onClick={() => { selectModal(null); selectPage('blog'); selectArticle('how-traders-identify-support-and-resistance-using-option-chain-data'); }}
                     className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
                   >
