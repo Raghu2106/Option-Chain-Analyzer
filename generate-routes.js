@@ -58,6 +58,16 @@ const routeMeta = {
     desc: 'Discover the mission and background of Option Chain Analyzer, our visual support and resistance methodology, and how we help retail traders interpret live NSE option chain data.',
     canonical: 'https://optionchainanalyzer.in/about'
   },
+  'contact': {
+    title: 'Contact Us - Option Chain Analyzer Support Desk',
+    desc: 'Get in touch with the Option Chain Analyzer support and editorial team for feedback, CSV parsing questions, or research queries.',
+    canonical: 'https://optionchainanalyzer.in/contact'
+  },
+  'disclaimer': {
+    title: 'SEBI Compliance & Financial Risk Disclaimer - Option Chain Analyzer',
+    desc: 'Review statutory SEBI regulatory disclosures, retail loss studies, and the non-advisory educational status of the Option Chain Analyzer software.',
+    canonical: 'https://optionchainanalyzer.in/disclaimer'
+  },
   'privacy': {
     title: 'Privacy Protocol - Option Chain Analyzer',
     desc: 'Read our comprehensive privacy policy governing data protection, cookies, and local browser storage security guidelines.',
@@ -67,6 +77,16 @@ const routeMeta = {
     title: 'Usage Terms & Legal Agreement - Option Chain Analyzer',
     desc: 'Review the usage terms and regulatory disclaimers governing your access to the Option Chain Analyzer software, spreadsheets, and educational blogs.',
     canonical: 'https://optionchainanalyzer.in/terms'
+  },
+  'blog/option-greeks-explained-delta-gamma-theta-vega': {
+    title: 'Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices',
+    desc: 'Master the four fundamental Option Greeks—Delta, Gamma, Theta, and Vega. Understand how Greek sensitivities impact premium decay, directional movement, and strike risk on Nifty and Bank Nifty option chains.',
+    canonical: 'https://optionchainanalyzer.in/blog/option-greeks-explained-delta-gamma-theta-vega'
+  },
+  'blog/how-to-spot-long-buildup-and-short-covering-in-oi': {
+    title: 'Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup',
+    desc: 'Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.',
+    canonical: 'https://optionchainanalyzer.in/blog/how-to-spot-long-buildup-and-short-covering-in-oi'
   }
 };
 
@@ -82,8 +102,11 @@ const navigationHTML = `
     </div>
   </div>
   <nav class="hidden md:flex items-center gap-6">
+    <a href="/" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Analyzer</a>
     <a href="/blog" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Blog</a>
     <a href="/about" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">About Us</a>
+    <a href="/contact" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Contact</a>
+    <a href="/disclaimer" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Disclaimer</a>
     <a href="/privacy" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Privacy Protocol</a>
     <a href="/terms" class="text-xs font-black uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-all">Terms of Use</a>
   </nav>
@@ -109,7 +132,7 @@ const footerHTML = `
         <div class="flex flex-col gap-3">
           <a href="/" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Analyzer Tool</a>
           <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-          <a href="/blog" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Blog</a>
+          <a href="/blog" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95">Research Blog</a>
         </div>
       </div>
 
@@ -117,16 +140,19 @@ const footerHTML = `
         <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Security & Legal</h4>
         <div class="flex flex-col gap-3">
           <a href="/about" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">About Us</a>
+          <a href="/contact" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Contact Us</a>
+          <a href="/disclaimer" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">SEBI Disclaimer</a>
           <a href="/privacy" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Privacy Protocol</a>
           <a href="/terms" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider">Usage Terms</a>
         </div>
       </div>
 
       <div class="flex flex-col gap-4">
-        <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support</h4>
+        <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">Support Desk</h4>
         <div class="flex flex-col gap-3">
-          <a href="mailto:support@optionchainanalyzer.in" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
-          <span class="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest text-left">v1.2.0 Stable Build</span>
+          <a href="mailto:reachraghuhere14@gmail.com" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors lowercase tracking-normal">reachraghuhere14@gmail.com</a>
+          <a href="mailto:support@optionchainanalyzer.in" class="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors lowercase tracking-normal">support@optionchainanalyzer.in</a>
+          <span class="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest text-left">v1.2.0 Production Build</span>
         </div>
       </div>
     </div>
@@ -1118,6 +1144,124 @@ const getPageBodyContent = (route) => {
       `;
       break;
     
+    case 'contact':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="border-b border-slate-200 pb-6">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a] block mb-1">Support & Editorial Desk</span>
+              <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">Contact Us</h1>
+              <p class="text-sm md:text-base text-slate-600 font-medium mt-2">Have questions regarding our option chain analysis models, CSV parsing, or educational blog? Connect with our desk.</p>
+            </div>
+            
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed shadow-sm">
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide">Direct Contact Channels</h2>
+              <div class="space-y-4 text-sm font-medium">
+                <p><strong>Primary Inquiries:</strong> <a href="mailto:reachraghuhere14@gmail.com" class="text-blue-600 underline">reachraghuhere14@gmail.com</a></p>
+                <p><strong>Technical & Support Desk:</strong> <a href="mailto:support@optionchainanalyzer.in" class="text-blue-600 underline">support@optionchainanalyzer.in</a></p>
+                <p><strong>Office Hours:</strong> Monday – Friday, 9:00 AM – 6:00 PM IST (Responses within 24–48 hours)</p>
+                <p><strong>Operations Location:</strong> Bengaluru, Karnataka, India</p>
+              </div>
+              <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-600 space-y-2">
+                <p class="font-black uppercase text-slate-500 tracking-wider">SEBI Disclaimer Note</p>
+                <p>OptionChainAnalyzer.in is an educational and analytical tool. We do not provide financial advisory services, personalized stock tips, or portfolio management services. Inquiries soliciting specific trade calls cannot be answered.</p>
+              </div>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'disclaimer':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="border-b border-slate-200 pb-6">
+              <span class="text-xs font-black uppercase tracking-widest text-rose-600 block mb-1">Regulatory Risk & Compliance</span>
+              <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">SEBI Compliance & Financial Disclaimer</h1>
+              <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-2">Effective Date: October 9, 2026</p>
+            </div>
+            
+            <div class="p-8 md:p-10 bg-rose-50 border-2 border-rose-200 rounded-[2rem] space-y-4">
+              <h2 class="text-lg font-black uppercase tracking-tight text-rose-900">Securities and Exchange Board of India (SEBI) Retail Risk Study</h2>
+              <p class="text-sm text-slate-800 leading-relaxed font-semibold">Per official SEBI research findings on individual retail traders in the equity derivatives (F&O) segment:</p>
+              <ul class="list-disc pl-6 space-y-2 text-xs md:text-sm text-slate-700 font-medium">
+                <li><strong>9 out of 10 individual traders</strong> in the equity Options segment incurred net losses.</li>
+                <li>Loss-makers registered average net trading losses close to <strong>₹50,000 per year</strong>.</li>
+                <li>Loss-makers spent an additional <strong>28% of net trading losses</strong> on transaction costs and brokerage fees.</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-sm font-medium shadow-sm">
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide">1. Educational Nature of the Application</h2>
+              <p>OptionChainAnalyzer.in is an independent, non-commercial analytical software utility designed strictly for personal educational and quantitative research purposes. All metrics (OI clustering, Put-Call Ratio, Call-Put Ratio, Max Pain strike, and IV skew) are computed locally using mathematical algorithms.</p>
+
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">2. No Investment Advice</h2>
+              <p>OptionChainAnalyzer.in does not provide investment, financial, trading, or tax advice. We are not a SEBI-registered Investment Adviser (RIA), Research Analyst (RA), or broker. No information on this website constitutes a recommendation to buy or sell any security.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/option-greeks-explained-delta-gamma-theta-vega':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Education • 7 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 9, 2026 • By Quantitative Derivatives Desk</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Every price quoted on the National Stock Exchange (NSE) option chain is governed by mathematical sensitivities known as Option Greeks—Delta, Gamma, Theta, and Vega.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Delta (&Delta;) &amp; Directional Exposure</h2>
+              <p>Delta measures the expected price change in an option for every 1-point change in the underlying spot price. ATM options feature Deltas near &plusmn;0.50.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Theta (&Theta;) &amp; Time Decay</h2>
+              <p>Theta measures the daily rate of option premium erosion. Institutional option sellers leverage heavy OI defense zones to capture consistent time decay.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/how-to-spot-long-buildup-and-short-covering-in-oi':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 6 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding &amp; Short Buildup</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 8, 2026 • By Market Structure Analyst</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Price movement alone can be deceiving. The Price vs. Open Interest (OI) Quadrant reveals whether moves are backed by fresh institutional accumulation or transient short squeezes.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">The 4 Quadrants</h2>
+              <p><strong>1. Long Buildup:</strong> Price ▲ + OI ▲ (Strong Bullish)<br /><strong>2. Short Covering:</strong> Price ▲ + OI ▼ (Transient Bullish)<br /><strong>3. Short Buildup:</strong> Price ▼ + OI ▲ (Strong Bearish)<br /><strong>4. Long Unwinding:</strong> Price ▼ + OI ▼ (Mild Bearish)</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
     default:
       content = `<div class="p-12 text-center text-slate-500 font-bold uppercase tracking-widest bg-white">Pre-rendered payload not available</div>`;
   }
@@ -1198,7 +1342,7 @@ Object.keys(routeMeta).forEach(route => {
 
   // Inject rich pre-rendered HTML into <div id="root"></div> for crawlers
   const pageBody = getPageBodyContent(route);
-  const wrappedBody = `<noscript><div class="seo-pre-render">${pageBody}</div></noscript>${loadingIndicatorHTML}`;
+  const wrappedBody = `<div class="seo-pre-render">${pageBody}</div>`;
   customizedHTML = customizedHTML.replace(
     /<div id="root"><\/div>/,
     `<div id="root">${wrappedBody}</div>`
@@ -1240,7 +1384,7 @@ try {
 
   // Inject beautiful text and guides inside the homepage <div id="root"></div> as well!
   const homeBody = getPageBodyContent('index');
-  const wrappedHome = `<noscript><div class="seo-pre-render">${homeBody}</div></noscript>${loadingIndicatorHTML}`;
+  const wrappedHome = `<div class="seo-pre-render">${homeBody}</div>`;
   homeHTML = homeHTML.replace(
     /<div id="root"><\/div>/,
     `<div id="root">${wrappedHome}</div>`

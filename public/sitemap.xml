@@ -3,7 +3,7 @@
   <!-- Interactive Option Chain Analyzer Dashboard (Home) -->
   <url>
     <loc>https://optionchainanalyzer.in/</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>always</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,31 +11,55 @@
   <!-- Market Research & Derivatives Education Blog Index -->
   <url>
     <loc>https://optionchainanalyzer.in/blog</loc>
-    <lastmod>2026-06-19</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Article: Taking Cues from Global Markets -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/how-global-market-cues-impact-the-nse-option-chain</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry -->
+  <!-- Article: Option Greeks Explained -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/option-greeks-explained-delta-gamma-theta-vega</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: Decoding Open Interest Buildup -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/how-to-spot-long-buildup-and-short-covering-in-oi</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: Understanding Max Pain Theory -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/understanding-max-pain-theory-on-the-option-chain</loc>
-    <lastmod>2026-06-19</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide -->
+  <!-- Article: Understanding Implied Volatility (IV) -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/understanding-implied-volatility-iv-on-the-option-chain</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: How Traders Identify Support and Resistance Using Option Chain Data -->
+  <!-- Article: How Traders Identify Support and Resistance -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/how-traders-identify-support-and-resistance-using-option-chain-data</loc>
-    <lastmod>2026-06-10</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -43,56 +67,72 @@
   <!-- Article: What is an Option Chain and Why Do Traders Use It? -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/what-is-an-option-chain-and-why-do-traders-use-it</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders -->
+  <!-- Article: What Is Put Call Ratio (PCR)? -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/what-is-put-call-ratio-pcr</loc>
-    <lastmod>2026-05-25</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: What Is Open Interest (OI)? A Complete Beginner's Guide -->
+  <!-- Article: What Is Open Interest (OI)? -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/what-is-open-interest-oi</loc>
-    <lastmod>2026-05-31</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Article: Open Interest vs Volume: Understanding the Key Differences -->
+  <!-- Article: Open Interest vs Volume -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/open-interest-vs-volume</loc>
-    <lastmod>2026-06-03</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- About Us Page for Confluence and Platform Guidance -->
+  <!-- About Us -->
   <url>
     <loc>https://optionchainanalyzer.in/about</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
   </url>
 
-  <!-- Privacy & Data Security Protocol -->
+  <!-- Contact Us -->
+  <url>
+    <loc>https://optionchainanalyzer.in/contact</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- SEBI Regulatory Disclaimer -->
+  <url>
+    <loc>https://optionchainanalyzer.in/disclaimer</loc>
+    <lastmod>2026-10-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Privacy Policy Protocol -->
   <url>
     <loc>https://optionchainanalyzer.in/privacy</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.7</priority>
   </url>
 
-  <!-- Usage Terms & Legal Agreement -->
+  <!-- Terms of Use -->
   <url>
     <loc>https://optionchainanalyzer.in/terms</loc>
-    <lastmod>2026-05-22</lastmod>
+    <lastmod>2026-10-09</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.7</priority>
   </url>
 </urlset>

@@ -1399,6 +1399,146 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
           </p>
         </div>
       )
+    },
+    {
+      id: 'option-greeks-explained-delta-gamma-theta-vega',
+      title: "Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices",
+      excerpt: "Master the four fundamental Option Greeks—Delta, Gamma, Theta, and Vega. Understand how Greek sensitivities impact premium decay, directional movement, and strike risk on Nifty and Bank Nifty option chains.",
+      category: 'Education',
+      date: 'October 9, 2026',
+      readTime: '7 min read',
+      author: 'Quantitative Derivatives Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            Every price quoted on the National Stock Exchange (NSE) option chain is governed by mathematical sensitivities known as <strong>Option Greeks</strong>. While spot price movements catch the headlines, Greeks dictate whether your option gains ₹50, loses ₹30, or bleeds premium through silent time decay.
+          </p>
+
+          <p>
+            For retail options traders analyzing Nifty 50, Bank Nifty, or liquid single-stock options, understanding Greeks is not just academic theory—it is essential risk management. Here is a practical, field-tested guide to Delta, Gamma, Theta, and Vega.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
+              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-1">DIRECTIONAL EXPOSURE</span>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">1. Delta (&Delta;)</h3>
+              <p className="text-sm text-slate-650 leading-relaxed">
+                Delta measures how much an option's premium changes for every 1-point move in the underlying spot index or stock. Call Deltas range from 0 to +1.0, while Put Deltas range from -1.0 to 0. An At-The-Money (ATM) Nifty Call typically has a Delta close to +0.50.
+              </p>
+            </div>
+
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
+              <span className="text-xs font-black uppercase text-rose-600 tracking-widest block mb-1">ACCELERATION RISK</span>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">2. Gamma (&Gamma;)</h3>
+              <p className="text-sm text-slate-650 leading-relaxed">
+                Gamma represents the rate of change of Delta per 1-point move in the underlying asset. Highest at near-the-money strikes approaching expiry, Gamma causes rapid Delta shifts—fueling explosive expiry-day "hero or zero" moves and sudden margin expansion.
+              </p>
+            </div>
+
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
+              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-1">TIME DECAY</span>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">3. Theta (&Theta;)</h3>
+              <p className="text-sm text-slate-650 leading-relaxed">
+                Theta represents the monetary decay of an option premium for each passing day, all else being equal. Theta decay is non-linear—it accelerates drastically during the final 48 to 72 hours before weekly and monthly contract expiration.
+              </p>
+            </div>
+
+            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
+              <span className="text-xs font-black uppercase text-blue-600 tracking-widest block mb-1">VOLATILITY SENSITIVITY</span>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">4. Vega (&Nu;)</h3>
+              <p className="text-sm text-slate-650 leading-relaxed">
+                Vega quantifies how much the option price fluctuates for every 1% change in Implied Volatility (IV). When India VIX spikes ahead of major elections or RBI policy decisions, Vega inflates option premiums across the entire chain even if spot prices remain flat.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Why Option Sellers Profit from Theta Decay
+          </h2>
+          <p>
+            SEBI studies repeatedly show that retail option buyers struggle with profitability. A core reason is Theta. When you buy an Out-of-the-Money (OTM) option, time works against you every second the market is open—and over weekends. Institutional option writers position at high Open Interest strikes (PCR/CPR &ge; 6.0x) precisely to harvest this predictable time decay.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
+            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Risk Reminder</p>
+            <p>
+              Trading options carries significant risk of capital loss. Per SEBI studies, 9 out of 10 retail traders incur net losses in the F&amp;O segment. Never trade without defined stop-loss thresholds and thorough position sizing.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'how-to-spot-long-buildup-and-short-covering-in-oi',
+      title: "Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup",
+      excerpt: "Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.",
+      category: 'Strategy',
+      date: 'October 8, 2026',
+      readTime: '6 min read',
+      author: 'Market Structure Analyst',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            Price movement alone can be deceiving. A 100-point rally in Nifty could be driven by institutional buyers aggressively accumulating fresh long contracts—or simply trapped short sellers rushing to close positions. The <strong>Price vs. Open Interest (OI) Quadrant</strong> reveals the true institutional intent behind every market swing.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            The 4-Quadrant Price-OI Matrix Explained
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+            <div className="p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-2">
+              <span className="text-xs font-black uppercase text-emerald-800 tracking-widest block">PRICE ▲ | OI ▲</span>
+              <h3 className="text-lg font-black text-emerald-950 uppercase tracking-tight">1. Long Buildup (Strong Bullish)</h3>
+              <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                Both underlying price and Open Interest are expanding simultaneously. This confirms fresh capital deployment on the long side. Buyers are entering aggressive positions and willing to pay higher prices, indicating sustainable upward momentum.
+              </p>
+            </div>
+
+            <div className="p-6 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
+              <span className="text-xs font-black uppercase text-blue-800 tracking-widest block">PRICE ▲ | OI ▼</span>
+              <h3 className="text-lg font-black text-blue-950 uppercase tracking-tight">2. Short Covering (Transient Bullish)</h3>
+              <p className="text-xs text-blue-900 leading-relaxed font-medium">
+                Price is rising, but Open Interest is decreasing. Traders who previously held short positions are closing them out to stem losses. While this causes sharp upward squeezes, rallies driven purely by short covering often stall once trapped sellers finish squaring off.
+              </p>
+            </div>
+
+            <div className="p-6 bg-rose-50/70 border border-rose-200 rounded-2xl space-y-2">
+              <span className="text-xs font-black uppercase text-rose-800 tracking-widest block">PRICE ▼ | OI ▲</span>
+              <h3 className="text-lg font-black text-rose-950 uppercase tracking-tight">3. Short Buildup (Strong Bearish)</h3>
+              <p className="text-xs text-rose-900 leading-relaxed font-medium">
+                Price is falling while Open Interest is expanding. Aggressive market participants are creating fresh short positions, anticipating further downside. This reflects strong institutional selling pressure and overhead resistance.
+              </p>
+            </div>
+
+            <div className="p-6 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-2">
+              <span className="text-xs font-black uppercase text-amber-800 tracking-widest block">PRICE ▼ | OI ▼</span>
+              <h3 className="text-lg font-black text-amber-950 uppercase tracking-tight">4. Long Unwinding (Mild Bearish)</h3>
+              <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                Price is dropping and Open Interest is declining. Existing long position holders are booking profits or closing losing trades. There is no major aggressive new short selling, meaning selling pressure may abate once profit booking ends.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Applying Buildup Analysis to the Option Chain
+          </h2>
+          <p>
+            When inspecting an NSE Option Chain CSV on our dashboard:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-sm">
+            <li><strong>Strike-by-Strike "Change in OI":</strong> Positive change in OI on Call strikes during an intraday rise indicates Call writers are reinforcing overhead resistance (Short Buildup in Calls).</li>
+            <li><strong>Negative Change in OI:</strong> Sudden sharp drops in Put OI at lower strikes indicates panic unwinding by put sellers, frequently preceding sharp downside breaks.</li>
+          </ul>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
+            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Risk Disclaimer</p>
+            <p>
+              Derivatives trading involves severe financial risk. 9 out of 10 retail traders incur net financial losses per SEBI research. OI metrics are analytical tools for study and should never replace disciplined risk controls and stop-losses.
+            </p>
+          </div>
+        </div>
+      )
     }
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), []);
 

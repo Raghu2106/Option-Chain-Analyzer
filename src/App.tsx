@@ -1,8 +1,10 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info, X } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info, X, Sparkles, ShieldCheck, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import BlogSection from './components/BlogSection';
+import { SAMPLE_NIFTY_CSV } from './data/sampleNiftyData';
+import { ContactPage, DisclaimerPage, AboutPage, PrivacyPage, TermsPage } from './components/StaticPages';
 
 export interface OptionChainRow {
   strikePrice: number;
@@ -25,6 +27,8 @@ export interface OptionChainRow {
   isCallIVAnomaly: boolean;
   isPutIVAnomaly: boolean;
 }
+
+export type AppPage = 'tool' | 'blog' | 'about' | 'contact' | 'disclaimer' | 'privacy' | 'terms';
 
 export default function App() {
   const [data, setData] = useState<OptionChainRow[]>([]);
@@ -69,13 +73,16 @@ export default function App() {
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
 
-  const [activePage, setActivePage] = useState<'tool' | 'blog'>(() => {
+  const [activePage, setActivePage] = useState<AppPage>(() => {
     if (typeof window === 'undefined') return 'tool';
     const rawPath = window.location.pathname;
     const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
-    if (pathname === '/blog' || pathname.startsWith('/blog/')) {
-      return 'blog';
-    }
+    if (pathname === '/blog' || pathname.startsWith('/blog/')) return 'blog';
+    if (pathname === '/about') return 'about';
+    if (pathname === '/contact') return 'contact';
+    if (pathname === '/disclaimer') return 'disclaimer';
+    if (pathname === '/privacy' || pathname === '/privacy-policy') return 'privacy';
+    if (pathname === '/terms' || pathname === '/terms-of-service') return 'terms';
     return 'tool';
   });
 
@@ -90,29 +97,21 @@ export default function App() {
     return params.get('article') || null;
   });
 
-  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | 'blog' | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const rawPath = window.location.pathname;
-    const pathname = rawPath === '/' ? '/' : rawPath.replace(/\/$/, '');
-    if (pathname === '/about') return 'about';
-    if (pathname === '/privacy') return 'privacy';
-    if (pathname === '/terms') return 'terms';
-    const params = new URLSearchParams(window.location.search);
-    const modalParam = params.get('modal');
-    if (modalParam === 'privacy' || modalParam === 'terms' || modalParam === 'about') {
-      return modalParam as 'privacy' | 'terms' | 'about';
-    }
-    return null;
-  });
+  const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'about' | 'blog' | null>(null);
 
-  const selectPage = useCallback((page: 'tool' | 'blog') => {
+  const selectPage = useCallback((page: AppPage) => {
     setActivePage(page);
+    setActiveModal(null);
     if (page === 'tool') {
       setOpenArticleId(null);
       window.history.pushState(null, '', '/');
     } else if (page === 'blog') {
       window.history.pushState(null, '', '/blog');
+    } else {
+      setOpenArticleId(null);
+      window.history.pushState(null, '', `/${page}`);
     }
+    homeContainerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
 
   const selectArticle = useCallback((id: string | null) => {
@@ -125,21 +124,16 @@ export default function App() {
   }, []);
 
   const selectModal = useCallback((modal: 'privacy' | 'terms' | 'about' | 'blog' | null) => {
+    if (modal === 'about' || modal === 'privacy' || modal === 'terms') {
+      selectPage(modal);
+      return;
+    }
     if (modal === 'blog') {
-      setActiveModal(null);
       selectPage('blog');
       return;
     }
-    setActiveModal(modal);
-    if (modal) {
-      window.history.pushState(null, '', `/${modal}`);
-    } else {
-      const recoveryPath = activePage === 'blog' 
-        ? (openArticleId ? `/blog/${openArticleId}` : '/blog') 
-        : '/';
-      window.history.pushState(null, '', recoveryPath);
-    }
-  }, [activePage, openArticleId, selectPage]);
+    selectPage('tool');
+  }, [selectPage]);
 
   const [logoError, setLogoError] = useState(false);
   const [showScrollPopup, setShowScrollPopup] = useState(false);
@@ -282,18 +276,28 @@ export default function App() {
       setOpenArticleId(articleId || null);
       setActiveModal(null);
     } else if (pathname === '/about') {
-      setActivePage('tool');
-      setActiveModal('about');
-    } else if (pathname === '/privacy') {
-      setActivePage('tool');
-      setActiveModal('privacy');
-    } else if (pathname === '/terms') {
-      setActivePage('tool');
-      setActiveModal('terms');
+      setActivePage('about');
+      setOpenArticleId(null);
+      setActiveModal(null);
+    } else if (pathname === '/contact') {
+      setActivePage('contact');
+      setOpenArticleId(null);
+      setActiveModal(null);
+    } else if (pathname === '/disclaimer') {
+      setActivePage('disclaimer');
+      setOpenArticleId(null);
+      setActiveModal(null);
+    } else if (pathname === '/privacy' || pathname === '/privacy-policy') {
+      setActivePage('privacy');
+      setOpenArticleId(null);
+      setActiveModal(null);
+    } else if (pathname === '/terms' || pathname === '/terms-of-service') {
+      setActivePage('terms');
+      setOpenArticleId(null);
+      setActiveModal(null);
     } else {
       const articleParam = params.get('article');
       const pageParam = params.get('page');
-      const modalParam = params.get('modal');
 
       if (articleParam) {
         setActivePage('blog');
@@ -303,15 +307,14 @@ export default function App() {
         setActivePage('blog');
         setOpenArticleId(null);
         setActiveModal(null);
+      } else if (pageParam === 'about' || pageParam === 'contact' || pageParam === 'disclaimer' || pageParam === 'privacy' || pageParam === 'terms') {
+        setActivePage(pageParam as AppPage);
+        setOpenArticleId(null);
+        setActiveModal(null);
       } else {
         setActivePage('tool');
         setOpenArticleId(null);
-
-        if (modalParam === 'privacy' || modalParam === 'terms' || modalParam === 'about') {
-          setActiveModal(modalParam as 'privacy' | 'terms' | 'about');
-        } else {
-          setActiveModal(null);
-        }
+        setActiveModal(null);
       }
     }
   }, []);
@@ -330,7 +333,19 @@ export default function App() {
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
-      if (openArticleId === 'understanding-max-pain-theory-on-the-option-chain') {
+      if (openArticleId === 'how-global-market-cues-impact-the-nse-option-chain') {
+        title = "Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain";
+        desc = "Discover how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/how-global-market-cues-impact-the-nse-option-chain";
+      } else if (openArticleId === 'option-greeks-explained-delta-gamma-theta-vega') {
+        title = "Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices";
+        desc = "Master the four fundamental Option Greeks—Delta, Gamma, Theta, and Vega. Understand how Greek sensitivities impact premium decay, directional movement, and strike risk on Nifty and Bank Nifty option chains.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/option-greeks-explained-delta-gamma-theta-vega";
+      } else if (openArticleId === 'how-to-spot-long-buildup-and-short-covering-in-oi') {
+        title = "Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup";
+        desc = "Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/how-to-spot-long-buildup-and-short-covering-in-oi";
+      } else if (openArticleId === 'understanding-max-pain-theory-on-the-option-chain') {
         title = "Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry";
         desc = "Explore the Max Pain Theory: a derivatives analysis model showing how index/stock prices gravitate towards the strike price where option buyers face the greatest maximum financial loss on expiry day.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/understanding-max-pain-theory-on-the-option-chain";
@@ -363,15 +378,23 @@ export default function App() {
         desc = "Learn option chain analysis, Put Call Ratio (PCR), Open Interest (OI) clustering, and other essential derivatives trading metrics with our expert-crafted guides.";
         canonicalUrl = "https://optionchainanalyzer.in/blog";
       }
-    } else if (activeModal === 'about') {
+    } else if (activePage === 'about') {
       title = "About Us - Option Chain Analyzer";
       desc = "Discover the mission and background of Option Chain Analyzer, our visual support and resistance methodology, and how we help retail traders interpret live NSE option chain data.";
       canonicalUrl = "https://optionchainanalyzer.in/about";
-    } else if (activeModal === 'privacy') {
+    } else if (activePage === 'contact') {
+      title = "Contact Us - Option Chain Analyzer Support Desk";
+      desc = "Get in touch with the Option Chain Analyzer support and editorial team for feedback, CSV parsing questions, or research queries.";
+      canonicalUrl = "https://optionchainanalyzer.in/contact";
+    } else if (activePage === 'disclaimer') {
+      title = "SEBI Compliance & Financial Risk Disclaimer - Option Chain Analyzer";
+      desc = "Review statutory SEBI regulatory disclosures, retail loss studies, and the non-advisory educational status of the Option Chain Analyzer software.";
+      canonicalUrl = "https://optionchainanalyzer.in/disclaimer";
+    } else if (activePage === 'privacy') {
       title = "Privacy Protocol - Option Chain Analyzer";
       desc = "Read our comprehensive privacy policy governing data protection, cookies, and local browser storage security guidelines.";
       canonicalUrl = "https://optionchainanalyzer.in/privacy";
-    } else if (activeModal === 'terms') {
+    } else if (activePage === 'terms') {
       title = "Usage Terms & Legal Agreement - Option Chain Analyzer";
       desc = "Review the usage terms and regulatory disclaimers governing your access to the Option Chain Analyzer software, spreadsheets, and educational blogs.";
       canonicalUrl = "https://optionchainanalyzer.in/terms";
@@ -462,17 +485,20 @@ export default function App() {
     }
   }, [data.length]);
 
-  const processCSV = useCallback((file: File, method: 'file_upload' | 'drag_drop' = 'file_upload') => {
+  const processCSV = useCallback((fileOrContent: File | string, method: 'file_upload' | 'drag_drop' | 'sample_data' = 'file_upload') => {
     // Initial extraction from filename as hint
-    const fileName = file.name.toUpperCase();
-    const symbolMatch = fileName.match(/OPTION-CHAIN-ED-([^-]+)/) || fileName.match(/([A-Z]+)/);
     let detectedSymbol: string | null = null;
-    
-    if (symbolMatch && symbolMatch[1]) {
-      detectedSymbol = symbolMatch[1];
+    if (typeof fileOrContent !== 'string') {
+      const fileName = fileOrContent.name.toUpperCase();
+      const symbolMatch = fileName.match(/OPTION-CHAIN-ED-([^-]+)/) || fileName.match(/([A-Z]+)/);
+      if (symbolMatch && symbolMatch[1]) {
+        detectedSymbol = symbolMatch[1];
+      }
+    } else {
+      detectedSymbol = 'NIFTY';
     }
 
-    Papa.parse(file, {
+    Papa.parse(fileOrContent as any, {
       header: false,
       skipEmptyLines: true,
       complete: (results) => {
@@ -776,6 +802,20 @@ export default function App() {
     });
   }, [hasShownPopupThisSession]);
 
+  const handleLoadSampleData = useCallback(() => {
+    selectPage('tool');
+    processCSV(SAMPLE_NIFTY_CSV, 'sample_data');
+  }, [selectPage, processCSV]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('demo') === '1' || params.get('sample') === '1') {
+        handleLoadSampleData();
+      }
+    }
+  }, [handleLoadSampleData]);
+
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
     setIsHovering(true);
@@ -978,10 +1018,14 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
             <div className="flex flex-col gap-3">
-              <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer">Reset Platform</a>
+              <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer">Analyzer Platform</a>
+              <button type="button" onClick={handleLoadSampleData} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-all text-left uppercase tracking-wider cursor-pointer flex items-center gap-1.5 w-fit">
+                <span>Try Sample Nifty 50 Demo</span>
+                <Sparkles size={12} className="text-amber-500 animate-pulse" />
+              </button>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
               <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer flex items-center gap-1.5 w-fit">
-                <span>Blog</span>
+                <span>Research Blog</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-brand-teal animate-pulse" />
               </a>
             </div>
@@ -990,17 +1034,20 @@ export default function App() {
           <div className="flex flex-col gap-4">
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Security & Legal</h4>
             <div className="flex flex-col gap-3">
-              <a href="/about" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('about'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">About Us</a>
-              <a href="/privacy" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('privacy'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Privacy Protocol</a>
-              <a href="/terms" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('terms'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Usage Terms</a>
+              <a href="/about" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('about'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">About Us</a>
+              <a href="/contact" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('contact'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Contact Us</a>
+              <a href="/disclaimer" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('disclaimer'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">SEBI Disclaimer</a>
+              <a href="/privacy" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('privacy'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Privacy Protocol</a>
+              <a href="/terms" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('terms'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Usage Terms</a>
             </div>
           </div>
 
           <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Support</h4>
-            <div className="flex flex-col gap-3">
-              <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors uppercase tracking-wider">Contact Us</a>
-              <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest leading-none">v1.2.0 Stable Build</span>
+            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Support Desk</h4>
+            <div className="flex flex-col gap-2.5">
+              <a href="mailto:reachraghuhere14@gmail.com" className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors lowercase tracking-normal">reachraghuhere14@gmail.com</a>
+              <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors lowercase tracking-normal">support@optionchainanalyzer.in</a>
+              <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest leading-none mt-1">v1.2.0 Production Build</span>
             </div>
           </div>
         </div>
@@ -1049,341 +1096,6 @@ export default function App() {
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-teal/[0.02] rounded-full blur-[120px] pointer-events-none z-0" />
       <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-brand-teal/[0.015] rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {activeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-teal/80 backdrop-blur-xl animate-in fade-in duration-200">
-          <div className="bg-white rounded-[3rem] w-full max-w-3xl max-h-[85vh] overflow-auto p-16 premium-shadow relative animate-in fade-in zoom-in duration-300 scrollbar-none">
-            <button 
-              onClick={() => selectModal(null)} 
-              className="absolute top-8 right-8 text-slate-400 hover:text-brand-teal transition-all hover:rotate-90 hover:scale-110 active:scale-95 flex items-center justify-center w-10 h-10 rounded-full bg-slate-50 hover:bg-slate-100 cursor-pointer" 
-              aria-label="Close modal"
-            >
-              <X size={20} className="stroke-[2.5]" />
-            </button>
-            <div className="flex items-center gap-8 mb-16">
-              <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center p-3 border border-slate-100 shadow-2xl shadow-brand-teal/10">
-                <Logo />
-              </div>
-              <div>
-                <h2 className="text-4xl font-black uppercase tracking-tighter text-brand-teal">{activeModal === 'privacy' ? 'Privacy Policy' : activeModal === 'terms' ? 'Terms of Use' : activeModal === 'about' ? 'About Us' : 'Market Research Blog'}</h2>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1 block">{activeModal === 'about' ? 'Utility Information Detail' : activeModal === 'blog' ? 'Educational Insights & Articles' : 'Protocol Document'}</span>
-              </div>
-            </div>
-            <div className="prose prose-slate prose-lg max-w-none">
-            {activeModal === 'about' ? (
-              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
-                    Our Core Mission
-                  </h3>
-                  <p>
-                    Welcome to <strong>OptionChainAnalyzer.in</strong>. Our mission is to democratize complex derivative data analysis by providing clear, visually intuitive, and highly functional tools for independent financial researchers, retail options traders, and market students. We believe that financial literacy and thorough quantitative analysis are foundational to surviving and thriving in today's sophisticated financial markets.
-                  </p>
-                  <p>
-                    Traditional option chain data can be incredibly overwhelming when viewed in dense, monochrome tables. By converting raw, static spreadsheets into interactive, color-mapped visualization dashboards, we help users see past the noise to identify structural market barriers, capital commitments, and volatility hotspots.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
-                    Bespoke High-Probability Mapping Engine
-                  </h3>
-                  <p>
-                    OptionChainAnalyzer.in employs proprietary algorithms designed to compute strike-by-strike open interest (OI) concentration metrics instantly. Our tool focuses on two critical mathematical indexes:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-sm">
-                    <li>
-                      <strong>Put-Call Ratio (PCR):</strong> Calculated as <em>Put Open Interest / Call Open Interest</em> at individual strike levels. Ratios above 6.0x are highlighted in vibrant green, representing powerful put underwriting defense walls that act as statistical support zones.
-                    </li>
-                    <li>
-                      <strong>Call-Put Ratio (CPR):</strong> Calculated as <em>Call Open Interest / Put Open Interest</em> at individual strike levels. Ratios above 6.0x are highlighted in crimson red, representing heavy overhead call underwriting walls that act as overhead resistance barriers.
-                    </li>
-                  </ul>
-                  <p>
-                    These highlighted layers serve as mathematical confluences. They are designed to supplement your primary technical analysis (such as support/resistance levels, trendlines, and candlestick charts) and should never be viewed as standalone execution signals.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-2">
-                    Our Commitment to Transparency and Safety
-                  </h3>
-                  <p>
-                    We are dedicated to safety and local privacy. That is why <strong>OptionChainAnalyzer.in</strong> processes 100% of user-uploaded or dragged-and-dropped CSV files entirely client-side, right in your local browser memory. No proprietary financial information, uploaded spreadsheets, or specific ticker symbols are ever transmitted to external servers, ensuring absolute privacy for your research models.
-                  </p>
-                  <p>
-                    We actively promote cautious risk management. Derivatives markets involve substantial speculative risk, which is why we display regulatory statistics, educational articles, and detailed guides prominently throughout our interface. We want our users to stay informed, protect their capital, and analytical tools should be the first step on that journey.
-                  </p>
-                </section>
-              </div>
-            ) : activeModal === 'privacy' ? (
-              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
-                  Last Updated: June 30, 2026
-                </p>
-                
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    1. Introduction and Scope
-                  </h3>
-                  <p>
-                    This Privacy Policy describes how <strong>OptionChainAnalyzer.in</strong> ("we", "our", or "us") collects, uses, protects, and discloses information when you use our website and local analysis tool. We are fully committed to protecting your privacy and ensuring you have a secure experience when visiting our platform. By accessing or using our website, you consent to the data practices described in this policy.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    2. Local Data Processing (Zero Upload Policy)
-                  </h3>
-                  <p>
-                    Our core application operates on an "offline-first, browser-local" model. When you upload, select, or drag-and-drop an NSE Option Chain CSV file onto our interface, the data is processed entirely in your web browser's local memory. 
-                  </p>
-                  <p>
-                    <strong>We do not upload, transmit, store, or share your CSV files, stock symbols, target strikes, or financial datasets on our servers or with any third party.</strong> Your research remains 100% private, isolated, and confidential to your local machine.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    3. Information We Collect Automatically
-                  </h3>
-                  <p>
-                    Like most standard website operators, we may collect non-personally identifying information of the sort that web browsers and servers typically make available, such as:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-sm">
-                    <li><strong>Log Files:</strong> We collect standard internet log files including Internet Protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring or exit pages, and clickstream data. These are analyzed collectively to understand general usage trends and maintain platform security.</li>
-                    <li><strong>Device Metadata:</strong> Basic information regarding your operating system, screen resolution, and language settings to ensure our responsive layout renders properly.</li>
-                  </ul>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    4. Cookies and Third-Party Advertising (Google AdSense Disclosure)
-                  </h3>
-                  <p>
-                    To keep our comprehensive option mapping utilities and analytical blog free of charge, we partner with third-party networks, including Google AdSense, to display relevant advertisements across our platform.
-                  </p>
-                  <div className="p-6 bg-slate-50 border border-slate-150 rounded-2xl space-y-3">
-                    <p className="text-xs font-black uppercase text-brand-teal tracking-wider">Crucial Cookie Disclosures</p>
-                    <ul className="list-disc pl-6 space-y-2 text-xs leading-relaxed text-slate-600">
-                      <li>
-                        <strong>Third-Party Vendors:</strong> Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to our website or other websites on the Internet.
-                      </li>
-                      <li>
-                        <strong>DoubleClick DART Cookie:</strong> Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and/or other sites on the Internet.
-                      </li>
-                      <li>
-                        <strong>How to Opt-Out:</strong> Users may opt out of personalized advertising by visiting Google's ad setting configurations at <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">https://policies.google.com/technologies/ads</a>. Alternatively, users can opt out of third-party vendors' use of cookies for personalized advertising by visiting <a href="http://www.aboutads.info/choices/" target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline font-semibold">www.aboutads.info/choices</a>.
-                      </li>
-                    </ul>
-                  </div>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    5. GDPR and CCPA Privacy Rights
-                  </h3>
-                  <p>
-                    We want to ensure you are fully aware of all your data protection rights. Every user is entitled to the following:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-sm">
-                    <li><strong>The Right to Access:</strong> You have the right to request copies of your personal data. (Since we do not store your data, we hold no records to provide).</li>
-                    <li><strong>The Right to Rectification & Erasure:</strong> You have the right to request that we correct or erase any personal information we may hold.</li>
-                    <li><strong>The Right to Object/Restrict Processing:</strong> You have the right to object to or request that we restrict the processing of your data under specific conditions.</li>
-                    <li><strong>CCPA "Do Not Sell" Compliance:</strong> Under the California Consumer Privacy Act, users have the right to opt-out of the sale of their personal information. We do not collect or sell any personal data.</li>
-                  </ul>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    6. Children's Online Privacy Protection
-                  </h3>
-                  <p>
-                    Protecting children's privacy online is of paramount importance to us. <strong>OptionChainAnalyzer.in</strong> does not knowingly collect or solicit any Personally Identifiable Information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us immediately so we can take steps to remove it from our systems.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    7. Contact and Support Information
-                  </h3>
-                  <p>
-                    If you have any questions, clarifications, or concerns regarding this Privacy Policy, please contact our support team at:
-                  </p>
-                  <p className="font-mono text-sm text-brand-teal font-extrabold">
-                    Email: support@optionchainanalyzer.in
-                  </p>
-                </section>
-              </div>
-            ) : activeModal === 'terms' ? (
-              <div className="space-y-8 text-base text-slate-600 leading-relaxed font-medium">
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
-                  Last Updated: June 30, 2026
-                </p>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    1. Acceptance of Terms
-                  </h3>
-                  <p>
-                    By accessing, browsing, or utilizing the services provided on <strong>OptionChainAnalyzer.in</strong>, you agree to comply with and be bound by these Terms of Use, along with our Privacy Policy. If you do not agree with any part of these terms, you are strictly prohibited from using or accessing this website and must disconnect immediately.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    2. Use License and Limitations
-                  </h3>
-                  <p>
-                    Permission is granted to temporarily use the Option Chain Analyzer mapping tool and read our integrated Knowledge Base materials for personal, non-commercial, and educational research purposes only. This is the grant of a license, not a transfer of title, and under this license you may not:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2 text-sm">
-                    <li>Modify, copy, reverse engineer, or decompile any software code, visualization interfaces, or mathematical highlights of OptionChainAnalyzer.in;</li>
-                    <li>Use the materials or mapping tools for any commercial purpose or public display;</li>
-                    <li>Sublicense, lease, rent, or redistribute the application layout or algorithmic models;</li>
-                    <li>Attempt to breach local sandbox securities, manipulate iframe settings, or run unauthorized scripts.</li>
-                  </ul>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight text-rose-600">
-                    3. Critical Speculative Risk Warning (SEBI Statistics)
-                  </h3>
-                  <div className="p-6 bg-rose-50 border border-rose-100 rounded-2xl space-y-3">
-                    <p className="text-xs font-black uppercase text-rose-700 tracking-wider">Regulatory F&amp;O Trading Risk Disclosure</p>
-                    <p className="text-xs leading-relaxed text-slate-700 font-semibold">
-                      Futures and Options (F&amp;O) trading involves substantial speculative risk and can lead to immediate, irreversible loss of capital. According to reports published by the Securities and Exchange Board of India (SEBI):
-                    </p>
-                    <ul className="list-disc pl-6 space-y-1 text-[11px] leading-relaxed text-slate-650 font-bold">
-                      <li>9 out of 10 individual traders in the equity Options segment incurred net losses.</li>
-                      <li>On average, loss-makers registered net trading losses close to ₹50,000 per year.</li>
-                      <li>Over and above the net trading losses, loss-makers spent an additional 28% of net trading losses as transaction costs.</li>
-                      <li>Those with net profits redirected a significant portion of their earnings toward transaction fees and exchange taxes.</li>
-                    </ul>
-                  </div>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    4. No Investment Advice Disclaimer
-                  </h3>
-                  <p>
-                    <strong>The Option Chain Analyzer does not provide financial, investment, legal, tax, or trading advice.</strong> All calculations, ratios (such as PCR and CPR), color-coded strike indicators, or volatility spikes highlighted by our software are purely mathematical operations on user-supplied parameters. 
-                  </p>
-                  <p>
-                    They are created solely to assist in educational data sorting and should never be construed as recommendations, BUY/SELL signals, or endorsements of any security, index, or strategy. OptionChainAnalyzer.in is not a SEBI-registered advisory entity, broker, or financial custodian. Always perform your own research and consult a certified financial advisor before committing real capital.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    5. Accuracy of User-Supplied Data
-                  </h3>
-                  <p>
-                    This utility relies strictly on static, offline CSV files downloaded and supplied directly by the user from external web databases (such as www.nseindia.com). We do not warrant or guarantee the accuracy, completeness, timeliness, or validity of the files or parsed outputs. It is your sole responsibility to verify all technical metrics, spot prices, and contract values against official live exchange terminals before making decisions.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    6. Absolute Limitation of Liability
-                  </h3>
-                  <p>
-                    Under no circumstances (including negligence) will OptionChainAnalyzer.in, its developers, or affiliates be liable to you or any third party for any direct, indirect, special, incidental, punitive, or consequential damages (including, without limitation, trading losses, lost profits, loss of trading capital, or data corruption) arising from the use of, or inability to use, our mapping engine, even if we have been advised of the possibility of such damages.
-                  </p>
-                </section>
-
-                <section className="space-y-4">
-                  <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    7. Indemnification and Governing Law
-                  </h3>
-                  <p>
-                    You agree to indemnify, defend, and hold harmless the site administrators and developers from and against any claims, losses, or expenses resulting from your breach of these terms or your speculative market activities. These Terms of Use shall be governed by and construed in accordance with the laws of India, and any disputes shall be resolved exclusively within the relevant jurisdictions.
-                  </p>
-                </section>
-              </div>
-            ) : (
-              <div className="space-y-8 text-base">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Market Research & Education Library</h3>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">Authoritative analytical guides on derivatives and NSE option chains</p>
-                  </div>
-                  <button 
-                    onClick={() => { selectModal(null); selectPage('blog'); }}
-                    className="px-4 py-2 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-brand-teal/90 transition-all cursor-pointer shadow-sm w-fit"
-                  >
-                    Open Research Hub &rarr;
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div 
-                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('how-global-market-cues-impact-the-nse-option-chain'); }}
-                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded">Strategy</span>
-                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
-                    </div>
-                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Discover how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.</p>
-                  </div>
-
-                  <div 
-                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('how-traders-identify-support-and-resistance-using-option-chain-data'); }}
-                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
-                      <span className="text-[10px] text-slate-400 font-bold">5 min read</span>
-                    </div>
-                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">How Traders Identify Support and Resistance Using Option Chain Data</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.</p>
-                  </div>
-
-                  <div 
-                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('what-is-an-option-chain-and-why-do-traders-use-it'); }}
-                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Beginners</span>
-                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
-                    </div>
-                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">What Is an Option Chain and Why Do Traders Use It?</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">A complete guide to understanding option chain structure, calls, puts, strike prices, and open interest metrics.</p>
-                  </div>
-
-                  <div 
-                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('what-is-put-call-ratio-pcr'); }}
-                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-700 px-2 py-0.5 rounded">Strategy</span>
-                      <span className="text-[10px] text-slate-400 font-bold">5 min read</span>
-                    </div>
-                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">What Is Put Call Ratio (PCR)? Complete Beginner Guide</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Explore how Put-Call Ratio works, mathematical formulas, sentiment interpretation, and retail vs institutional positioning.</p>
-                  </div>
-
-                  <div 
-                    onClick={() => { selectModal(null); selectPage('blog'); selectArticle('understanding-implied-volatility-iv-on-the-option-chain'); }}
-                    className="border border-slate-200/80 bg-slate-50/60 p-5 rounded-2xl space-y-2.5 hover:bg-white hover:border-brand-teal/40 transition-all cursor-pointer shadow-sm group"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[9px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 px-2 py-0.5 rounded">Volatility</span>
-                      <span className="text-[10px] text-slate-400 font-bold">6 min read</span>
-                    </div>
-                    <h4 className="font-black text-slate-800 text-sm group-hover:text-brand-teal transition-colors">Understanding Implied Volatility (IV) on the Option Chain</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">Understand why IV impacts options pricing, how to spot volatility skews, and how to identify IV anomalies.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            </div>
-          </div>
-        </div>
-      )}
-      
       <AnimatePresence>
         {showScrollPopup && (
           <motion.div
@@ -1451,34 +1163,55 @@ export default function App() {
           </div>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6 ml-auto">
+        <nav className="hidden md:flex items-center gap-5 ml-auto">
+          <a 
+            href="/" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'tool' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Analyzer
+          </a>
           <a 
             href="/blog" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'blog' && !activeModal ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'blog' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
           >
             Blog
           </a>
           <a 
             href="/about" 
-            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('about'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'about' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('about'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'about' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
           >
             About Us
           </a>
           <a 
-            href="/privacy" 
-            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('privacy'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'privacy' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            href="/contact" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('contact'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'contact' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
           >
-            Privacy Protocol
+            Contact
+          </a>
+          <a 
+            href="/disclaimer" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('disclaimer'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'disclaimer' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Disclaimer
+          </a>
+          <a 
+            href="/privacy" 
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('privacy'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'privacy' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+          >
+            Privacy
           </a>
           <a 
             href="/terms" 
-            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectModal('terms'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activeModal === 'terms' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('terms'); } }} 
+            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'terms' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
           >
-            Terms of Use
+            Terms
           </a>
         </nav>
       </header>
@@ -1491,6 +1224,51 @@ export default function App() {
             openArticleId={openArticleId}
             onSelectArticle={selectArticle}
           />
+        ) : activePage === 'about' ? (
+          <div className="flex-1 overflow-auto bg-[#fafafa]">
+            <AboutPage 
+              onBackToApp={() => selectPage('tool')}
+              onNavigateBlog={() => selectPage('blog')}
+              onNavigatePage={selectPage}
+            />
+            <FooterContent />
+          </div>
+        ) : activePage === 'contact' ? (
+          <div className="flex-1 overflow-auto bg-[#fafafa]">
+            <ContactPage 
+              onBackToApp={() => selectPage('tool')}
+              onNavigateBlog={() => selectPage('blog')}
+              onNavigatePage={selectPage}
+            />
+            <FooterContent />
+          </div>
+        ) : activePage === 'disclaimer' ? (
+          <div className="flex-1 overflow-auto bg-[#fafafa]">
+            <DisclaimerPage 
+              onBackToApp={() => selectPage('tool')}
+              onNavigateBlog={() => selectPage('blog')}
+              onNavigatePage={selectPage}
+            />
+            <FooterContent />
+          </div>
+        ) : activePage === 'privacy' ? (
+          <div className="flex-1 overflow-auto bg-[#fafafa]">
+            <PrivacyPage 
+              onBackToApp={() => selectPage('tool')}
+              onNavigateBlog={() => selectPage('blog')}
+              onNavigatePage={selectPage}
+            />
+            <FooterContent />
+          </div>
+        ) : activePage === 'terms' ? (
+          <div className="flex-1 overflow-auto bg-[#fafafa]">
+            <TermsPage 
+              onBackToApp={() => selectPage('tool')}
+              onNavigateBlog={() => selectPage('blog')}
+              onNavigatePage={selectPage}
+            />
+            <FooterContent />
+          </div>
         ) : data.length === 0 ? (
           <div 
             ref={homeContainerRef}
@@ -1519,20 +1297,22 @@ export default function App() {
                 </motion.div>
               )}
               
-              <div className="flex flex-col gap-3 mb-8">
+              <div className="flex justify-center mb-3 w-full max-w-md">
                 <label 
-                  className="px-8 py-5 bg-brand-teal text-white rounded-xl text-sm font-black uppercase tracking-[0.3em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center"
+                  className="w-full py-4 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center flex items-center justify-center gap-2"
                   aria-label="Upload NSE Option Chain CSV File"
                 >
-                  Upload CSV File
+                  <Upload size={16} />
+                  <span>Upload CSV File</span>
                   <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
                 </label>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-600 text-center">
-                  or drop it anywhere on this page
-                </p>
               </div>
 
-              <div className="w-full max-w-4xl mx-auto px-4 mt-6">
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-8">
+                Or Drop CSV Anywhere on the Screen
+              </p>
+
+              <div className="w-full max-w-4xl mx-auto px-4 mt-2">
                 <GuideContent />
               </div>
               
