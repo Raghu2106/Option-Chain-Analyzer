@@ -87,6 +87,21 @@ const routeMeta = {
     title: 'Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup',
     desc: 'Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.',
     canonical: 'https://optionchainanalyzer.in/blog/how-to-spot-long-buildup-and-short-covering-in-oi'
+  },
+  'blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain': {
+    title: 'Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on Nifty Option Chain',
+    desc: 'Understand how Federal Reserve interest rate projections, US Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.',
+    canonical: 'https://optionchainanalyzer.in/blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain'
+  },
+  'blog/crude-oil-shocks-geopolitical-risk-iv-skew-nse': {
+    title: 'Crude Oil Price Shocks & Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options',
+    desc: 'Learn how sudden spikes in Brent crude and geopolitical supply tensions reprice Indian equity risk—triggering India VIX spikes, Put-side IV anomalies, and defensive strike adjustments.',
+    canonical: 'https://optionchainanalyzer.in/blog/crude-oil-shocks-geopolitical-risk-iv-skew-nse'
+  },
+  'blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps': {
+    title: 'Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain',
+    desc: 'Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.',
+    canonical: 'https://optionchainanalyzer.in/blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps'
   }
 };
 
@@ -1254,6 +1269,82 @@ const getPageBodyContent = (route) => {
               <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Price movement alone can be deceiving. The Price vs. Open Interest (OI) Quadrant reveals whether moves are backed by fresh institutional accumulation or transient short squeezes.</p>
               <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">The 4 Quadrants</h2>
               <p><strong>1. Long Buildup:</strong> Price ▲ + OI ▲ (Strong Bullish)<br /><strong>2. Short Covering:</strong> Price ▲ + OI ▼ (Transient Bullish)<br /><strong>3. Short Buildup:</strong> Price ▼ + OI ▲ (Strong Bearish)<br /><strong>4. Long Unwinding:</strong> Price ▼ + OI ▼ (Mild Bearish)</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 8 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Fed Interest Rate Trajectory &amp; US Dollar Surge: Reading FII Shifts on the Nifty Option Chain</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Macro Derivatives Desk</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">When the Federal Reserve signals higher interest rates or the US Dollar Index (DXY) climbs, foreign institutional investor (FII) capital reallocation shifts the open interest landscape of the Nifty 50 option chain.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">The DXY and FII Outflow Transmission</h2>
+              <p>A climbing Dollar Index pressures emerging market currencies like the Indian Rupee. To hedge cash equities without triggering market panic, institutional desks write Out-of-The-Money (OTM) Call options, constructing aggressive resistance barriers.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Identifying Call Walls (CPR &ge; 6.0x)</h2>
+              <p>When Call-Put Ratio (CPR) multipliers on overhead strikes exceed 6.0x with low Put-Call Ratio (PCR &lt; 0.75), institutional option sellers are capping index upside, dragging Max Pain lower.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/crude-oil-shocks-geopolitical-risk-iv-skew-nse':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Analysis • 9 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Crude Oil Price Shocks &amp; Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Quantitative Research Team</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">With India importing over 85% of its crude requirements, global energy shocks immediately widen India's trade deficit and alter option implied volatility surfaces.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Asymmetrical Volatility Skew</h2>
+              <p>Geopolitical risks trigger panic Put option buying, creating an aggressive skew where Out-of-The-Money Put IVs dramatically exceed Call IVs. The Option Chain Analyzer detects these IV anomalies with localized visual highlights.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">High-IV Tactical Spreads</h2>
+              <p>During crude-driven spikes in India VIX, defined-risk vertical credit spreads outperform naked option purchases due to high accelerated theta decay.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 8 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Nasdaq Tech Earnings &amp; Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Derivatives Strategy Desk</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Overnight US tech earnings and Nasdaq movements establish Gift Nifty opening gaps. Verifying whether early 9:15–9:45 AM open interest supports the move distinguishes real trends from gap-and-trap reversals.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">The 9:30 AM Option Chain Rule</h2>
+              <p>Avoid trading the volatile 9:15 AM opening tick. Wait for the consolidated 9:30 AM NSE option chain refresh to verify whether Call writers are unwinding or aggressively blocking the gap with fresh CPR &ge; 6.0x resistance.</p>
             </div>
           </main>
           

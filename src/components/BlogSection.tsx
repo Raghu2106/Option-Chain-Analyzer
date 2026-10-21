@@ -20,7 +20,7 @@ export interface BlogPost {
   title: string;
   excerpt: string;
   content: React.ReactNode;
-  category: 'Education' | 'Strategy' | 'Analysis' | 'Compliance';
+  category: 'Education' | 'Strategy' | 'Analysis' | 'Compliance' | 'Advanced Analysis';
   date: string;
   readTime: string;
   author: string;
@@ -39,6 +39,376 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const posts = useMemo<BlogPost[]>(() => [
+    {
+      id: 'fed-rate-policy-us-dollar-dxy-nifty-option-chain',
+      title: "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on the Nifty Option Chain",
+      excerpt: "Understand how Federal Reserve interest rate projections, US 10-year Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.",
+      category: 'Strategy',
+      date: 'October 21, 2026',
+      readTime: '8 min read',
+      author: 'Macro Derivatives Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            When the US Federal Reserve issues forward guidance on interest rates or when the US Dollar Index (DXY) climbs above key technical thresholds, the effects reverberate immediately across emerging markets. For derivatives traders on the National Stock Exchange of India (NSE), tracking the Fed's terminal rate trajectory is not an abstract economic exercise—it directly alters institutional capital allocations, foreign portfolio flows, and the open interest topography of Nifty 50 option strikes.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li>A strengthening Dollar Index (DXY &gt; 104) and elevated US 10-Year Treasury yields typically trigger Foreign Institutional Investor (FII) net selling in domestic cash equities and index futures.</li>
+              <li>FII defensive hedging manifests primarily as aggressive Out-of-The-Money (OTM) Call writing, capping index ceilings and forcing Max Pain strikes downward.</li>
+              <li>A deteriorating Put-Call Ratio (PCR &lt; 0.75) alongside heavy Call additions with CPR multipliers exceeding 6.0x signals sustained institutional ceiling formation.</li>
+              <li>Option traders who monitor cross-asset signals (DXY, USD/INR, US 10Y Yields) avoid the dangerous trap of buying premature dip-buying Call options during macro liquidity contractions.</li>
+            </ul>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            1. The Macro Mechanism: From Washington to Dalal Street
+          </h2>
+          <p>
+            Global institutional investors operate under strict risk-adjusted yield mandates. When the Federal Reserve maintains a higher-for-longer interest rate stance or signals fewer rate cuts than previously priced in by futures markets, US dollar-denominated assets become relatively more attractive. The yield differential between emerging market equities and risk-free US Treasury notes narrows.
+          </p>
+          <p>
+            As international asset managers rebalance their emerging market baskets, two immediate domestic ripple effects occur in India:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 text-sm font-medium text-slate-700">
+            <li>
+              <strong>Currency Pressure (USD/INR Depreciation):</strong> A rising DXY exerts downward pressure on the Indian Rupee. Foreign investors selling Indian equities convert rupee proceeds back into dollars, compounding foreign exchange volatility.
+            </li>
+            <li>
+              <strong>FII Index Futures Hedging:</strong> Rather than dumping blue-chip cash shares in a single day, institutional desks frequently short Nifty index futures and write short Call spreads on near-month weekly expiries to hedge their existing equity portfolios against currency and drawdown risks.
+            </li>
+          </ol>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            2. How Fed Hawkishness Shows Up in the Nifty Option Chain
+          </h2>
+          <p>
+            When macro risk rises, institutional option writers behave with ruthless discipline. By uploading a current NSE Option Chain CSV file into the analyzer, traders can observe signature shifts across key metrics:
+          </p>
+
+          <div className="overflow-x-auto my-6 border border-slate-200 rounded-2xl">
+            <table className="w-full text-xs text-left text-slate-700 border-collapse">
+              <thead className="bg-slate-100 text-slate-900 uppercase font-black text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="p-3">Option Chain Metric</th>
+                  <th className="p-3">Dovish Fed / Soft Dollar (DXY Down)</th>
+                  <th className="p-3">Hawkish Fed / Strong Dollar (DXY Up)</th>
+                  <th className="p-3">Institutional Interpretation</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr>
+                  <td className="p-3 font-bold text-slate-900">Call-Put Ratio (CPR VOL / OI)</td>
+                  <td className="p-3 text-emerald-700 font-semibold">CPR &lt; 1.0 (Low Call buildup)</td>
+                  <td className="p-3 text-rose-700 font-bold">CPR &ge; 6.0x (Heavy Call blocks)</td>
+                  <td className="p-3">Option sellers erect formidable resistance walls above spot price.</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-bold text-slate-900">Put-Call Ratio (PCR Total OI)</td>
+                  <td className="p-3 text-emerald-700 font-semibold">1.10 – 1.45 (Bullish support)</td>
+                  <td className="p-3 text-rose-700 font-bold">0.60 – 0.80 (Defensive drift)</td>
+                  <td className="p-3">Put writers retreat to deeper strikes, indicating reduced willingness to cushion pullbacks.</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-bold text-slate-900">Max Pain Strike Migration</td>
+                  <td className="p-3 text-emerald-700 font-semibold">Migrates upward with spot</td>
+                  <td className="p-3 text-rose-700 font-bold">Steps down 100–300 points</td>
+                  <td className="p-3">Options decay point slides lower as Call sellers dominate total premium volume.</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-bold text-slate-900">IV Skew (Call IV vs Put IV)</td>
+                  <td className="p-3 text-slate-600">Balanced / Flat IV smile</td>
+                  <td className="p-3 text-amber-700 font-semibold">Put IV &gt; Call IV by 2.0–4.0 pts</td>
+                  <td className="p-3">Downside protection demand inflates Out-of-The-Money Put implied volatility.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            3. Tactical Playbook: Trading the FII Call Wall
+          </h2>
+          <p>
+            When US yields jump and the Dollar Index breaks higher overnight, retail traders often attempt to buy index calls on intraday dips, hoping for an immediate bounce. This frequently results in severe option buyer decay. Here is how professional derivatives desks navigate this macro regime:
+          </p>
+
+          <div className="space-y-4 my-6">
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 1: Identify the "Anchor Resistance" Strike (CPR &ge; 6.0x)</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                Locate the nearest Out-of-The-Money Call strike exhibiting both massive Open Interest accumulation and a CPR OI multiplier equal to or greater than 6.0x. For example, if Nifty is trading at 24,800 and the 25,000 CE strike has 3.5x the open interest of all nearby strikes with a 7.2x CPR ratio, 25,000 functions as an institutional steel ceiling for the current weekly expiry.
+              </p>
+            </div>
+
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 2: Never Chase Gap-Down Put Options (Avoid IV Crush)</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                When Nifty opens lower following hawkish Fed statements, Implied Volatility (IV) on Put options is already artificially inflated. Buying naked Put options during the first 15 minutes carries extreme IV crush risk. If the index merely consolidates, the Put option premium will rapidly lose value even without a market recovery.
+              </p>
+            </div>
+
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 3: Look for the Put Unwinding Domino Effect</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                If the previous day's primary Put support strike shows negative Change in OI (Chng in OI &lt; 0), Put writers are abandoning their positions and cutting losses. When Put writers surrender their strikes, dealer hedging forces additional index selling into the market, often creating a secondary intraday down-leg.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Summary Checklist for Fed Decision Days
+          </h2>
+          <p>
+            Before placing option trades during central bank announcement weeks, verify this checklist:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-sm font-medium text-slate-700">
+            <li>Check US 10-Year Treasury Yields: Are they above 4.25% or breaking new multi-month highs?</li>
+            <li>Inspect the DXY trend: Is the dollar continuing to print higher daily highs against major global currencies?</li>
+            <li>Verify Nifty Total PCR: Has the Put-Call Ratio broken below 0.80 on rising volume?</li>
+            <li>Look for CPR Clusters: Are overhead strikes showing CPR &ge; 6.0x, confirming institutional Call blocks?</li>
+            <li>Align with Max Pain: Is spot price trading below the current Max Pain level with option decay favoring Call sellers?</li>
+          </ul>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
+            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">SEBI Compliance &amp; Risk Disclosure</p>
+            <p>
+              Index derivative trading involves significant market volatility and leverage. Past correlations between the US Dollar Index, Federal Reserve decisions, and NSE option positioning do not guarantee future market outcomes. Always utilize stop-loss orders and consult an authorized financial advisor before trading derivatives.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'crude-oil-shocks-geopolitical-risk-iv-skew-nse',
+      title: "Crude Oil Price Shocks & Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options",
+      excerpt: "Learn how sudden spikes in Brent crude and geopolitical supply tensions reprice Indian equity risk—triggering India VIX spikes, Put-side IV anomalies, and defensive strike adjustments.",
+      category: 'Analysis',
+      date: 'October 21, 2026',
+      readTime: '9 min read',
+      author: 'Quantitative Research Team',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            India imports more than 85% of its crude oil requirements, making domestic equity valuations uniquely sensitive to global energy shocks. When geopolitical conflicts flare in major oil-producing corridors or OPEC+ announces unexpected production cuts, the National Stock Exchange of India (NSE) experiences an immediate repricing of tail-risk. Understanding how crude oil spikes distort the option chain's Implied Volatility (IV) smile gives derivatives traders a decisive quantitative edge.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li>A sharp climb in Brent crude ($85–$95/bbl) elevates domestic inflation forecasts and widens India's current account deficit, hitting Bank Nifty, Auto, and Paint sectors hardest.</li>
+              <li>Geopolitical risk creates an asymmetrical "Volatility Skew": Out-of-The-Money (OTM) Put implied volatility surges dramatically compared to equivalent Call strikes.</li>
+              <li>Option Chain Analyzer highlights IV Anomalies when individual strikes deviate significantly from adjacent strike volatilities, signaling institutional panic pricing or mispriced hedges.</li>
+              <li>During high-IV regimes, defined-risk credit spreads (such as Bull Put Spreads or Bear Call Spreads) drastically outperform naked option buying due to elevated premium decay.</li>
+            </ul>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            1. Why Crude Oil Shocks Distort Indian Equity Valuations
+          </h2>
+          <p>
+            Crude oil is the lifeblood of industrial input costs and transportation logistics across India. A sustained $10 per barrel increase in Brent crude typically adds 30–40 basis points to Indian CPI inflation and expands the import bill by over $12 billion annually.
+          </p>
+          <p>
+            For equity markets, this translates directly to margin compression for consumer cyclicals, airline operators, tire manufacturers, and specialty chemicals. At the macro level, it limits the Reserve Bank of India's (RBI) latitude to ease monetary policy. Consequently, institutional desks swiftly re-evaluate their exposure to heavy-weight banking and industrial constituents within Nifty 50 and Bank Nifty.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            2. Decoding the Volatility Skew &amp; IV Anomalies
+          </h2>
+          <p>
+            Under normal market conditions, an option chain exhibits a relatively symmetrical "volatility smile," where implied volatility rises moderately as strikes move further out of the money in both directions. However, during geopolitical energy shocks, the smile bends into a sharp, steepened skew:
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 my-6">
+            <h4 className="text-sm font-black uppercase text-brand-teal tracking-wider">Anatomy of an IV Skew During Crude Spikes</h4>
+            <div className="space-y-3 text-xs text-slate-700 leading-relaxed font-medium">
+              <p>
+                <strong>Put-Side Premium Expansion:</strong> Portfolio managers buy downside Put options as catastrophic insurance, driving OTM Put IVs from standard baseline levels of 12%–14% up to 22%–28% within hours.
+              </p>
+              <p>
+                <strong>Call-Side Premium Starvation:</strong> Because upside momentum is capped by macro headwind concerns, Call option demand evaporates, leaving Call IVs depressed at 11%–13%.
+              </p>
+              <p>
+                <strong>IV Anomaly Detection:</strong> When specific strike prices experience localized panic hedging—for instance, a sudden surge of buying at the 24,000 PE strike—its IV may spike 4 to 6 percentage points above adjacent strikes (23,900 PE and 24,100 PE). Our analyzer flags these as <em>IV Anomalies</em> with dedicated visual badges.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            3. Sectoral Transmission: Nifty 50 vs Bank Nifty
+          </h2>
+          <p>
+            The impact of crude shocks is not distributed equally across all NSE contracts. Traders must distinguish between the relative resilience of Nifty 50 and the vulnerability of Bank Nifty:
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Bank Nifty: The Transmission Vector</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                Higher crude oil fuels domestic bond yield spikes, which reduces treasury gains for public and private sector banks. Bank Nifty option chains typically lead the downside move, showing rapid Put unwinding at ATM strikes and massive Call OI accumulation.
+              </p>
+            </div>
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Nifty 50: The Energy Component Cushion</h4>
+              <p className="text-xs text-slate-650 leading-relaxed">
+                Nifty 50 contains heavy index weightings in energy and oil exploration companies (such as Reliance Industries and ONGC). Strong upstream crude realizations can partially buffer Nifty's benchmark decline, resulting in a divergent PCR between Nifty and Bank Nifty.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            4. Tactical Strategy: Surviving and Profiting in High-IV Regimes
+          </h2>
+          <p>
+            When geopolitical headlines push India VIX above 18–20 points and crude oil surges, traditional retail option buying strategies suffer catastrophic failure rates due to aggressive post-event IV crush. Follow these institutional principles:
+          </p>
+
+          <ol className="list-decimal pl-6 space-y-3 text-sm font-medium text-slate-700">
+            <li>
+              <strong>Avoid Buying Naked OTM Puts on Gap-Down Days:</strong> By the time crude oil headlines appear on morning news feeds, option sellers have already priced the risk into Put premiums. Buying a 1-day-old shock Put frequently results in a 40% loss even if spot prices drop slightly further.
+            </li>
+            <li>
+              <strong>Utilize Defined-Risk Vertical Spreads:</strong> When IV is elevated, sell the high-IV strike while buying a cheaper further OTM strike for protection (e.g., Bear Call Spread above the CPR &ge; 6.0x resistance level). The elevated implied volatility works in your favor through accelerated time decay.
+            </li>
+            <li>
+              <strong>Watch for Crude Stabilization as a Reversal Signal:</strong> If Brent crude tests resistance and begins consolidating while Nifty forms strong Put OI support (PCR &ge; 6.0x) near a psychological round number, a sharp short-covering rally often follows as India VIX cools down.
+            </li>
+          </ol>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
+            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Disclaimer</p>
+            <p>
+              Commodity price volatility and geopolitical developments create non-linear financial risks. The analysis provided here is strictly for educational purposes based on historical NSE market structure and options pricing theory. Derivative contracts carry substantial financial risk of total capital loss.
+            </p>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps',
+      title: "Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain",
+      excerpt: "Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.",
+      category: 'Strategy',
+      date: 'October 21, 2026',
+      readTime: '8 min read',
+      author: 'Derivatives Strategy Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            Every morning at 9:15 AM IST, the Indian stock market opens to a reality shaped by overnight trading on Wall Street. When Silicon Valley tech titans release earnings results or when the Nasdaq Composite index moves by more than 1.5% overnight, Gift Nifty (formerly SGX Nifty) immediately forecasts a substantial opening gap. However, trading opening gaps purely on enthusiasm or panic is the single most common cause of retail option account drawdowns. Here is how institutional option chain metrics reveal whether an opening gap will sustain into a trend day or reverse aggressively.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li>Overnight US tech earnings (Semiconductors, Cloud, AI mega-caps) directly influence the Indian IT index (TCS, Infosys, HCLTech), which comprises over 13% of Nifty 50.</li>
+              <li>An opening gap is only verified if the initial 30 minutes of trading demonstrate substantial Open Interest (OI) buildup supporting the gap direction.</li>
+              <li>A "Gap and Trap" occurs when Nifty gaps up by 100+ points on global cues, but option sellers aggressively write Calls (CPR &ge; 6.0x) right at the opening strike without adding Put support.</li>
+              <li>Uploading the NSE option chain CSV between 9:30 AM and 9:45 AM reveals whether domestic institutional writers are participating in the global move or fading it for premium decay.</li>
+            </ul>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            1. The Wall Street to Dalal Street Transmission Line
+          </h2>
+          <p>
+            The correlation between the Nasdaq Composite and the Nifty IT index is one of the strongest cross-border equity relationships in global finance. Major Indian IT exporters derive upwards of 55% to 65% of their total revenues from North American enterprise clients.
+          </p>
+          <p>
+            When US tech companies report strong capital expenditure in enterprise software and cloud infrastructure, Indian IT ADRs traded in New York (such as INFY and WIT) surge in after-hours trading. By early morning, Gift Nifty trading in GIFT City Gujarat absorbs this sentiment, establishing a projected opening range for Nifty 50.
+          </p>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            2. The Anatomy of Opening Gap Setups on the Option Chain
+          </h2>
+          <p>
+            When the market opens with a gap of 80 to 200 points, overnight straddle and strangle sellers face sudden delta imbalances. Their reactions during the first 30 minutes create distinct option chain fingerprints:
+          </p>
+
+          <div className="overflow-x-auto my-6 border border-slate-200 rounded-2xl">
+            <table className="w-full text-xs text-left text-slate-700 border-collapse">
+              <thead className="bg-slate-100 text-slate-900 uppercase font-black text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="p-3">Opening Pattern</th>
+                  <th className="p-3">Option Chain OI Signal</th>
+                  <th className="p-3">Volume &amp; PCR Confirmation</th>
+                  <th className="p-3">Expected Day Trajectory</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr>
+                  <td className="p-3 font-bold text-emerald-800">Trend Gap-Up (Continuation)</td>
+                  <td className="p-3 font-semibold text-emerald-700">Call writers rapidly cover (Chng in Call OI &lt; 0) + Aggressive Put writing at new ATM</td>
+                  <td className="p-3">PCR Vol &gt; 1.30, PCR OI &ge; 6.0x on support strikes</td>
+                  <td className="p-3">Market trends upward throughout the session; intraday dips are defended.</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-bold text-rose-800">Gap &amp; Trap (Exhaustion Reversal)</td>
+                  <td className="p-3 font-semibold text-rose-700">Call writers hold ground; massive fresh Call OI added (CPR &ge; 6.0x) at opening strike</td>
+                  <td className="p-3">Put writers refuse to move up; PCR fails to expand</td>
+                  <td className="p-3">Market fades the gap, drifting downward toward previous day's close or Max Pain.</td>
+                </tr>
+                <tr>
+                  <td className="p-3 font-bold text-slate-800">Rangebound Consolidation</td>
+                  <td className="p-3 font-semibold text-slate-600">Equal straddle writing at new ATM strike; Call OI and Put OI expand symmetrically</td>
+                  <td className="p-3">PCR stays between 0.90 and 1.10</td>
+                  <td className="p-3">Index remains locked inside a 60-point channel; premium decay dominates.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            3. The 9:15 to 9:45 AM Verification Rule
+          </h2>
+          <p>
+            The opening 15 minutes (9:15 AM – 9:30 AM) are notorious for institutional order matching, synthetic volatility spikes, and wide bid-ask spreads. Attempting to trade index options within this window without option chain confirmation is essentially gambling on overnight momentum.
+          </p>
+          <p>
+            Instead, follow the institutional 30-minute confirmation rule:
+          </p>
+
+          <div className="space-y-4 my-6">
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 1: Wait for 9:30 AM Data Refresh</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                The National Stock Exchange compiles and publishes its first consolidated open interest dataset around 9:25–9:30 AM. Download the fresh CSV directly from <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-bold">nseindia.com/option-chain</a> and load it into Option Chain Analyzer.
+              </p>
+            </div>
+
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 2: Inspect Support vs Resistance Multipliers</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                Check whether the opening level has established a green <strong>PCR Support Barrier (PCR &ge; 6.0x)</strong> or whether it has run directly into a red <strong>CPR Resistance Wall (CPR &ge; 6.0x)</strong>. If a gap-up opens right beneath an existing 6x CPR resistance zone, the probability of an immediate breakout is less than 20%.
+              </p>
+            </div>
+
+            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 3: Track Max Pain Gravitational Pull</h4>
+              <p className="text-xs text-slate-650 leading-relaxed font-medium">
+                Compare the opening spot price against the calculated Max Pain strike. On weekly expiry days (such as Thursday for Nifty or Wednesday for Bank Nifty), if an opening gap opens 150 points above the Max Pain strike without rapid upward Max Pain migration, the index almost always experiences an intraday gravitational pull back toward the pain point.
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
+            Discipline Over Emotion
+          </h2>
+          <p>
+            Wall Street headlines are designed to provoke emotional reactions. Successful options traders treat global indices as context, but rely on the NSE Option Chain as the ultimate arbiter of truth. When global news and domestic open interest agree, you have a high-conviction trade. When they disagree, trust the open interest.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
+            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Mandatory SEBI Risk Disclosure</p>
+            <p>
+              Trading index options during volatile market openings involves high market risk and rapid premium erosion. Over 90% of retail individual traders in the equity F&amp;O segment incurred average losses exceeding ₹50,000 in recent fiscal years according to SEBI study reports. Always trade with strict stop losses and defined position sizing.
+            </p>
+          </div>
+        </div>
+      )
+    },
     {
       id: 'how-global-market-cues-impact-the-nse-option-chain',
       title: "Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain at Opening Bell",

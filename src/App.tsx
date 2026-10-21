@@ -333,7 +333,19 @@ export default function App() {
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
-      if (openArticleId === 'how-global-market-cues-impact-the-nse-option-chain') {
+      if (openArticleId === 'fed-rate-policy-us-dollar-dxy-nifty-option-chain') {
+        title = "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on Nifty Option Chain";
+        desc = "Understand how Federal Reserve interest rate projections, US Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain";
+      } else if (openArticleId === 'crude-oil-shocks-geopolitical-risk-iv-skew-nse') {
+        title = "Crude Oil Price Shocks & Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options";
+        desc = "Learn how sudden spikes in Brent crude and geopolitical supply tensions reprice Indian equity risk—triggering India VIX spikes, Put-side IV anomalies, and defensive strike adjustments.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/crude-oil-shocks-geopolitical-risk-iv-skew-nse";
+      } else if (openArticleId === 'nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps') {
+        title = "Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain";
+        desc = "Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps";
+      } else if (openArticleId === 'how-global-market-cues-impact-the-nse-option-chain') {
         title = "Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain";
         desc = "Discover how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/how-global-market-cues-impact-the-nse-option-chain";
