@@ -211,7 +211,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-12">
             <!-- Hero matches exactly with the visual output -->
             <div class="text-center space-y-6">
-              <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#0f4e5a] uppercase leading-[1.1]">
+              <h2 class="text-3xl md:text-5xl font-black tracking-tighter text-[#005f73] uppercase leading-[1.1]">
                 Analyze NSE Option Chain <br class="hidden md:block" /> data effortlessly
               </h2>
               <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl mx-auto font-medium">
@@ -221,7 +221,7 @@ const getPageBodyContent = (route) => {
 
             <!-- Pre-render instructions for crawler indexing -->
             <div class="border border-slate-200/80 bg-slate-50 rounded-3xl p-8 max-w-xl mx-auto text-center space-y-4 shadow-sm">
-              <div class="w-12 h-12 bg-[#0f4e5a]/10 text-[#0f4e5a] rounded-2xl flex items-center justify-center mx-auto">
+              <div class="w-12 h-12 bg-[#005f73]/10 text-[#005f73] rounded-2xl flex items-center justify-center mx-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
               </div>
               <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Interactive Option Chain Mapper Tool</h3>
@@ -238,55 +238,55 @@ const getPageBodyContent = (route) => {
               <div class="flex justify-between items-end border-b border-slate-100 pb-4">
                 <div>
                   <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Derivatives Education & Option Chain Blog</h3>
-                  <p class="text-xs text-[#0f4e5a] font-bold uppercase tracking-wider mt-1">Comprehensive tutorials on Open Interest, PCR, and Volume clusters</p>
+                  <p class="text-xs text-[#005f73] font-bold uppercase tracking-wider mt-1">Comprehensive tutorials on Open Interest, PCR, and Volume clusters</p>
                 </div>
-                <a href="/blog" class="text-xs font-black uppercase text-[#0f4e5a] hover:underline whitespace-nowrap">View All Articles &rarr;</a>
+                <a href="/blog" class="text-xs font-black uppercase text-[#005f73] hover:underline whitespace-nowrap">View All Articles &rarr;</a>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
                   <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-brand-teal px-2 py-0.5 rounded">Strategy</span>
                   <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
-                    <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="hover:text-[#0f4e5a] transition-colors">Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain</a>
+                    <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="hover:text-[#005f73] transition-colors">Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain</a>
                   </h4>
                   <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.</p>
-                  <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                  <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="text-xs font-bold text-[#005f73] inline-block pt-1 hover:underline">Read Article &rarr;</a>
                 </div>
 
                 <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
                   <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
                   <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
-                    <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="hover:text-[#0f4e5a] transition-colors">How Traders Identify Support and Resistance Using Option Chain Data</a>
+                    <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="hover:text-[#005f73] transition-colors">How Traders Identify Support and Resistance Using Option Chain Data</a>
                   </h4>
                   <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.</p>
-                  <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                  <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="text-xs font-bold text-[#005f73] inline-block pt-1 hover:underline">Read Article &rarr;</a>
                 </div>
 
                 <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
                   <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
                   <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
-                    <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="hover:text-[#0f4e5a] transition-colors">What Is an Option Chain and Why Do Traders Use It? A Complete Beginner's Guide</a>
+                    <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="hover:text-[#005f73] transition-colors">What Is an Option Chain and Why Do Traders Use It? A Complete Beginner's Guide</a>
                   </h4>
                   <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.</p>
-                  <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                  <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="text-xs font-bold text-[#005f73] inline-block pt-1 hover:underline">Read Article &rarr;</a>
                 </div>
 
                 <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
                   <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
                   <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
-                    <a href="/blog/what-is-put-call-ratio-pcr" class="hover:text-[#0f4e5a] transition-colors">What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders</a>
+                    <a href="/blog/what-is-put-call-ratio-pcr" class="hover:text-[#005f73] transition-colors">What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders</a>
                   </h4>
                   <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.</p>
-                  <a href="/blog/what-is-put-call-ratio-pcr" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                  <a href="/blog/what-is-put-call-ratio-pcr" class="text-xs font-bold text-[#005f73] inline-block pt-1 hover:underline">Read Article &rarr;</a>
                 </div>
 
                 <div class="border border-slate-100 bg-[#fafafa]/50 rounded-2xl p-6 hover:shadow-md transition-all space-y-3">
                   <span class="text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Education</span>
                   <h4 class="text-md font-black text-slate-800 uppercase tracking-tight">
-                    <a href="/blog/what-is-open-interest-oi" class="hover:text-[#0f4e5a] transition-colors">What Is Open Interest (OI)? A Complete Beginner's Guide</a>
+                    <a href="/blog/what-is-open-interest-oi" class="hover:text-[#005f73] transition-colors">What Is Open Interest (OI)? A Complete Beginner's Guide</a>
                   </h4>
                   <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.</p>
-                  <a href="/blog/what-is-open-interest-oi" class="text-xs font-bold text-[#0f4e5a] inline-block pt-1 hover:underline">Read Article &rarr;</a>
+                  <a href="/blog/what-is-open-interest-oi" class="text-xs font-bold text-[#005f73] inline-block pt-1 hover:underline">Read Article &rarr;</a>
                 </div>
               </div>
             </div>
@@ -294,7 +294,7 @@ const getPageBodyContent = (route) => {
             <!-- Complete Option Chain operational guide rendered in clean HTML to ensure high-quality copy is crawled on / -->
             <div class="border-t border-slate-200/80 pt-12 flex flex-col gap-10 text-left">
               <div class="border-b border-slate-200 pb-5">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-[#0f4e5a] mb-1.5 block">User Guide & Reference</span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-[#005f73] mb-1.5 block">User Guide & Reference</span>
                 <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase leading-snug">
                   How to Use Option Chain Analyzer
                 </h3>
@@ -312,21 +312,21 @@ const getPageBodyContent = (route) => {
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">1</div>
+                    <div class="w-7 h-7 rounded-lg bg-[#005f73] text-white flex items-center justify-center text-xs font-black">1</div>
                     <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h5>
                     <p class="text-xs text-slate-500 leading-relaxed font-medium">
                       Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" class="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
                     </p>
                   </div>
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">2</div>
+                    <div class="w-7 h-7 rounded-lg bg-[#005f73] text-white flex items-center justify-center text-xs font-black">2</div>
                     <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h5>
                     <p class="text-xs text-slate-500 leading-relaxed font-medium">
                       Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
                     </p>
                   </div>
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-                    <div class="w-7 h-7 rounded-lg bg-[#0f4e5a] text-white flex items-center justify-center text-xs font-black">3</div>
+                    <div class="w-7 h-7 rounded-lg bg-[#005f73] text-white flex items-center justify-center text-xs font-black">3</div>
                     <h5 class="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h5>
                     <p class="text-xs text-slate-500 leading-relaxed font-medium">
                       Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
@@ -341,25 +341,25 @@ const getPageBodyContent = (route) => {
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Open Interest (OI) &amp; Change in OI</h5>
+                    <h5 class="text-xs font-bold uppercase text-[#005f73] tracking-wider">Open Interest (OI) &amp; Change in OI</h5>
                     <p class="text-xs text-slate-600 leading-relaxed font-medium">
                       Open Interest represents the total active, unsettled option contracts. High OI at specific strikes reflects institutional positioning. Increasing OI confirms new positions, while decreasing OI signals position unwinding or profit booking.
                     </p>
                   </div>
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">At-The-Money (ATM) Strike</h5>
+                    <h5 class="text-xs font-bold uppercase text-[#005f73] tracking-wider">At-The-Money (ATM) Strike</h5>
                     <p class="text-xs text-slate-600 leading-relaxed font-medium">
                       The strike price closest to the underlying spot price. It serves as the market pivot point where gamma and volatility changes have the most immediate impact on option prices.
                     </p>
                   </div>
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Put-Call Ratio (PCR)</h5>
+                    <h5 class="text-xs font-bold uppercase text-[#005f73] tracking-wider">Put-Call Ratio (PCR)</h5>
                     <p class="text-xs text-slate-600 leading-relaxed font-medium">
                       Calculated as <code class="font-semibold text-slate-800">Put Open Interest ÷ Call Open Interest</code>. A high PCR indicates stronger put open interest relative to calls, signaling that option writers are establishing support floors.
                     </p>
                   </div>
                   <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                    <h5 class="text-xs font-bold uppercase text-[#0f4e5a] tracking-wider">Call-Put Ratio (CPR)</h5>
+                    <h5 class="text-xs font-bold uppercase text-[#005f73] tracking-wider">Call-Put Ratio (CPR)</h5>
                     <p class="text-xs text-slate-600 leading-relaxed font-medium">
                       Calculated as <code class="font-semibold text-slate-800">Call Open Interest ÷ Put Open Interest</code>. A high CPR indicates heavy call open interest relative to puts, signaling strong overhead resistance from option writers.
                     </p>
@@ -439,7 +439,7 @@ const getPageBodyContent = (route) => {
             <div class="grid grid-cols-1 gap-12 pt-8 border-t border-slate-100">
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Strategy</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Strategy</span>
                   <span>October 9, 2026</span>
                   <span>6 min read</span>
                 </div>
@@ -449,12 +449,12 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   Discover how overnight global cues—from Gift Nifty and US indices to crude oil and the Dollar Index—shape early-morning NSE option chain data, strike unwinding, and institutional positioning.
                 </p>
-                <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/how-global-market-cues-impact-the-nse-option-chain" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
 
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                   <span>June 10, 2026</span>
                   <span>4 min read</span>
                 </div>
@@ -464,12 +464,12 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.
                 </p>
-                <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/how-traders-identify-support-and-resistance-using-option-chain-data" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
 
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                   <span>June 3, 2026</span>
                   <span>5 min read</span>
                 </div>
@@ -479,12 +479,12 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   Learn the difference between Open Interest and Volume, how traders use each metric, and why understanding both is important for option chain analysis.
                 </p>
-                <a href="/blog/open-interest-vs-volume" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/open-interest-vs-volume" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
 
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                   <span>May 31, 2026</span>
                   <span>6 min read</span>
                 </div>
@@ -494,12 +494,12 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.
                 </p>
-                <a href="/blog/what-is-open-interest-oi" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/what-is-open-interest-oi" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
 
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                   <span>May 25, 2026</span>
                   <span>6 min read</span>
                 </div>
@@ -509,12 +509,12 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.
                 </p>
-                <a href="/blog/what-is-put-call-ratio-pcr" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/what-is-put-call-ratio-pcr" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
 
               <article class="p-8 border border-slate-100 rounded-3xl space-y-4 hover:shadow-xl hover:shadow-brand-teal/5 transition-all bg-white">
                 <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                  <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                   <span>May 22, 2026</span>
                   <span>7 min read</span>
                 </div>
@@ -524,7 +524,7 @@ const getPageBodyContent = (route) => {
                 <p class="text-slate-600 text-sm md:text-base leading-relaxed">
                   If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.
                 </p>
-                <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="text-xs font-black uppercase tracking-wider text-[#0f4e5a] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
+                <a href="/blog/what-is-an-option-chain-and-why-do-traders-use-it" class="text-xs font-black uppercase tracking-wider text-[#005f73] hover:underline inline-block pt-2">View Full Guide &rarr;</a>
               </article>
             </div>
           </main>
@@ -542,7 +542,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Strategy</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Strategy</span>
                 <span>October 9, 2026</span>
                 <span>6 min read</span>
               </div>
@@ -692,7 +692,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Advanced Analysis</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Advanced Analysis</span>
                 <span>June 19, 2026</span>
                 <span>7 min read</span>
               </div>
@@ -766,7 +766,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                 <span>June 10, 2026</span>
                 <span>4 min read</span>
               </div>
@@ -835,7 +835,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                 <span>May 22, 2026</span>
                 <span>7 min read</span>
               </div>
@@ -888,7 +888,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                 <span>May 25, 2026</span>
                 <span>6 min read</span>
               </div>
@@ -941,7 +941,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                 <span>May 31, 2026</span>
                 <span>6 min read</span>
               </div>
@@ -988,7 +988,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
               <div class="flex items-center gap-3 text-xs text-slate-400 font-bold">
-                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#0f4e5a] px-3 py-1 rounded">Education</span>
+                <span class="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-[#005f73] px-3 py-1 rounded">Education</span>
                 <span>June 3, 2026</span>
                 <span>5 min read</span>
               </div>
@@ -1043,7 +1043,7 @@ const getPageBodyContent = (route) => {
           ${navigationHTML}
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
-            <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">About Us - Option Chain Analyzer</h1>
+            <h1 class="text-3xl md:text-5xl font-black text-[#005f73] tracking-tight leading-[1.1] uppercase">About Us - Option Chain Analyzer</h1>
             
             <div class="border-t border-slate-100 pt-8 space-y-8 text-slate-700 leading-relaxed text-base">
               <div>
@@ -1080,25 +1080,25 @@ const getPageBodyContent = (route) => {
           ${navigationHTML}
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
-            <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">Privacy Protocol</h1>
+            <h1 class="text-3xl md:text-5xl font-black text-[#005f73] tracking-tight leading-[1.1] uppercase">Privacy Protocol</h1>
             <p class="font-bold text-slate-500 uppercase tracking-widest text-xs">Last Updated: June 30, 2026</p>
             
             <div class="border-t border-slate-150 pt-8 space-y-6 text-slate-700 leading-relaxed text-base bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/60">
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide">1. Introduction and Scope</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide">1. Introduction and Scope</h2>
               <p>This Privacy Policy describes how <strong>OptionChainAnalyzer.in</strong> ("we", "our", or "us") collects, uses, protects, and discloses information when you use our website and local analysis tool. We are fully committed to protecting your privacy and ensuring you have a secure experience when visiting our platform. By accessing or using our website, you consent to the data practices described in this policy.</p>
               
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">2. Local Data Processing (Zero Upload Policy)</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">2. Local Data Processing (Zero Upload Policy)</h2>
               <p>Our core application operates on an "offline-first, browser-local" model. When you upload, select, or drag-and-drop an NSE Option Chain CSV file onto our interface, the data is processed entirely in your web browser's local memory.</p>
               <p><strong>We do not upload, transmit, store, or share your CSV files, stock symbols, target strikes, or financial datasets on our servers or with any third party.</strong> Your research remains 100% private, isolated, and confidential to your local machine.</p>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">3. Information We Collect Automatically</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">3. Information We Collect Automatically</h2>
               <p>Like most standard website operators, we may collect non-personally identifying information of the sort that web browsers and servers typically make available, such as:</p>
               <ul class="list-disc pl-6 space-y-2 text-sm">
                 <li><strong>Log Files:</strong> We collect standard internet log files including Internet Protocol (IP) addresses, browser type, Internet Service Provider (ISP), date/time stamps, referring or exit pages, and clickstream data. These are analyzed collectively to understand general usage trends and maintain platform security.</li>
                 <li><strong>Device Metadata:</strong> Basic information regarding your operating system, screen resolution, and language settings to ensure our responsive layout renders properly.</li>
               </ul>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">4. Cookies and Third-Party Advertising (Google AdSense Disclosure)</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">4. Cookies and Third-Party Advertising (Google AdSense Disclosure)</h2>
               <p>To keep our comprehensive option mapping utilities and analytical blog free of charge, we partner with third-party networks, including Google AdSense, to display relevant advertisements across our platform.</p>
               <div class="p-6 bg-slate-50 border border-slate-150 rounded-2xl space-y-3">
                 <p class="text-xs font-black uppercase text-brand-teal tracking-wider">Crucial Cookie Disclosures</p>
@@ -1109,7 +1109,7 @@ const getPageBodyContent = (route) => {
                 </ul>
               </div>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">5. GDPR and CCPA Privacy Rights</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">5. GDPR and CCPA Privacy Rights</h2>
               <p>We want to ensure you are fully aware of all your data protection rights. Every user is entitled to the following:</p>
               <ul class="list-disc pl-6 space-y-2 text-sm">
                 <li><strong>The Right to Access:</strong> You have the right to request copies of your personal data. (Since we do not store your data, we hold no records to provide).</li>
@@ -1118,12 +1118,12 @@ const getPageBodyContent = (route) => {
                 <li><strong>CCPA "Do Not Sell" Compliance:</strong> Under the California Consumer Privacy Act, users have the right to opt-out of the sale of their personal information. We do not collect or sell any personal data.</li>
               </ul>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">6. Children's Online Privacy Protection</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">6. Children's Online Privacy Protection</h2>
               <p>Protecting children's privacy online is of paramount importance to us. <strong>OptionChainAnalyzer.in</strong> does not knowingly collect or solicit any Personally Identifiable Information from children under the age of 13. If you believe that a child has provided us with personal information, please contact us immediately so we can take steps to remove it from our systems.</p>
 
-              <h2 class="text-xl font-black text-[#0f4e5a] uppercase tracking-wide pt-4">7. Contact and Support Information</h2>
+              <h2 class="text-xl font-black text-[#005f73] uppercase tracking-wide pt-4">7. Contact and Support Information</h2>
               <p>If you have any questions, clarifications, or concerns regarding this Privacy Policy, please contact our support team at:</p>
-              <p class="font-mono text-sm text-[#0f4e5a] font-extrabold">Email: support@optionchainanalyzer.in</p>
+              <p class="font-mono text-sm text-[#005f73] font-extrabold">Email: support@optionchainanalyzer.in</p>
             </div>
           </main>
           
@@ -1138,7 +1138,7 @@ const getPageBodyContent = (route) => {
           ${navigationHTML}
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
-            <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">Usage Terms & Legal Disclaimers</h1>
+            <h1 class="text-3xl md:text-5xl font-black text-[#005f73] tracking-tight leading-[1.1] uppercase">Usage Terms & Legal Disclaimers</h1>
             
             <div class="border-t border-slate-150 pt-8 space-y-6 text-slate-700 leading-relaxed text-base bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/60">
               <h2 class="text-xl font-black text-rose-700 uppercase tracking-wide">1. Important Regulatory Financial Risk Disclosure</h2>
@@ -1166,8 +1166,8 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="border-b border-slate-200 pb-6">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a] block mb-1">Support & Editorial Desk</span>
-              <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">Contact Us</h1>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73] block mb-1">Support & Editorial Desk</span>
+              <h1 class="text-3xl md:text-5xl font-black text-[#005f73] tracking-tight leading-[1.1] uppercase">Contact Us</h1>
               <p class="text-sm md:text-base text-slate-600 font-medium mt-2">Have questions regarding our option chain analysis models, CSV parsing, or educational blog? Connect with our desk.</p>
             </div>
             
@@ -1199,7 +1199,7 @@ const getPageBodyContent = (route) => {
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="border-b border-slate-200 pb-6">
               <span class="text-xs font-black uppercase tracking-widest text-rose-600 block mb-1">Regulatory Risk & Compliance</span>
-              <h1 class="text-3xl md:text-5xl font-black text-[#0f4e5a] tracking-tight leading-[1.1] uppercase">SEBI Compliance & Financial Disclaimer</h1>
+              <h1 class="text-3xl md:text-5xl font-black text-[#005f73] tracking-tight leading-[1.1] uppercase">SEBI Compliance & Financial Disclaimer</h1>
               <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-2">Effective Date: October 9, 2026</p>
             </div>
             
@@ -1234,7 +1234,7 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Education • 7 min read</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Education • 7 min read</span>
               <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices</h1>
               <p class="text-slate-500 text-sm font-bold">Published on October 9, 2026 • By Quantitative Derivatives Desk</p>
             </div>
@@ -1260,7 +1260,7 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 6 min read</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Strategy • 6 min read</span>
               <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding &amp; Short Buildup</h1>
               <p class="text-slate-500 text-sm font-bold">Published on October 8, 2026 • By Market Structure Analyst</p>
             </div>
@@ -1284,7 +1284,7 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 8 min read</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Strategy • 8 min read</span>
               <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Fed Interest Rate Trajectory &amp; US Dollar Surge: Reading FII Shifts on the Nifty Option Chain</h1>
               <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Macro Derivatives Desk</p>
             </div>
@@ -1310,7 +1310,7 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Analysis • 9 min read</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Analysis • 9 min read</span>
               <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Crude Oil Price Shocks &amp; Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options</h1>
               <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Quantitative Research Team</p>
             </div>
@@ -1336,7 +1336,7 @@ const getPageBodyContent = (route) => {
           
           <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
             <div class="space-y-4">
-              <span class="text-xs font-black uppercase tracking-widest text-[#0f4e5a]">Strategy • 8 min read</span>
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Strategy • 8 min read</span>
               <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Nasdaq Tech Earnings &amp; Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain</h1>
               <p class="text-slate-500 text-sm font-bold">Published on October 21, 2026 • By Derivatives Strategy Desk</p>
             </div>
@@ -1368,7 +1368,7 @@ const loadingIndicatorHTML = `
       <img src="/logo.svg" alt="Loading Logo" style="width: 100%; height: 100%; object-fit: contain;" />
     </div>
     <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
-      <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: #0f4e5a;">Option Chain Analyzer</span>
+      <span style="font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: #005f73;">Option Chain Analyzer</span>
       <span style="font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.25em; color: #94a3b8;">Initializing Analyzer Dashboard...</span>
     </div>
   </div>

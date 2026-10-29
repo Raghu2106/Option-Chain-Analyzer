@@ -1069,10 +1069,6 @@ export default function App() {
             <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
             <div className="flex flex-col gap-3">
               <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer">Analyzer Platform</a>
-              <button type="button" onClick={handleLoadSampleData} className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-all text-left uppercase tracking-wider cursor-pointer flex items-center gap-1.5 w-fit">
-                <span>Try Sample Nifty 50 Demo</span>
-                <Sparkles size={12} className="text-amber-500 animate-pulse" />
-              </button>
               <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
               <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer flex items-center gap-1.5 w-fit">
                 <span>Research Blog</span>

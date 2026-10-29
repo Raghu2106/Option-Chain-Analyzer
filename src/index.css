@@ -6,7 +6,10 @@
   --font-display: "Outfit", "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-brand-teal: #0f4e5a;
+  --color-brand-teal: #005f73;
+  --color-brand-blue: #007791;
+  --color-brand-navy: #003844;
+  --color-brand-sky: #0a9396;
   --color-support: #10b981;
   --color-resistance: #ef4444;
 
@@ -19,7 +22,7 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased selection:bg-brand-teal/20 selection:text-brand-teal;
+    @apply bg-slate-50 text-slate-900 antialiased selection:bg-cyan-100 selection:text-cyan-950;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -40,46 +43,46 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgba(15, 78, 90, 0.15);
+    background: rgba(0, 95, 115, 0.2);
     border-radius: 9999px;
     transition: all 0.3s ease;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(15, 78, 90, 0.35);
+    background: rgba(0, 95, 115, 0.4);
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/75 backdrop-blur-xl border border-slate-200/50;
+    @apply bg-white/90 backdrop-blur-xl border border-slate-200/80;
   }
   
   .premium-shadow {
-    box-shadow: 0 25px 60px -15px rgba(15, 78, 90, 0.1), 
-                0 10px 30px -10px rgba(15, 78, 90, 0.06),
-                0 0 0 1px rgba(15, 78, 90, 0.02);
+    box-shadow: 0 20px 45px -15px rgba(0, 95, 115, 0.1), 
+                0 8px 20px -8px rgba(0, 95, 115, 0.05),
+                0 0 0 1px rgba(0, 95, 115, 0.03);
   }
 
   .premium-shadow-hover {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .premium-shadow-hover:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 35px 70px -15px rgba(15, 78, 90, 0.15), 
-                0 15px 40px -10px rgba(15, 78, 90, 0.1),
-                0 0 0 1px rgba(15, 78, 90, 0.05);
+    transform: translateY(-3px);
+    box-shadow: 0 30px 60px -15px rgba(0, 95, 115, 0.15), 
+                0 12px 28px -8px rgba(0, 95, 115, 0.08),
+                0 0 0 1px rgba(0, 95, 115, 0.05);
   }
 
   /* Dot Grid Matrix Accent */
   .dot-grid {
-    background-image: radial-gradient(#0f4e5a 1px, transparent 1px);
+    background-image: radial-gradient(#005f73 1px, transparent 1px);
     background-size: 24px 24px;
     opacity: 0.035;
   }
 
   .glow-teal {
-    box-shadow: 0 0 40px -5px rgba(15, 78, 90, 0.15);
+    box-shadow: 0 0 40px -5px rgba(0, 95, 115, 0.18);
   }
 
   /* Scrollbar Utilities for Firefox */
@@ -88,6 +91,6 @@
   }
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgba(15, 78, 90, 0.2) transparent;
+    scrollbar-color: rgba(0, 95, 115, 0.2) transparent;
   }
 }
