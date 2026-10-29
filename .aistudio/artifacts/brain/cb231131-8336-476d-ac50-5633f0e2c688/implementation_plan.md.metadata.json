@@ -1,6 +1,6 @@
 {
-  "summary":  "Implementation plan for adding 3 new SEO-optimized blog posts on October 21, 2026, examining how global macroeconomic news (Fed rate trajectory & DXY, crude oil shocks & geopolitical risk, and Nasdaq tech earnings & Wall Street cues) directly impact the NSE Option Chain open interest and implied volatility.",
-  "updatedAt":  "2026-10-21T15:00:34.737663742Z",
+  "summary":  "Comprehensive diagnostic report and 4-phase implementation plan to fix the Google AdSense 'Low value content' rejection for optionchainanalyzer.in. Identifies critical root causes including the empty-shell homepage for human reviewers, financial YMYL E-E-A-T deficits, text-to-code ratio on the root route, and outlines concrete enhancements for AdSense approval.",
+  "updatedAt":  "2026-10-21T15:13:37.935526952Z",
   "requestFeedback":  true,
   "userFacing":  true
 }

@@ -69,6 +69,7 @@ export default function App() {
   }, [updateTimeAgo]);
 
   const [isHovering, setIsHovering] = useState(false);
+  const [isGuideExpanded, setIsGuideExpanded] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
@@ -845,131 +846,168 @@ export default function App() {
   };
 
   const GuideContent = () => (
-    <div className="flex flex-col gap-10 text-left w-full py-12 border-t border-slate-200 mt-12 bg-white rounded-2xl p-6 md:p-10 shadow-sm relative overflow-hidden">
-      {/* Informative Title Header */}
-      <div className="border-b border-slate-200 pb-5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-brand-teal mb-1.5 block">User Guide & Reference</span>
-        <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight uppercase leading-snug">
-          How to Use Option Chain Analyzer
-        </h2>
-        <p className="text-xs md:text-sm font-semibold text-slate-500 mt-1">
-          A concise guide to analyzing NSE Open Interest, Put-Call Ratios, and Volatility anomalies
-        </p>
-      </div>
-
-      {/* Section 1: Quick Start Workflow */}
-      <section className="space-y-4">
-        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
-          1. Quick Start Workflow
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed font-medium">
-          Option Chain Analyzer processes official National Stock Exchange of India (NSE) option chain CSV exports directly in your browser. All computations run 100% locally in your device memory—no data is uploaded or stored on any external server.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">1</div>
-            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h4>
-            <p className="text-xs text-slate-500 leading-relaxed font-medium">
-              Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
-            </p>
+    <div className="flex flex-col text-left w-full border border-slate-200 mt-12 bg-white rounded-2xl shadow-xs relative overflow-hidden transition-all duration-300">
+      {/* Clickable Collapsible Header */}
+      <button
+        type="button"
+        onClick={() => setIsGuideExpanded(!isGuideExpanded)}
+        className="w-full text-left p-6 md:p-8 flex items-center justify-between gap-4 transition-colors hover:bg-slate-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal select-none group cursor-pointer"
+        aria-expanded={isGuideExpanded}
+        aria-label="Toggle User Guide and How to Use Option Chain Analyzer"
+      >
+        <div className="flex-1 pr-2">
+          <div className="flex items-center gap-2.5 mb-1.5 flex-wrap">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-teal block">
+              User Guide &amp; Reference
+            </span>
+            <span className="text-[9px] font-bold text-slate-500 bg-slate-100 group-hover:bg-slate-200 px-2 py-0.5 rounded border border-slate-200/80 transition-colors uppercase tracking-wider">
+              {isGuideExpanded ? "Click to collapse ▲" : "Click to expand ▼"}
+            </span>
           </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">2</div>
-            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h4>
-            <p className="text-xs text-slate-500 leading-relaxed font-medium">
-              Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
-            </p>
-          </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-            <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">3</div>
-            <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h4>
-            <p className="text-xs text-slate-550 leading-relaxed font-medium">
-              Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 2: Key Indicators Explained */}
-      <section className="space-y-4 pt-2 border-t border-slate-100">
-        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
-          2. Key Derivatives Indicators Explained
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
-            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Open Interest (OI) &amp; Change in OI</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Open Interest represents the total active, unsettled option contracts. High OI at specific strikes reflects institutional positioning. Increasing OI confirms new positions, while decreasing OI signals position unwinding or profit booking.
-            </p>
-          </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
-            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">At-The-Money (ATM) Strike</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              The strike price closest to the underlying spot price. It serves as the market pivot point where gamma and volatility changes have the most immediate impact on option prices.
-            </p>
-          </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
-            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Put-Call Ratio (PCR)</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Calculated as <code className="font-semibold text-slate-800">Put Open Interest ÷ Call Open Interest</code>. A high PCR indicates stronger put open interest relative to calls, signaling that option writers are establishing support floors.
-            </p>
-          </div>
-          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
-            <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Call-Put Ratio (CPR)</h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              Calculated as <code className="font-semibold text-slate-800">Call Open Interest ÷ Put Open Interest</code>. A high CPR indicates heavy call open interest relative to puts, signaling strong overhead resistance from option writers.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 3: Interpreting Support & Resistance Multipliers */}
-      <section className="space-y-4 pt-2 border-t border-slate-100">
-        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
-          3. Automated Support &amp; Resistance Highlights (6.0x Rule)
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed font-medium">
-          Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as defense barriers defended by institutional writers:
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <h4 className="text-xs font-bold uppercase text-emerald-900 tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h4>
-            </div>
-            <p className="text-xs text-emerald-950 leading-relaxed font-medium">
-              Highlighted in <strong>Green</strong>. Indicates Put Open Interest is at least 6 times greater than Call Open Interest at that strike, identifying an institutional put-writing floor.
-            </p>
-          </div>
-          <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <h4 className="text-xs font-bold uppercase text-rose-900 tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h4>
-            </div>
-            <p className="text-xs text-rose-950 leading-relaxed font-medium">
-              Highlighted in <strong>Red</strong>. Indicates Call Open Interest is at least 6 times greater than Put Open Interest at that strike, identifying a heavy call-writing ceiling.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 4: Risk Management & Compliance */}
-      <section className="space-y-4 pt-2 border-t border-slate-100">
-        <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
-          4. Risk Management &amp; SEBI Compliance
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed font-medium">
-          Derivatives trading carries significant financial risk. According to research published by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail traders in the equity futures and options segment incur net financial losses</strong>.
-        </p>
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600 leading-relaxed font-medium">
-          <p>
-            <strong>Confluence Only:</strong> Option chain open interest distribution should always be used as a secondary confirmation tool alongside primary price action and technical charts.
-          </p>
-          <p>
-            <strong>No Investment Advice:</strong> Option Chain Analyzer is an independent analytical tool built strictly for educational and informational purposes. We do not provide trading recommendations, buy/sell calls, or financial advice.
+          <h2 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight uppercase leading-snug group-hover:text-brand-teal transition-colors">
+            How to Use Option Chain Analyzer
+          </h2>
+          <p className="text-xs md:text-sm font-semibold text-slate-500 mt-1">
+            A concise guide to analyzing NSE Open Interest, Put-Call Ratios, and Volatility anomalies
           </p>
         </div>
-      </section>
+        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 transition-all duration-200 shrink-0 group-hover:bg-slate-200 group-hover:text-brand-teal">
+          {isGuideExpanded ? (
+            <ChevronUp size={20} className="text-brand-teal" />
+          ) : (
+            <ChevronDown size={20} className="text-slate-600" />
+          )}
+        </div>
+      </button>
+
+      {/* Collapsible Content Section */}
+      <AnimatePresence initial={false}>
+        {isGuideExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden border-t border-slate-200"
+          >
+            <div className="flex flex-col gap-10 p-6 md:p-10 pt-8">
+              {/* Section 1: Quick Start Workflow */}
+              <section className="space-y-4">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  1. Quick Start Workflow
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                  Option Chain Analyzer processes official National Stock Exchange of India (NSE) option chain CSV exports directly in your browser. All computations run 100% locally in your device memory—no data is uploaded or stored on any external server.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">1</div>
+                    <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">2</div>
+                    <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                      Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                    <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">3</div>
+                    <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h4>
+                    <p className="text-xs text-slate-550 leading-relaxed font-medium">
+                      Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 2: Key Indicators Explained */}
+              <section className="space-y-4 pt-2 border-t border-slate-100">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  2. Key Derivatives Indicators Explained
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Open Interest (OI) &amp; Change in OI</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                      Open Interest represents the total active, unsettled option contracts. High OI at specific strikes reflects institutional positioning. Increasing OI confirms new positions, while decreasing OI signals position unwinding or profit booking.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">At-The-Money (ATM) Strike</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                      The strike price closest to the underlying spot price. It serves as the market pivot point where gamma and volatility changes have the most immediate impact on option prices.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Put-Call Ratio (PCR)</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                      Calculated as <code className="font-semibold text-slate-800">Put Open Interest ÷ Call Open Interest</code>. A high PCR indicates stronger put open interest relative to calls, signaling that option writers are establishing support floors.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Call-Put Ratio (CPR)</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                      Calculated as <code className="font-semibold text-slate-800">Call Open Interest ÷ Put Open Interest</code>. A high CPR indicates heavy call open interest relative to puts, signaling strong overhead resistance from option writers.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 3: Interpreting Support & Resistance Multipliers */}
+              <section className="space-y-4 pt-2 border-t border-slate-100">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  3. Automated Support &amp; Resistance Highlights (6.0x Rule)
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                  Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as defense barriers defended by institutional writers:
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      <h4 className="text-xs font-bold uppercase text-emerald-900 tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h4>
+                    </div>
+                    <p className="text-xs text-emerald-950 leading-relaxed font-medium">
+                      Highlighted in <strong>Green</strong>. Indicates Put Open Interest is at least 6 times greater than Call Open Interest at that strike, identifying an institutional put-writing floor.
+                    </p>
+                  </div>
+                  <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                      <h4 className="text-xs font-bold uppercase text-rose-900 tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h4>
+                    </div>
+                    <p className="text-xs text-rose-950 leading-relaxed font-medium">
+                      Highlighted in <strong>Red</strong>. Indicates Call Open Interest is at least 6 times greater than Put Open Interest at that strike, identifying a heavy call-writing ceiling.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 4: Risk Management & Compliance */}
+              <section className="space-y-4 pt-2 border-t border-slate-100">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                  4. Risk Management &amp; SEBI Compliance
+                </h3>
+                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                  Derivatives trading carries significant financial risk. According to research published by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail traders in the equity futures and options segment incur net financial losses</strong>.
+                </p>
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600 leading-relaxed font-medium">
+                  <p>
+                    <strong>Confluence Only:</strong> Option chain open interest distribution should always be used as a secondary confirmation tool alongside primary price action and technical charts.
+                  </p>
+                  <p>
+                    <strong>No Investment Advice:</strong> Option Chain Analyzer is an independent analytical tool built strictly for educational and informational purposes. We do not provide trading recommendations, buy/sell calls, or financial advice.
+                  </p>
+                </div>
+              </section>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 
