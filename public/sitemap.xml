@@ -16,6 +16,22 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Article: Global Central Bank Liquidity Cycles -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/global-central-bank-liquidity-shifts-nse-derivatives</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Article: Geopolitical Developments & Trade Corridor Disruptions -->
+  <url>
+    <loc>https://optionchainanalyzer.in/blog/geopolitical-trade-corridor-disruptions-market-volatility</loc>
+    <lastmod>2026-10-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Article: Fed Rate Policy & US Dollar DXY -->
   <url>
     <loc>https://optionchainanalyzer.in/blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain</loc>

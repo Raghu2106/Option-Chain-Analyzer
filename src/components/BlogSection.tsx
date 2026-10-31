@@ -40,6 +40,229 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
 
   const posts = useMemo<BlogPost[]>(() => [
     {
+      id: 'global-central-bank-liquidity-shifts-nse-derivatives',
+      title: "Global Central Bank Liquidity Cycles: How Global Macro Shocks Transmit to the NSE Option Chain",
+      excerpt: "An educational overview of how policy rate decisions by the US Federal Reserve, European Central Bank, and Bank of Japan alter cross-border liquidity flows, influencing open interest concentration and Implied Volatility on Indian benchmark indices.",
+      category: 'Education',
+      date: 'October 31, 2026',
+      readTime: '9 min read',
+      author: 'Market Research Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            In modern interconnected financial markets, domestic index derivatives do not operate in isolation. Shifts in monetary policy stances by systemically important central banks—including the US Federal Reserve (Fed), the European Central Bank (ECB), and the Bank of Japan (BoJ)—catalyze macro liquidity reallocations that directly influence market positioning on the National Stock Exchange of India (NSE). This educational guide examines how global macro developments ripple through sovereign debt yields, foreign capital flows, and the structural metrics of the Nifty 50 option chain.
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Educational Key Takeaways</h3>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li><strong>Yield Differential Dynamics:</strong> Widening spreads between US 10-Year Treasuries and Indian Government Bonds (G-Secs) alter Foreign Portfolio Investor (FPI) hedging requirements, frequently observed as shifts in Out-of-the-Money (OTM) Put and Call open interest clusters.</li>
+              <li><strong>Currency Carry Trade Unwinding:</strong> Sudden policy adjustments by global lenders (such as BoJ rate normalization) can trigger global deleveraging, leading to elevated cross-asset volatility and measurable Implied Volatility (IV) expansion in Indian index options.</li>
+              <li><strong>Informational Sentiment vs. Trading Signals:</strong> Option chain Open Interest (OI) reveals where market participants have established defensive cushions and overhead resistance, serving as an observational mapping tool rather than a predictive price forecasting device.</li>
+            </ul>
+          </div>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              1. The Global Monetary Policy Transmission Mechanism
+            </h2>
+            <p>
+              When a major central bank alters its policy benchmark rate or adjusts quantitative tightening (QT) balance sheet operations, global capital re-evaluates risk-reward profiles across emerging markets. The transmission mechanism to Indian derivatives unfolds through three primary channels:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 1</span>
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Foreign Portfolio Flows</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Higher benchmark rates abroad elevate the risk-free hurdle rate for institutional capital, influencing Foreign Institutional Investor (FII) net cash and index derivatives positions.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 2</span>
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Currency &amp; FX Volatility</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Fluctuations in the US Dollar Index (DXY) impact the INR/USD exchange rate. Institutional portfolios frequently hedge equity exposure via index derivatives during currency volatility spikes.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 3</span>
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Cross-Asset Risk Appetite</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Global equity market corrections increase international risk aversion, which typically manifests in domestic option chains through heightened Implied Volatility (IV).
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              2. How Global Macro Events Reflect on the Option Chain
+            </h2>
+            <p>
+              An option chain is a direct visual ledger of active contractual commitments. During significant global economic milestones—such as FOMC rate announcements, US non-farm payroll reports, or ECB monetary summaries—market analysts observe distinct statistical adjustments across strike tables:
+            </p>
+            
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-800 border-b border-slate-200 font-bold uppercase tracking-wider">
+                    <th className="p-3">Global Macro Catalyst</th>
+                    <th className="p-3">Primary Impact Metric</th>
+                    <th className="p-3">Observed Option Chain Signature</th>
+                    <th className="p-3">Market Context</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                  <tr className="hover:bg-slate-50/60">
+                    <td className="p-3 font-bold text-slate-900">Hawkish Global Central Bank Stance</td>
+                    <td className="p-3">Overhead Call Open Interest</td>
+                    <td className="p-3">Rapid buildup in Out-of-the-Money Call OI; elevated Call-Put Ratio (CPR ≥ 6.0x) on upper strikes</td>
+                    <td className="p-3">Indicates institutional participants writing options to defend overhead ceiling levels</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/60">
+                    <td className="p-3 font-bold text-slate-900">Global Liquidity Easing / Dovish Pivot</td>
+                    <td className="p-3">Downside Put Open Interest</td>
+                    <td className="p-3">Put OI addition across near-the-money strikes; Put-Call Ratio (PCR) expands above 1.10</td>
+                    <td className="p-3">Reflects willingness among market writers to underwrite lower strikes as support floors</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/60">
+                    <td className="p-3 font-bold text-slate-900">Unanticipated Global Macro Shock</td>
+                    <td className="p-3">Implied Volatility (IV) &amp; Skew</td>
+                    <td className="p-3">Put-side IV escalates sharply relative to Call-side IV; India VIX expands</td>
+                    <td className="p-3">Demonstrates heightened premium demand for tail-risk protective options</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              3. The Role of Implied Volatility (IV) During Global Events
+            </h2>
+            <p>
+              Implied Volatility reflects the annualized standard deviation of expected price returns embedded in option premiums. In the days preceding major global macro announcements, option contracts across both Call and Put wings often experience an *IV inflation* phenomenon.
+            </p>
+            <p>
+              Because option sellers demand greater premium compensation to assume overnight event risk, contract prices expand even if the underlying spot index remains stationary. Following the release of the macro data, an *IV crush* commonly transpires, where excess premium rapidly deflates as uncertainty resolves. Understanding this statistical behavior helps market observers distinguish between genuine directional movements and volatility-driven premium expansions.
+            </p>
+          </section>
+
+          <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+              <AlertCircle size={16} />
+              <span>SEBI Educational Compliance &amp; Non-Advisory Notice</span>
+            </div>
+            <p className="text-xs text-amber-950 font-medium leading-relaxed">
+              This publication is strictly educational and is intended solely to improve analytical understanding of macroeconomic data and exchange open interest figures. <strong>Option Chain Analyzer does not provide buy, sell, or trading recommendations.</strong> Derivatives trading involves substantial financial risk. According to SEBI research, over 90% of individual retail traders in equity derivatives incur net financial losses. Always conduct independent research and consult a registered financial advisor before making any investment decisions.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'geopolitical-trade-corridor-disruptions-market-volatility',
+      title: "Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE",
+      excerpt: "An educational guide on how geopolitical events, global supply chain bottlenecks, and sovereign trade policy updates impact commodity inputs, India VIX, and option chain open interest structures.",
+      category: 'Education',
+      date: 'October 31, 2026',
+      readTime: '8 min read',
+      author: 'Market Research Desk',
+      content: (
+        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
+          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
+            Geopolitical tensions and trade policy shifts—such as maritime shipping corridor disruptions, export tariffs on critical minerals, or regional energy supply revisions—constitute major external variables for developing economies. For India, a net importer of key energy and industrial raw materials, international trade developments transmit quickly to the domestic financial system. This article provides an educational exploration of how global geopolitical headlines influence broad market sentiment, India VIX, and open interest positioning on the National Stock Exchange of India (NSE).
+          </p>
+
+          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Educational Key Takeaways</h3>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li><strong>Import Dependency &amp; Margin Compression:</strong> Disruptions to maritime transit routes or energy exports directly influence freight indices and crude import bills, impacting corporate operating margins across manufacturing and transport sectors.</li>
+              <li><strong>The Volatility Thermometer (India VIX):</strong> Geopolitical uncertainty typically triggers swift reassessments of option premiums, causing India VIX to expand as institutional participants hedge equity portfolios.</li>
+              <li><strong>Open Interest Shifts as Defensive Adjustments:</strong> Examining the open interest distribution across strikes illustrates how institutional participants adjust downside protective floors, offering factual market structure visibility without offering trading calls.</li>
+            </ul>
+          </div>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              1. The Anatomy of Geopolitical Risk Transmission
+            </h2>
+            <p>
+              When geopolitical events escalate, financial markets process information along several concurrent pathways. Unlike scheduled corporate earnings announcements or statutory monetary policy meetings, geopolitical developments often emerge with little advance notice, creating distinct analytical characteristics:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Energy &amp; Commodity Inputs</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  India imports over 85% of its crude oil requirements. When international energy corridors experience friction, benchmark crude indices (e.g., Brent Crude) face supply risk premiums, which can exert pressure on the current account deficit and domestic wholesale inflation indices.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Sovereign Debt &amp; Currency Stability</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Geopolitical uncertainty historically induces a "flight to safety" into reserve currencies and sovereign bonds. Emerging market assets, including equities, frequently experience foreign institutional portfolio reallocation during such periods.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              2. Reading Open Interest (OI) topographies During Global Crises
+            </h2>
+            <p>
+              During periods of heightened global news flow, derivatives market participants utilize option chains to safeguard existing holdings against adverse price excursions. Market analysts observe the following structural phenomena:
+            </p>
+            
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Downward Migration of Put Writing</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  In stable market regimes, Put option writers comfortably underwrite strikes near the current spot price. When global news introduces uncertainty, option writers typically migrate further out-of-the-money (OTM), resetting structural support barriers to lower strike levels.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Call Resistance Wall Consolidation</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  To hedge underlying equity exposures, institutional portfolio managers often write Call options against existing long positions (covered call structures), leading to rapid open interest accumulation and elevated Call-Put Ratios (CPR) at proximate overhead strikes.
+                </p>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
+                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Asymmetric Implied Volatility (IV) Skew</h4>
+                <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  Because participants seek downside portfolio insurance more urgently than upside participation during geopolitical friction, OTM Put options exhibit higher Implied Volatility than equidistant OTM Call options. This pronounced slope is referred to as the volatility skew.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
+              3. Objective Analysis vs. Emotional Market Reactions
+            </h2>
+            <p>
+              Headline-driven market environments frequently elicit emotional reactions among retail investors. Educational analysis emphasizes looking at factual exchange data rather than subjective news commentary:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
+              <li><strong>Track Verified Data Sets:</strong> Review official NSE option chain bhavcopy snapshots to confirm whether open interest is genuinely accumulating or if volume is simply rotating without new contract creation.</li>
+              <li><strong>Observe Max Pain Neutrality:</strong> While individual headlines can generate sharp intraday spikes, tracking the Max Pain strike across weekly expiries highlights where option writers collectively absorb the least payout liability.</li>
+              <li><strong>Maintain Strict Risk Parameters:</strong> Historical market studies demonstrate that excessive leverage during high-IV regimes substantially compounds drawdown risks for retail accounts.</li>
+            </ul>
+          </section>
+
+          <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+              <AlertCircle size={16} />
+              <span>SEBI Educational Compliance &amp; Non-Advisory Notice</span>
+            </div>
+            <p className="text-xs text-amber-950 font-medium leading-relaxed">
+              This publication is created strictly for educational, informational, and market literacy purposes. <strong>Option Chain Analyzer does not provide investment advice, trading tips, or trade recommendations.</strong> Derivatives trading on the NSE involves severe risk of capital loss. SEBI's retail derivatives study indicates that 90% of active retail traders incur net losses in the futures and options market. Always exercise prudence, manage risk diligently, and consult a SEBI-registered financial planner before participating in derivatives markets.
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    {
       id: 'fed-rate-policy-us-dollar-dxy-nifty-option-chain',
       title: "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on the Nifty Option Chain",
       excerpt: "Understand how Federal Reserve interest rate projections, US 10-year Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.",

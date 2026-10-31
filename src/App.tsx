@@ -334,7 +334,15 @@ export default function App() {
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
-      if (openArticleId === 'fed-rate-policy-us-dollar-dxy-nifty-option-chain') {
+      if (openArticleId === 'global-central-bank-liquidity-shifts-nse-derivatives') {
+        title = "Global Central Bank Liquidity Cycles: How Macro Shocks Transmit to NSE Option Chain";
+        desc = "Educational overview of how global central bank interest rate decisions and cross-border capital flows shape open interest concentration and implied volatility on the NSE.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/global-central-bank-liquidity-shifts-nse-derivatives";
+      } else if (openArticleId === 'geopolitical-trade-corridor-disruptions-market-volatility') {
+        title = "Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE";
+        desc = "Learn how geopolitical events, global supply chain bottlenecks, and trade policy updates impact commodity inputs, India VIX, and option chain open interest structures.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/geopolitical-trade-corridor-disruptions-market-volatility";
+      } else if (openArticleId === 'fed-rate-policy-us-dollar-dxy-nifty-option-chain') {
         title = "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on Nifty Option Chain";
         desc = "Understand how Federal Reserve interest rate projections, US Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain";

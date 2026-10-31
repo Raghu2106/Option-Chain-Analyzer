@@ -102,6 +102,16 @@ const routeMeta = {
     title: 'Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain',
     desc: 'Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.',
     canonical: 'https://optionchainanalyzer.in/blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps'
+  },
+  'blog/global-central-bank-liquidity-shifts-nse-derivatives': {
+    title: 'Global Central Bank Liquidity Cycles: How Macro Shocks Transmit to NSE Option Chain',
+    desc: 'Educational overview of how global central bank interest rate decisions and cross-border capital flows shape open interest concentration and implied volatility on the NSE.',
+    canonical: 'https://optionchainanalyzer.in/blog/global-central-bank-liquidity-shifts-nse-derivatives'
+  },
+  'blog/geopolitical-trade-corridor-disruptions-market-volatility': {
+    title: 'Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE',
+    desc: 'Learn how geopolitical events, global supply chain bottlenecks, and trade policy updates impact commodity inputs, India VIX, and option chain open interest structures.',
+    canonical: 'https://optionchainanalyzer.in/blog/geopolitical-trade-corridor-disruptions-market-volatility'
   }
 };
 
@@ -1345,6 +1355,56 @@ const getPageBodyContent = (route) => {
               <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Overnight US tech earnings and Nasdaq movements establish Gift Nifty opening gaps. Verifying whether early 9:15–9:45 AM open interest supports the move distinguishes real trends from gap-and-trap reversals.</p>
               <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">The 9:30 AM Option Chain Rule</h2>
               <p>Avoid trading the volatile 9:15 AM opening tick. Wait for the consolidated 9:30 AM NSE option chain refresh to verify whether Call writers are unwinding or aggressively blocking the gap with fresh CPR &ge; 6.0x resistance.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+    case 'blog/global-central-bank-liquidity-shifts-nse-derivatives':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Education • 9 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Global Central Bank Liquidity Cycles: How Global Macro Shocks Transmit to the NSE Option Chain</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 31, 2026 • By Market Research Desk</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Shifts in monetary policy stances by systemically important central banks—such as the US Federal Reserve, ECB, and Bank of Japan—catalyze macro liquidity reallocations that directly influence market positioning on the National Stock Exchange of India.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Global Monetary Policy Transmission Channels</h2>
+              <p>Widening bond yield spreads between US Treasuries and Indian Government Bonds alter Foreign Portfolio Investor hedging requirements, frequently observed as shifts in Out-of-the-Money (OTM) Put and Call open interest clusters.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Observing Implied Volatility Expansion</h2>
+              <p>Prior to major global macro announcements, option contracts across both Call and Put wings often experience an IV inflation phenomenon, as market participants demand higher premium compensation for overnight event risk.</p>
+            </div>
+          </main>
+          
+          ${footerHTML}
+        </div>
+      `;
+      break;
+
+    case 'blog/geopolitical-trade-corridor-disruptions-market-volatility':
+      content = `
+        <div class="flex flex-col min-h-screen bg-[#fafafa]">
+          ${navigationHTML}
+          
+          <main class="flex-1 max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
+            <div class="space-y-4">
+              <span class="text-xs font-black uppercase tracking-widest text-[#005f73]">Education • 8 min read</span>
+              <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">Geopolitical Developments &amp; Global Trade Disruptions: Reading Derivatives Sentiment on the NSE</h1>
+              <p class="text-slate-500 text-sm font-bold">Published on October 31, 2026 • By Market Research Desk</p>
+            </div>
+
+            <div class="bg-white p-8 md:p-12 rounded-[2rem] border border-slate-200/80 space-y-6 text-slate-700 leading-relaxed text-base font-medium shadow-sm">
+              <p class="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4">Geopolitical tensions and trade policy shifts—such as maritime shipping corridor disruptions or regional energy supply revisions—constitute major external variables that transmit to domestic equity benchmarks.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Reading Open Interest Topographies During Crises</h2>
+              <p>During periods of heightened global news flow, derivatives market participants utilize option chains to safeguard existing holdings against adverse price excursions, leading to downward migration of Put writing and Call resistance wall consolidation.</p>
+              <h2 class="text-xl font-black text-slate-900 uppercase tracking-wide pt-4">Objective Data Analysis vs. Emotion</h2>
+              <p>Tracking verified exchange data sets, understanding volatility skews, and observing Max Pain strikes help market observers navigate headline turbulence with analytical clarity without relying on speculative tips.</p>
             </div>
           </main>
           
