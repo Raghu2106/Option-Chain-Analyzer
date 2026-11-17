@@ -1,30 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ArrowLeft, 
-  Search, 
-  BookOpen, 
-  Calendar, 
-  Clock, 
-  ChevronRight, 
-  TrendingUp, 
-  Share2, 
+import {
+  ArrowLeft,
+  Search,
+  ChevronRight,
+  Share2,
   Bookmark,
-  Sparkles,
-  Award,
-  AlertCircle
+  UserCheck,
+  AlertCircle,
+  Check
 } from 'lucide-react';
+
+export type BlogCategory =
+  | 'Global Macro'
+  | 'Option Chain Basics'
+  | 'Analytical Metrics'
+  | 'Volatility & Risk';
 
 export interface BlogPost {
   id: string;
   title: string;
   excerpt: string;
   content: React.ReactNode;
-  category: 'Education' | 'Strategy' | 'Analysis' | 'Compliance' | 'Advanced Analysis';
+  category: BlogCategory;
   date: string;
   readTime: string;
   author: string;
-  imageGenPrompt?: string;
 }
 
 interface BlogSectionProps {
@@ -33,2139 +34,506 @@ interface BlogSectionProps {
   onSelectArticle: (id: string | null) => void;
 }
 
+const BOOKMARKS_STORAGE_KEY = 'oca_bookmarked_articles';
+
 export default function BlogSection({ onBackToApp, openArticleId, onSelectArticle }: BlogSectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [bookmarkedIds, setBookmarkedIds] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = window.localStorage.getItem(BOOKMARKS_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(BOOKMARKS_STORAGE_KEY, JSON.stringify(bookmarkedIds));
+    } catch {
+      // Ignore storage quota errors gracefully
+    }
+  }, [bookmarkedIds]);
+
+  const toggleBookmark = (id: string) => {
+    setBookmarkedIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
 
   const posts = useMemo<BlogPost[]>(() => [
     {
       id: 'global-central-bank-liquidity-shifts-nse-derivatives',
-      title: "Global Central Bank Liquidity Cycles: How Global Macro Shocks Transmit to the NSE Option Chain",
-      excerpt: "An educational overview of how policy rate decisions by the US Federal Reserve, European Central Bank, and Bank of Japan alter cross-border liquidity flows, influencing open interest concentration and Implied Volatility on Indian benchmark indices.",
-      category: 'Education',
+      title: 'Global Central Bank Liquidity Cycles: How Macro Shocks Transmit to the NSE Option Chain',
+      excerpt: 'An educational overview of how policy rate decisions by the US Federal Reserve, European Central Bank, and Bank of Japan alter cross-border capital flows and Implied Volatility on Indian benchmark indices.',
+      category: 'Global Macro',
       date: 'October 31, 2026',
-      readTime: '9 min read',
-      author: 'Market Research Desk',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            In modern interconnected financial markets, domestic index derivatives do not operate in isolation. Shifts in monetary policy stances by systemically important central banks—including the US Federal Reserve (Fed), the European Central Bank (ECB), and the Bank of Japan (BoJ)—catalyze macro liquidity reallocations that directly influence market positioning on the National Stock Exchange of India (NSE). This educational guide examines how global macro developments ripple through sovereign debt yields, foreign capital flows, and the structural metrics of the Nifty 50 option chain.
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            In interconnected financial markets, domestic index derivatives respond continuously to global capital flows. Shifts in monetary policy stances by major central banks—including the US Federal Reserve (Fed), the European Central Bank (ECB), and the Bank of Japan (BoJ)—alter sovereign bond yields and cross-border liquidity, which in turn shape open interest distribution on the National Stock Exchange of India (NSE).
           </p>
 
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Educational Key Takeaways</h3>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li><strong>Yield Differential Dynamics:</strong> Widening spreads between US 10-Year Treasuries and Indian Government Bonds (G-Secs) alter Foreign Portfolio Investor (FPI) hedging requirements, frequently observed as shifts in Out-of-the-Money (OTM) Put and Call open interest clusters.</li>
-              <li><strong>Currency Carry Trade Unwinding:</strong> Sudden policy adjustments by global lenders (such as BoJ rate normalization) can trigger global deleveraging, leading to elevated cross-asset volatility and measurable Implied Volatility (IV) expansion in Indian index options.</li>
-              <li><strong>Informational Sentiment vs. Trading Signals:</strong> Option chain Open Interest (OI) reveals where market participants have established defensive cushions and overhead resistance, serving as an observational mapping tool rather than a predictive price forecasting device.</li>
+          <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+            <h3 className="text-sm font-bold text-slate-900">Key Educational Concepts</h3>
+            <ul className="list-disc pl-5 space-y-1.5 text-sm text-slate-700">
+              <li><strong>Yield Spread Dynamics:</strong> Widening spreads between US 10-Year Treasuries and Indian Government Bonds affect Foreign Portfolio Investor (FPI) hedging requirements across index options.</li>
+              <li><strong>Currency Carry Adjustments:</strong> Sudden policy shifts abroad can trigger cross-asset deleveraging and measurable Implied Volatility (IV) expansion in domestic contracts.</li>
+              <li><strong>Observational Mapping:</strong> Option chain Open Interest (OI) reflects existing contractual commitments—it is a descriptive ledger, not a predictive price signal.</li>
             </ul>
           </div>
 
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              1. The Global Monetary Policy Transmission Mechanism
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. The Global Monetary Transmission Channels
             </h2>
             <p>
-              When a major central bank alters its policy benchmark rate or adjusts quantitative tightening (QT) balance sheet operations, global capital re-evaluates risk-reward profiles across emerging markets. The transmission mechanism to Indian derivatives unfolds through three primary channels:
+              When major central banks adjust benchmark interest rates or balance sheet liquidity, institutional allocators reassess emerging market exposures through three main channels:
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 1</span>
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Foreign Portfolio Flows</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Higher benchmark rates abroad elevate the risk-free hurdle rate for institutional capital, influencing Foreign Institutional Investor (FII) net cash and index derivatives positions.
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Foreign Portfolio Flows</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Higher sovereign yields abroad raise the global risk-free hurdle rate, influencing net institutional cash and index derivatives positioning.
                 </p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 2</span>
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Currency &amp; FX Volatility</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Fluctuations in the US Dollar Index (DXY) impact the INR/USD exchange rate. Institutional portfolios frequently hedge equity exposure via index derivatives during currency volatility spikes.
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Currency &amp; FX Hedging</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Moves in the US Dollar Index (DXY) affect the INR/USD exchange rate, prompting institutional portfolios to adjust index hedges during currency swings.
                 </p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-teal block">Channel 3</span>
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Cross-Asset Risk Appetite</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Global equity market corrections increase international risk aversion, which typically manifests in domestic option chains through heightened Implied Volatility (IV).
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Cross-Asset Volatility</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Global equity repricing elevates international risk aversion, often appearing on NSE option chains as broader Implied Volatility expansion.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              2. How Global Macro Events Reflect on the Option Chain
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. Observable Option Chain Signatures
             </h2>
             <p>
-              An option chain is a direct visual ledger of active contractual commitments. During significant global economic milestones—such as FOMC rate announcements, US non-farm payroll reports, or ECB monetary summaries—market analysts observe distinct statistical adjustments across strike tables:
+              During scheduled policy meetings such as FOMC rate decisions or macro payroll releases, analysts examine how strike tables reprice risk:
             </p>
-            
             <div className="overflow-x-auto rounded-xl border border-slate-200">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-800 border-b border-slate-200 font-bold uppercase tracking-wider">
-                    <th className="p-3">Global Macro Catalyst</th>
-                    <th className="p-3">Primary Impact Metric</th>
-                    <th className="p-3">Observed Option Chain Signature</th>
-                    <th className="p-3">Market Context</th>
+                  <tr className="bg-slate-100 text-slate-800 border-b border-slate-200 font-bold">
+                    <th className="p-3">Macro Event Regime</th>
+                    <th className="p-3">Primary Metric Observed</th>
+                    <th className="p-3">Typical Option Chain Behavior</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="p-3 font-bold text-slate-900">Hawkish Global Central Bank Stance</td>
-                    <td className="p-3">Overhead Call Open Interest</td>
-                    <td className="p-3">Rapid buildup in Out-of-the-Money Call OI; elevated Call-Put Ratio (CPR ≥ 6.0x) on upper strikes</td>
-                    <td className="p-3">Indicates institutional participants writing options to defend overhead ceiling levels</td>
+                <tbody className="divide-y divide-slate-100 text-slate-600">
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Tighter Global Rate Expectations</td>
+                    <td className="p-3">Call Open Interest &amp; CPR</td>
+                    <td className="p-3">Increased Out-of-the-Money Call OI concentration at upper strikes as institutions hedge upside exposure.</td>
                   </tr>
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="p-3 font-bold text-slate-900">Global Liquidity Easing / Dovish Pivot</td>
-                    <td className="p-3">Downside Put Open Interest</td>
-                    <td className="p-3">Put OI addition across near-the-money strikes; Put-Call Ratio (PCR) expands above 1.10</td>
-                    <td className="p-3">Reflects willingness among market writers to underwrite lower strikes as support floors</td>
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Accommodative Policy Stance</td>
+                    <td className="p-3">Put Open Interest &amp; PCR</td>
+                    <td className="p-3">Gradual Put OI addition closer to at-the-money strikes as downside hedging urgency eases.</td>
                   </tr>
-                  <tr className="hover:bg-slate-50/60">
-                    <td className="p-3 font-bold text-slate-900">Unanticipated Global Macro Shock</td>
-                    <td className="p-3">Implied Volatility (IV) &amp; Skew</td>
-                    <td className="p-3">Put-side IV escalates sharply relative to Call-side IV; India VIX expands</td>
-                    <td className="p-3">Demonstrates heightened premium demand for tail-risk protective options</td>
+                  <tr>
+                    <td className="p-3 font-semibold text-slate-900">Unanticipated Policy Surprise</td>
+                    <td className="p-3">Implied Volatility (IV) Skew</td>
+                    <td className="p-3">Put-side IV rises faster than Call-side IV, reflecting higher demand for downside portfolio protection.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </section>
 
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              3. The Role of Implied Volatility (IV) During Global Events
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              03. Event-Driven IV Expansion &amp; Post-Event Crush
             </h2>
             <p>
-              Implied Volatility reflects the annualized standard deviation of expected price returns embedded in option premiums. In the days preceding major global macro announcements, option contracts across both Call and Put wings often experience an *IV inflation* phenomenon.
-            </p>
-            <p>
-              Because option sellers demand greater premium compensation to assume overnight event risk, contract prices expand even if the underlying spot index remains stationary. Following the release of the macro data, an *IV crush* commonly transpires, where excess premium rapidly deflates as uncertainty resolves. Understanding this statistical behavior helps market observers distinguish between genuine directional movements and volatility-driven premium expansions.
+              Before major central bank announcements, option premiums across both Calls and Puts frequently expand—a statistical effect known as <em>IV inflation</em>. Once the announcement passes and event uncertainty clears, excess implied volatility rapidly deflates (<em>IV crush</em>), demonstrating why option pricing reflects uncertainty rather than direction alone.
             </p>
           </section>
-
-          <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
-            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
-              <AlertCircle size={16} />
-              <span>SEBI Educational Compliance &amp; Non-Advisory Notice</span>
-            </div>
-            <p className="text-xs text-amber-950 font-medium leading-relaxed">
-              This publication is strictly educational and is intended solely to improve analytical understanding of macroeconomic data and exchange open interest figures. <strong>Option Chain Analyzer does not provide buy, sell, or trading recommendations.</strong> Derivatives trading involves substantial financial risk. According to SEBI research, over 90% of individual retail traders in equity derivatives incur net financial losses. Always conduct independent research and consult a registered financial advisor before making any investment decisions.
-            </p>
-          </div>
         </div>
       ),
     },
     {
       id: 'geopolitical-trade-corridor-disruptions-market-volatility',
-      title: "Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE",
-      excerpt: "An educational guide on how geopolitical events, global supply chain bottlenecks, and sovereign trade policy updates impact commodity inputs, India VIX, and option chain open interest structures.",
-      category: 'Education',
+      title: 'Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE',
+      excerpt: 'An educational guide on how geopolitical events, global supply chain bottlenecks, and trade policy updates impact energy inputs, India VIX, and option chain open interest structures.',
+      category: 'Global Macro',
       date: 'October 31, 2026',
-      readTime: '8 min read',
-      author: 'Market Research Desk',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Geopolitical tensions and trade policy shifts—such as maritime shipping corridor disruptions, export tariffs on critical minerals, or regional energy supply revisions—constitute major external variables for developing economies. For India, a net importer of key energy and industrial raw materials, international trade developments transmit quickly to the domestic financial system. This article provides an educational exploration of how global geopolitical headlines influence broad market sentiment, India VIX, and open interest positioning on the National Stock Exchange of India (NSE).
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            Geopolitical developments and international trade policy shifts—such as maritime shipping disruptions, commodity export restrictions, or tariff revisions—introduce external economic variables for net-importing economies. Understanding how these headlines translate into India VIX and NSE option chain structures helps market participants read derivatives data objectively.
           </p>
 
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Educational Key Takeaways</h3>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li><strong>Import Dependency &amp; Margin Compression:</strong> Disruptions to maritime transit routes or energy exports directly influence freight indices and crude import bills, impacting corporate operating margins across manufacturing and transport sectors.</li>
-              <li><strong>The Volatility Thermometer (India VIX):</strong> Geopolitical uncertainty typically triggers swift reassessments of option premiums, causing India VIX to expand as institutional participants hedge equity portfolios.</li>
-              <li><strong>Open Interest Shifts as Defensive Adjustments:</strong> Examining the open interest distribution across strikes illustrates how institutional participants adjust downside protective floors, offering factual market structure visibility without offering trading calls.</li>
+          <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+            <h3 className="text-sm font-bold text-slate-900">Key Awareness Points</h3>
+            <ul className="list-disc pl-5 space-y-1.5 text-sm text-slate-700">
+              <li><strong>Import Sensitivity:</strong> India imports over 85% of its crude oil, making benchmark energy shocks an important macro factor for domestic inflation and corporate margin expectations.</li>
+              <li><strong>Volatility Thermometer:</strong> Geopolitical uncertainty often raises India VIX as market makers and funds price wider expected index ranges.</li>
+              <li><strong>Defensive Strike Adjustments:</strong> Shifting open interest distributions highlight how institutions adjust portfolio protection—not guaranteed market direction.</li>
             </ul>
           </div>
 
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              1. The Anatomy of Geopolitical Risk Transmission
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. How Geopolitical Headlines Affect Pricing Surfaces
             </h2>
             <p>
-              When geopolitical events escalate, financial markets process information along several concurrent pathways. Unlike scheduled corporate earnings announcements or statutory monetary policy meetings, geopolitical developments often emerge with little advance notice, creating distinct analytical characteristics:
+              Unlike scheduled quarterly earnings or central bank calendars, geopolitical news frequently arrives without advance notice. When supply corridors face disruption, two immediate adjustments occur across financial markets:
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Energy &amp; Commodity Inputs</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  India imports over 85% of its crude oil requirements. When international energy corridors experience friction, benchmark crude indices (e.g., Brent Crude) face supply risk premiums, which can exert pressure on the current account deficit and domestic wholesale inflation indices.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Commodity &amp; Freight Cost Risk</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Higher Brent crude prices and freight rates can widen trade balances and pressure input costs for aviation, logistics, and manufacturing industries.
                 </p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
-                <h4 className="text-xs font-bold uppercase text-brand-teal tracking-wider">Sovereign Debt &amp; Currency Stability</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Geopolitical uncertainty historically induces a "flight to safety" into reserve currencies and sovereign bonds. Emerging market assets, including equities, frequently experience foreign institutional portfolio reallocation during such periods.
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Safe-Haven Capital Reallocation</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Periods of international tension historically prompt global funds to rotate temporarily toward reserve currencies and sovereign debt instruments.
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              2. Reading Open Interest (OI) topographies During Global Crises
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. Observing Open Interest Shifts &amp; Volatility Skew
             </h2>
             <p>
-              During periods of heightened global news flow, derivatives market participants utilize option chains to safeguard existing holdings against adverse price excursions. Market analysts observe the following structural phenomena:
+              During headline-heavy weeks, reading the NSE option chain reveals three structural patterns in how risk is priced:
             </p>
-            
-            <div className="space-y-3">
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Downward Migration of Put Writing</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  In stable market regimes, Put option writers comfortably underwrite strikes near the current spot price. When global news introduces uncertainty, option writers typically migrate further out-of-the-money (OTM), resetting structural support barriers to lower strike levels.
-                </p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Call Resistance Wall Consolidation</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  To hedge underlying equity exposures, institutional portfolio managers often write Call options against existing long positions (covered call structures), leading to rapid open interest accumulation and elevated Call-Put Ratios (CPR) at proximate overhead strikes.
-                </p>
-              </div>
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1">
-                <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Asymmetric Implied Volatility (IV) Skew</h4>
-                <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Because participants seek downside portfolio insurance more urgently than upside participation during geopolitical friction, OTM Put options exhibit higher Implied Volatility than equidistant OTM Call options. This pronounced slope is referred to as the volatility skew.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-wide">
-              3. Objective Analysis vs. Emotional Market Reactions
-            </h2>
-            <p>
-              Headline-driven market environments frequently elicit emotional reactions among retail investors. Educational analysis emphasizes looking at factual exchange data rather than subjective news commentary:
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li><strong>Track Verified Data Sets:</strong> Review official NSE option chain bhavcopy snapshots to confirm whether open interest is genuinely accumulating or if volume is simply rotating without new contract creation.</li>
-              <li><strong>Observe Max Pain Neutrality:</strong> While individual headlines can generate sharp intraday spikes, tracking the Max Pain strike across weekly expiries highlights where option writers collectively absorb the least payout liability.</li>
-              <li><strong>Maintain Strict Risk Parameters:</strong> Historical market studies demonstrate that excessive leverage during high-IV regimes substantially compounds drawdown risks for retail accounts.</li>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+              <li><strong>Lower Put Strike Migration:</strong> Option writers often shift activity further out-of-the-money (OTM) to give themselves wider statistical cushions against sudden intraday swings.</li>
+              <li><strong>Asymmetric Put IV Skew:</strong> Protective Put contracts frequently trade at higher Implied Volatility than equidistant Call contracts because portfolio managers pay extra premium for downside insurance.</li>
+              <li><strong>Volume vs. Net New Positions:</strong> Comparing intraday trading Volume against Change in Open Interest clarifies whether headlines caused temporary turnover or durable hedging commitments.</li>
             </ul>
           </section>
-
-          <div className="p-6 bg-amber-50/80 border border-amber-200 rounded-2xl space-y-3">
-            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
-              <AlertCircle size={16} />
-              <span>SEBI Educational Compliance &amp; Non-Advisory Notice</span>
-            </div>
-            <p className="text-xs text-amber-950 font-medium leading-relaxed">
-              This publication is created strictly for educational, informational, and market literacy purposes. <strong>Option Chain Analyzer does not provide investment advice, trading tips, or trade recommendations.</strong> Derivatives trading on the NSE involves severe risk of capital loss. SEBI's retail derivatives study indicates that 90% of active retail traders incur net losses in the futures and options market. Always exercise prudence, manage risk diligently, and consult a SEBI-registered financial planner before participating in derivatives markets.
-            </p>
-          </div>
         </div>
       ),
     },
     {
-      id: 'fed-rate-policy-us-dollar-dxy-nifty-option-chain',
-      title: "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on the Nifty Option Chain",
-      excerpt: "Understand how Federal Reserve interest rate projections, US 10-year Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.",
-      category: 'Strategy',
-      date: 'October 21, 2026',
-      readTime: '8 min read',
-      author: 'Macro Derivatives Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            When the US Federal Reserve issues forward guidance on interest rates or when the US Dollar Index (DXY) climbs above key technical thresholds, the effects reverberate immediately across emerging markets. For derivatives traders on the National Stock Exchange of India (NSE), tracking the Fed's terminal rate trajectory is not an abstract economic exercise—it directly alters institutional capital allocations, foreign portfolio flows, and the open interest topography of Nifty 50 option strikes.
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li>A strengthening Dollar Index (DXY &gt; 104) and elevated US 10-Year Treasury yields typically trigger Foreign Institutional Investor (FII) net selling in domestic cash equities and index futures.</li>
-              <li>FII defensive hedging manifests primarily as aggressive Out-of-The-Money (OTM) Call writing, capping index ceilings and forcing Max Pain strikes downward.</li>
-              <li>A deteriorating Put-Call Ratio (PCR &lt; 0.75) alongside heavy Call additions with CPR multipliers exceeding 6.0x signals sustained institutional ceiling formation.</li>
-              <li>Option traders who monitor cross-asset signals (DXY, USD/INR, US 10Y Yields) avoid the dangerous trap of buying premature dip-buying Call options during macro liquidity contractions.</li>
-            </ul>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            1. The Macro Mechanism: From Washington to Dalal Street
-          </h2>
-          <p>
-            Global institutional investors operate under strict risk-adjusted yield mandates. When the Federal Reserve maintains a higher-for-longer interest rate stance or signals fewer rate cuts than previously priced in by futures markets, US dollar-denominated assets become relatively more attractive. The yield differential between emerging market equities and risk-free US Treasury notes narrows.
-          </p>
-          <p>
-            As international asset managers rebalance their emerging market baskets, two immediate domestic ripple effects occur in India:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 text-sm font-medium text-slate-700">
-            <li>
-              <strong>Currency Pressure (USD/INR Depreciation):</strong> A rising DXY exerts downward pressure on the Indian Rupee. Foreign investors selling Indian equities convert rupee proceeds back into dollars, compounding foreign exchange volatility.
-            </li>
-            <li>
-              <strong>FII Index Futures Hedging:</strong> Rather than dumping blue-chip cash shares in a single day, institutional desks frequently short Nifty index futures and write short Call spreads on near-month weekly expiries to hedge their existing equity portfolios against currency and drawdown risks.
-            </li>
-          </ol>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            2. How Fed Hawkishness Shows Up in the Nifty Option Chain
-          </h2>
-          <p>
-            When macro risk rises, institutional option writers behave with ruthless discipline. By uploading a current NSE Option Chain CSV file into the analyzer, traders can observe signature shifts across key metrics:
-          </p>
-
-          <div className="overflow-x-auto my-6 border border-slate-200 rounded-2xl">
-            <table className="w-full text-xs text-left text-slate-700 border-collapse">
-              <thead className="bg-slate-100 text-slate-900 uppercase font-black text-[10px] tracking-wider border-b border-slate-200">
-                <tr>
-                  <th className="p-3">Option Chain Metric</th>
-                  <th className="p-3">Dovish Fed / Soft Dollar (DXY Down)</th>
-                  <th className="p-3">Hawkish Fed / Strong Dollar (DXY Up)</th>
-                  <th className="p-3">Institutional Interpretation</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                <tr>
-                  <td className="p-3 font-bold text-slate-900">Call-Put Ratio (CPR VOL / OI)</td>
-                  <td className="p-3 text-emerald-700 font-semibold">CPR &lt; 1.0 (Low Call buildup)</td>
-                  <td className="p-3 text-rose-700 font-bold">CPR &ge; 6.0x (Heavy Call blocks)</td>
-                  <td className="p-3">Option sellers erect formidable resistance walls above spot price.</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-900">Put-Call Ratio (PCR Total OI)</td>
-                  <td className="p-3 text-emerald-700 font-semibold">1.10 – 1.45 (Bullish support)</td>
-                  <td className="p-3 text-rose-700 font-bold">0.60 – 0.80 (Defensive drift)</td>
-                  <td className="p-3">Put writers retreat to deeper strikes, indicating reduced willingness to cushion pullbacks.</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-900">Max Pain Strike Migration</td>
-                  <td className="p-3 text-emerald-700 font-semibold">Migrates upward with spot</td>
-                  <td className="p-3 text-rose-700 font-bold">Steps down 100–300 points</td>
-                  <td className="p-3">Options decay point slides lower as Call sellers dominate total premium volume.</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-900">IV Skew (Call IV vs Put IV)</td>
-                  <td className="p-3 text-slate-600">Balanced / Flat IV smile</td>
-                  <td className="p-3 text-amber-700 font-semibold">Put IV &gt; Call IV by 2.0–4.0 pts</td>
-                  <td className="p-3">Downside protection demand inflates Out-of-The-Money Put implied volatility.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            3. Tactical Playbook: Trading the FII Call Wall
-          </h2>
-          <p>
-            When US yields jump and the Dollar Index breaks higher overnight, retail traders often attempt to buy index calls on intraday dips, hoping for an immediate bounce. This frequently results in severe option buyer decay. Here is how professional derivatives desks navigate this macro regime:
-          </p>
-
-          <div className="space-y-4 my-6">
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 1: Identify the "Anchor Resistance" Strike (CPR &ge; 6.0x)</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                Locate the nearest Out-of-The-Money Call strike exhibiting both massive Open Interest accumulation and a CPR OI multiplier equal to or greater than 6.0x. For example, if Nifty is trading at 24,800 and the 25,000 CE strike has 3.5x the open interest of all nearby strikes with a 7.2x CPR ratio, 25,000 functions as an institutional steel ceiling for the current weekly expiry.
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 2: Never Chase Gap-Down Put Options (Avoid IV Crush)</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                When Nifty opens lower following hawkish Fed statements, Implied Volatility (IV) on Put options is already artificially inflated. Buying naked Put options during the first 15 minutes carries extreme IV crush risk. If the index merely consolidates, the Put option premium will rapidly lose value even without a market recovery.
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Rule 3: Look for the Put Unwinding Domino Effect</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                If the previous day's primary Put support strike shows negative Change in OI (Chng in OI &lt; 0), Put writers are abandoning their positions and cutting losses. When Put writers surrender their strikes, dealer hedging forces additional index selling into the market, often creating a secondary intraday down-leg.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Summary Checklist for Fed Decision Days
-          </h2>
-          <p>
-            Before placing option trades during central bank announcement weeks, verify this checklist:
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-sm font-medium text-slate-700">
-            <li>Check US 10-Year Treasury Yields: Are they above 4.25% or breaking new multi-month highs?</li>
-            <li>Inspect the DXY trend: Is the dollar continuing to print higher daily highs against major global currencies?</li>
-            <li>Verify Nifty Total PCR: Has the Put-Call Ratio broken below 0.80 on rising volume?</li>
-            <li>Look for CPR Clusters: Are overhead strikes showing CPR &ge; 6.0x, confirming institutional Call blocks?</li>
-            <li>Align with Max Pain: Is spot price trading below the current Max Pain level with option decay favoring Call sellers?</li>
-          </ul>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">SEBI Compliance &amp; Risk Disclosure</p>
-            <p>
-              Index derivative trading involves significant market volatility and leverage. Past correlations between the US Dollar Index, Federal Reserve decisions, and NSE option positioning do not guarantee future market outcomes. Always utilize stop-loss orders and consult an authorized financial advisor before trading derivatives.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'crude-oil-shocks-geopolitical-risk-iv-skew-nse',
-      title: "Crude Oil Price Shocks & Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options",
-      excerpt: "Learn how sudden spikes in Brent crude and geopolitical supply tensions reprice Indian equity risk—triggering India VIX spikes, Put-side IV anomalies, and defensive strike adjustments.",
-      category: 'Analysis',
-      date: 'October 21, 2026',
-      readTime: '9 min read',
-      author: 'Quantitative Research Team',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            India imports more than 85% of its crude oil requirements, making domestic equity valuations uniquely sensitive to global energy shocks. When geopolitical conflicts flare in major oil-producing corridors or OPEC+ announces unexpected production cuts, the National Stock Exchange of India (NSE) experiences an immediate repricing of tail-risk. Understanding how crude oil spikes distort the option chain's Implied Volatility (IV) smile gives derivatives traders a decisive quantitative edge.
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li>A sharp climb in Brent crude ($85–$95/bbl) elevates domestic inflation forecasts and widens India's current account deficit, hitting Bank Nifty, Auto, and Paint sectors hardest.</li>
-              <li>Geopolitical risk creates an asymmetrical "Volatility Skew": Out-of-The-Money (OTM) Put implied volatility surges dramatically compared to equivalent Call strikes.</li>
-              <li>Option Chain Analyzer highlights IV Anomalies when individual strikes deviate significantly from adjacent strike volatilities, signaling institutional panic pricing or mispriced hedges.</li>
-              <li>During high-IV regimes, defined-risk credit spreads (such as Bull Put Spreads or Bear Call Spreads) drastically outperform naked option buying due to elevated premium decay.</li>
-            </ul>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            1. Why Crude Oil Shocks Distort Indian Equity Valuations
-          </h2>
-          <p>
-            Crude oil is the lifeblood of industrial input costs and transportation logistics across India. A sustained $10 per barrel increase in Brent crude typically adds 30–40 basis points to Indian CPI inflation and expands the import bill by over $12 billion annually.
-          </p>
-          <p>
-            For equity markets, this translates directly to margin compression for consumer cyclicals, airline operators, tire manufacturers, and specialty chemicals. At the macro level, it limits the Reserve Bank of India's (RBI) latitude to ease monetary policy. Consequently, institutional desks swiftly re-evaluate their exposure to heavy-weight banking and industrial constituents within Nifty 50 and Bank Nifty.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            2. Decoding the Volatility Skew &amp; IV Anomalies
-          </h2>
-          <p>
-            Under normal market conditions, an option chain exhibits a relatively symmetrical "volatility smile," where implied volatility rises moderately as strikes move further out of the money in both directions. However, during geopolitical energy shocks, the smile bends into a sharp, steepened skew:
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 my-6">
-            <h4 className="text-sm font-black uppercase text-brand-teal tracking-wider">Anatomy of an IV Skew During Crude Spikes</h4>
-            <div className="space-y-3 text-xs text-slate-700 leading-relaxed font-medium">
-              <p>
-                <strong>Put-Side Premium Expansion:</strong> Portfolio managers buy downside Put options as catastrophic insurance, driving OTM Put IVs from standard baseline levels of 12%–14% up to 22%–28% within hours.
-              </p>
-              <p>
-                <strong>Call-Side Premium Starvation:</strong> Because upside momentum is capped by macro headwind concerns, Call option demand evaporates, leaving Call IVs depressed at 11%–13%.
-              </p>
-              <p>
-                <strong>IV Anomaly Detection:</strong> When specific strike prices experience localized panic hedging—for instance, a sudden surge of buying at the 24,000 PE strike—its IV may spike 4 to 6 percentage points above adjacent strikes (23,900 PE and 24,100 PE). Our analyzer flags these as <em>IV Anomalies</em> with dedicated visual badges.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            3. Sectoral Transmission: Nifty 50 vs Bank Nifty
-          </h2>
-          <p>
-            The impact of crude shocks is not distributed equally across all NSE contracts. Traders must distinguish between the relative resilience of Nifty 50 and the vulnerability of Bank Nifty:
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Bank Nifty: The Transmission Vector</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Higher crude oil fuels domestic bond yield spikes, which reduces treasury gains for public and private sector banks. Bank Nifty option chains typically lead the downside move, showing rapid Put unwinding at ATM strikes and massive Call OI accumulation.
-              </p>
-            </div>
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-              <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Nifty 50: The Energy Component Cushion</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Nifty 50 contains heavy index weightings in energy and oil exploration companies (such as Reliance Industries and ONGC). Strong upstream crude realizations can partially buffer Nifty's benchmark decline, resulting in a divergent PCR between Nifty and Bank Nifty.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            4. Tactical Strategy: Surviving and Profiting in High-IV Regimes
-          </h2>
-          <p>
-            When geopolitical headlines push India VIX above 18–20 points and crude oil surges, traditional retail option buying strategies suffer catastrophic failure rates due to aggressive post-event IV crush. Follow these institutional principles:
-          </p>
-
-          <ol className="list-decimal pl-6 space-y-3 text-sm font-medium text-slate-700">
-            <li>
-              <strong>Avoid Buying Naked OTM Puts on Gap-Down Days:</strong> By the time crude oil headlines appear on morning news feeds, option sellers have already priced the risk into Put premiums. Buying a 1-day-old shock Put frequently results in a 40% loss even if spot prices drop slightly further.
-            </li>
-            <li>
-              <strong>Utilize Defined-Risk Vertical Spreads:</strong> When IV is elevated, sell the high-IV strike while buying a cheaper further OTM strike for protection (e.g., Bear Call Spread above the CPR &ge; 6.0x resistance level). The elevated implied volatility works in your favor through accelerated time decay.
-            </li>
-            <li>
-              <strong>Watch for Crude Stabilization as a Reversal Signal:</strong> If Brent crude tests resistance and begins consolidating while Nifty forms strong Put OI support (PCR &ge; 6.0x) near a psychological round number, a sharp short-covering rally often follows as India VIX cools down.
-            </li>
-          </ol>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Disclaimer</p>
-            <p>
-              Commodity price volatility and geopolitical developments create non-linear financial risks. The analysis provided here is strictly for educational purposes based on historical NSE market structure and options pricing theory. Derivative contracts carry substantial financial risk of total capital loss.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
       id: 'nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps',
-      title: "Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain",
-      excerpt: "Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.",
-      category: 'Strategy',
+      title: 'Overnight Wall Street & Global Cues: Understanding Opening Price Adjustments on the NSE',
+      excerpt: 'How overnight US index moves, global technology earnings, and Gift Nifty pricing shape domestic opening gaps and early-session open interest updates on the NSE.',
+      category: 'Global Macro',
       date: 'October 21, 2026',
-      readTime: '8 min read',
-      author: 'Derivatives Strategy Desk',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Every morning at 9:15 AM IST, the Indian stock market opens to a reality shaped by overnight trading on Wall Street. When Silicon Valley tech titans release earnings results or when the Nasdaq Composite index moves by more than 1.5% overnight, Gift Nifty (formerly SGX Nifty) immediately forecasts a substantial opening gap. However, trading opening gaps purely on enthusiasm or panic is the single most common cause of retail option account drawdowns. Here is how institutional option chain metrics reveal whether an opening gap will sustain into a trend day or reverse aggressively.
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            Because Indian equity markets operate in a different time zone from Wall Street and major European exchanges, overnight global earnings releases and US index movements are often priced into domestic benchmarks immediately at the 9:15 AM IST opening bell. Examining how overnight cues translate into opening gaps and option chain adjustments provides essential context for market literacy.
           </p>
 
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h3 className="text-sm font-black uppercase text-slate-900 tracking-wider">Key Takeaways</h3>
-            <ul className="list-disc pl-5 space-y-2 text-xs text-slate-700 font-medium">
-              <li>Overnight US tech earnings (Semiconductors, Cloud, AI mega-caps) directly influence the Indian IT index (TCS, Infosys, HCLTech), which comprises over 13% of Nifty 50.</li>
-              <li>An opening gap is only verified if the initial 30 minutes of trading demonstrate substantial Open Interest (OI) buildup supporting the gap direction.</li>
-              <li>A "Gap and Trap" occurs when Nifty gaps up by 100+ points on global cues, but option sellers aggressively write Calls (CPR &ge; 6.0x) right at the opening strike without adding Put support.</li>
-              <li>Uploading the NSE option chain CSV between 9:30 AM and 9:45 AM reveals whether domestic institutional writers are participating in the global move or fading it for premium decay.</li>
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. Why Overnight Cues Create Opening Gaps
+            </h2>
+            <p>
+              Major US indices (the S&amp;P 500 and Nasdaq Composite), global semiconductor and software earnings, and Asian morning benchmarks reflect new economic information while the NSE is closed. International derivatives contracts such as Gift Nifty trade across extended hours, allowing domestic indices to reflect global valuations right at market open.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. How Option Chains Re-Center After an Opening Gap
+            </h2>
+            <p>
+              When the underlying spot index opens significantly higher or lower than the previous day&apos;s close, the existing At-The-Money (ATM) strike shifts immediately:
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+              <li><strong>Strike Re-Anchoring:</strong> Yesterday&apos;s Out-of-the-Money strikes can instantaneously become In-the-Money or At-the-Money contracts, altering Delta and Gamma sensitivity.</li>
+              <li><strong>Early-Session Liquidity Noise:</strong> During the first 15 minutes of trading, bid-ask spreads and implied volatility readings fluctuate rapidly as market makers recalibrate quotes to the new spot reference.</li>
+              <li><strong>Position Unwinding vs. Fresh Addition:</strong> Monitoring Change in OI after initial market settlement shows whether existing contract holders closed positions or established new reference levels.</li>
             </ul>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            1. The Wall Street to Dalal Street Transmission Line
-          </h2>
-          <p>
-            The correlation between the Nasdaq Composite and the Nifty IT index is one of the strongest cross-border equity relationships in global finance. Major Indian IT exporters derive upwards of 55% to 65% of their total revenues from North American enterprise clients.
-          </p>
-          <p>
-            When US tech companies report strong capital expenditure in enterprise software and cloud infrastructure, Indian IT ADRs traded in New York (such as INFY and WIT) surge in after-hours trading. By early morning, Gift Nifty trading in GIFT City Gujarat absorbs this sentiment, establishing a projected opening range for Nifty 50.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            2. The Anatomy of Opening Gap Setups on the Option Chain
-          </h2>
-          <p>
-            When the market opens with a gap of 80 to 200 points, overnight straddle and strangle sellers face sudden delta imbalances. Their reactions during the first 30 minutes create distinct option chain fingerprints:
-          </p>
-
-          <div className="overflow-x-auto my-6 border border-slate-200 rounded-2xl">
-            <table className="w-full text-xs text-left text-slate-700 border-collapse">
-              <thead className="bg-slate-100 text-slate-900 uppercase font-black text-[10px] tracking-wider border-b border-slate-200">
-                <tr>
-                  <th className="p-3">Opening Pattern</th>
-                  <th className="p-3">Option Chain OI Signal</th>
-                  <th className="p-3">Volume &amp; PCR Confirmation</th>
-                  <th className="p-3">Expected Day Trajectory</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                <tr>
-                  <td className="p-3 font-bold text-emerald-800">Trend Gap-Up (Continuation)</td>
-                  <td className="p-3 font-semibold text-emerald-700">Call writers rapidly cover (Chng in Call OI &lt; 0) + Aggressive Put writing at new ATM</td>
-                  <td className="p-3">PCR Vol &gt; 1.30, PCR OI &ge; 6.0x on support strikes</td>
-                  <td className="p-3">Market trends upward throughout the session; intraday dips are defended.</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-rose-800">Gap &amp; Trap (Exhaustion Reversal)</td>
-                  <td className="p-3 font-semibold text-rose-700">Call writers hold ground; massive fresh Call OI added (CPR &ge; 6.0x) at opening strike</td>
-                  <td className="p-3">Put writers refuse to move up; PCR fails to expand</td>
-                  <td className="p-3">Market fades the gap, drifting downward toward previous day's close or Max Pain.</td>
-                </tr>
-                <tr>
-                  <td className="p-3 font-bold text-slate-800">Rangebound Consolidation</td>
-                  <td className="p-3 font-semibold text-slate-600">Equal straddle writing at new ATM strike; Call OI and Put OI expand symmetrically</td>
-                  <td className="p-3">PCR stays between 0.90 and 1.10</td>
-                  <td className="p-3">Index remains locked inside a 60-point channel; premium decay dominates.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            3. The 9:15 to 9:45 AM Verification Rule
-          </h2>
-          <p>
-            The opening 15 minutes (9:15 AM – 9:30 AM) are notorious for institutional order matching, synthetic volatility spikes, and wide bid-ask spreads. Attempting to trade index options within this window without option chain confirmation is essentially gambling on overnight momentum.
-          </p>
-          <p>
-            Instead, follow the institutional 30-minute confirmation rule:
-          </p>
-
-          <div className="space-y-4 my-6">
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 1: Wait for 9:30 AM Data Refresh</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                The National Stock Exchange compiles and publishes its first consolidated open interest dataset around 9:25–9:30 AM. Download the fresh CSV directly from <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-bold">nseindia.com/option-chain</a> and load it into Option Chain Analyzer.
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 2: Inspect Support vs Resistance Multipliers</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                Check whether the opening level has established a green <strong>PCR Support Barrier (PCR &ge; 6.0x)</strong> or whether it has run directly into a red <strong>CPR Resistance Wall (CPR &ge; 6.0x)</strong>. If a gap-up opens right beneath an existing 6x CPR resistance zone, the probability of an immediate breakout is less than 20%.
-              </p>
-            </div>
-
-            <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
-              <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Step 3: Track Max Pain Gravitational Pull</h4>
-              <p className="text-xs text-slate-650 leading-relaxed font-medium">
-                Compare the opening spot price against the calculated Max Pain strike. On weekly expiry days (such as Thursday for Nifty or Wednesday for Bank Nifty), if an opening gap opens 150 points above the Max Pain strike without rapid upward Max Pain migration, the index almost always experiences an intraday gravitational pull back toward the pain point.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Discipline Over Emotion
-          </h2>
-          <p>
-            Wall Street headlines are designed to provoke emotional reactions. Successful options traders treat global indices as context, but rely on the NSE Option Chain as the ultimate arbiter of truth. When global news and domestic open interest agree, you have a high-conviction trade. When they disagree, trust the open interest.
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Mandatory SEBI Risk Disclosure</p>
-            <p>
-              Trading index options during volatile market openings involves high market risk and rapid premium erosion. Over 90% of retail individual traders in the equity F&amp;O segment incurred average losses exceeding ₹50,000 in recent fiscal years according to SEBI study reports. Always trade with strict stop losses and defined position sizing.
-            </p>
-          </div>
+          </section>
         </div>
-      )
-    },
-    {
-      id: 'how-global-market-cues-impact-the-nse-option-chain',
-      title: "Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain at Opening Bell",
-      excerpt: "Discover how overnight global cues—from Gift Nifty and US indices to crude oil and the Dollar Index—shape early-morning NSE option chain data, strike unwinding, and institutional positioning.",
-      category: 'Strategy',
-      date: 'October 9, 2026',
-      readTime: '6 min read',
-      author: 'Derivatives Strategy Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            In derivative trading, the National Stock Exchange of India (NSE) never opens in a vacuum. Long before the opening bell rings at 9:15 AM IST, global markets have already spent hours reacting to overnight macroeconomic news, interest rate expectations, commodity fluctuations, and geopolitical developments.
-          </p>
-
-          <p>
-            For option chain analysts trading <strong>Nifty 50</strong>, <strong>Bank Nifty</strong>, or top liquid equity derivatives, tracking global market cues is not about predicting the exact opening tick. It is about understanding how overnight risk shifts the baseline expectations of institutional option sellers—forcing sudden strike migrations, implied volatility (IV) re-pricing, and opening Call or Put unwinding.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            The Core Global Barometers for NSE Derivative Traders
-          </h2>
-          <p>
-            Before opening the morning option chain spreadsheet or dashboard, professional Indian option traders assess five critical global indicators:
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-1">EARLY PRICE DISCOVERY</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">1. GIFT Nifty (GIFT City)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Trading from 6:30 AM IST in Gujarat International Finance Tec-City, GIFT Nifty serves as the earliest direct proxy for Nifty 50 opening levels. A wide premium or discount flags whether opening options will face a gap-up or gap-down scenario.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-1">WALL STREET &amp; US VIX</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">2. US Markets (S&amp;P 500 &amp; Nasdaq)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                The overnight close of US benchmark indices dictates global risk appetite. A surge in the CBOE VIX typically triggers early morning volatility spikes across global index options, raising implied volatility floors in domestic contracts.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-rose-600 tracking-widest block mb-1">INFLATION &amp; MACRO DRIVER</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">3. Brent Crude Oil</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                As a net oil importer, India's macroeconomic balance is exceptionally sensitive to crude prices. Rapid surges above key resistance levels directly pressure Indian banking and auto sectors, reflecting in heavy Call writing on Bank Nifty strikes.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-blue-600 tracking-widest block mb-1">CURRENCY &amp; FII FLOWS</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">4. Dollar Index (DXY) &amp; USD/INR</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                A strengthening US Dollar Index often triggers foreign institutional investor (FII) capital outflows from emerging equity markets. When DXY spikes overnight, institutional participants frequently buy protective index Puts or write deep OTM Calls.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Global Sentiment Translates Into the NSE Option Chain
-          </h2>
-          <p>
-            Understanding global indices is only half the battle. The true trading edge comes from examining how that overnight information is absorbed by the option chain during the first 30 to 45 minutes of trade:
-          </p>
-
-          <div className="space-y-6 my-8">
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal shrink-0">
-                <span className="font-extrabold text-sm">A</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Shift in the At-The-Money (ATM) Straddle Strike</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  A strong global gap-up or gap-down immediately displaces the ATM strike. Overnight option writers who sold straddles or strangles must either adjust their legs or scramble to cover the challenged side, resulting in sharp, immediate Changes in Open Interest (Chng in OI).
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                <span className="font-extrabold text-sm">B</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Short Covering vs. Fresh Writing at Boundary Strikes</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  When positive global cues produce a gap-up, observe whether Call writers are rapidly unwinding (negative change in OI on calls). If heavy Call unwinding is accompanied by aggressive fresh Put writing at the new ATM, the global rally is confirmed by domestic institutional capital.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                <span className="font-extrabold text-sm">C</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Opening Volatility Crushes (IV Drops)</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Retail traders often buy expensive out-of-the-money options ahead of expected global market events. Once the market opens and the uncertainty resolves, Implied Volatility (IV) often experiences a sharp drop, causing option premiums to decay rapidly even if the market opens in the anticipated direction.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Spotting Market Divergences: The Highest-Probability Setups
-          </h2>
-          <p>
-            Some of the most informative market signals occur when <strong>domestic option chain positioning contradicts global market cues</strong>. Here is how experienced analysts interpret these discrepancies:
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 my-6">
-            <h4 className="text-sm font-black uppercase text-brand-teal tracking-wider">Scenario 1: Weak Global Cues, Strong Put Writing (Absorption)</h4>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium">
-              If US indices closed down 1.5% and Gift Nifty indicated a 100-point gap down, but the NSE Option Chain shows strong Put additions (PCR multiplier &gt; 6.0x) near the opening lows without heavy Call writing, domestic institutional participants are absorbing supply. This often sets the stage for an intraday recovery rally.
-            </p>
-          </div>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-4 my-6">
-            <h4 className="text-sm font-black uppercase text-rose-700 tracking-wider">Scenario 2: Euphoric Global Cues, Heavy Call Writing (Exhaustion)</h4>
-            <p className="text-xs text-slate-700 leading-relaxed font-medium">
-              Conversely, if global markets rally overnight and Nifty gaps up by 150 points, but the Option Chain shows immediate massive Call writing (CPR multiplier &gt; 6.0x) right at the opening strike with little to no Put addition, smart money is using the global liquidity spike to sell into the rally.
-            </p>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            A Recommended Morning Workflow for Option Chain Analysis
-          </h2>
-          <p>
-            To avoid falling into emotional traps driven by early morning headlines, follow this disciplined 3-step routine:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 text-sm font-medium text-slate-700">
-            <li>
-              <strong>8:15 AM - 8:45 AM (Pre-Market Scan):</strong> Note GIFT Nifty's expected opening gap, overnight US market performance, Brent crude levels, and Asian indices. Form a baseline expectation, but do not execute trades based on pre-market numbers alone.
-            </li>
-            <li>
-              <strong>9:15 AM - 9:30 AM (Opening Price Discovery):</strong> Allow the initial 15-minute price discovery period to unfold. Early opening minutes often have distorted bid-ask spreads and transient order imbalances.
-            </li>
-            <li>
-              <strong>9:30 AM Onwards (Option Chain CSV Verification):</strong> Download the latest option chain data from the NSE website and upload it to Option Chain Analyzer. Look for high-probability support (PCR &ge; 6.0x) and resistance (CPR &ge; 6.0x) concentrations to verify whether institutional positioning confirms or refutes the morning global cues.
-            </li>
-          </ol>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Regulatory Risk Note</p>
-            <p>
-              Option contracts involve substantial financial leverage and capital risk. Under SEBI research, 9 out of 10 retail traders incur net losses in the F&amp;O segment. Global market cues and option chain metrics should only be used as analytical filters alongside strict risk management rules and stop losses.
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'understanding-max-pain-theory-on-the-option-chain',
-      title: "Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry",
-      excerpt: "Explore the Max Pain Theory: a derivatives analysis model showing how index/stock prices gravitate towards the strike price where option buyers face the greatest maximum financial loss on expiry day.",
-      category: 'Advanced Analysis',
-      date: 'June 19, 2026',
-      readTime: '7 min read',
-      author: 'Derivatives Strategy Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            In derivatives markets, <strong>Max Pain Theory</strong> (also referred to as Option Pain) suggests that the underlying security's price will tend to gravitate toward a specific "Max Pain Strike Price" as the expiration date draws near. This is the precise price point at which the maximum number of option buyers will suffer the major loss on their premium assets.
-          </p>
-
-          <p>
-            Whether you trade NSE Nifty, Bank Nifty, or liquid equity stock options, understanding how market makers and institutional option sellers build their portfolios around Max Pain can give you a major statistical edge on expiry day. This guide shows how to calculate, interpret, and trade the Max Pain point using raw Option Chain data.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            The Core Concept: Option Buyers vs. Option Sellers
-          </h2>
-          <p>
-            To understand Max Pain, one must first recognize the fundamental power dynamic in options trading. Historically, individual retail traders represent <strong>Option Buyers</strong> (who purchase cheap, leveraged Calls and Puts), while large financial institutions and market makers represent <strong>Option Sellers</strong> (who write options to harvest premium income).
-          </p>
-          <p>
-            Because institutions possess deep capital reserves and superior hedging risk engines, they generally win most option battles. Therefore, options are statistically prone toexpire worthless. Max Pain Theory is built on this very premise: that institutional option writers will manipulate or hedge the underlying asset's spot price near expiry to strike a settlement price where the cumulative payout to option buyers is at its absolute minimum.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-1">MARKET DEFENSE</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Option Sellers' Goal</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Aim to keep the spot price pinned near the Max Pain point so that the absolute highest volume of Call and Put premiums decay to zero, leaving them with maximum retained profits.
-              </p>
-            </div>
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-1">RETAIL EXPOSURE</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Option Buyers' Exposure</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Typically purchase out-of-the-money (OTM) options. If the market closes exactly at the Max Pain strike, almost all of these OTM premiums are wiped out completely.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Is Max Pain Calculated?
-          </h2>
-          <p>
-            While calculating the exact Max Pain point manually for all strikes can be tedious, modern analyzer tools do this dynamically. The mathematical process involves evaluating the cumulative monetary loss for option buyers across every possible strike price:
-          </p>
-
-          <div className="space-y-6 my-8">
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal shrink-0">
-                <span className="font-extrabold text-sm">1</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">List All Outstanding Strikes</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Map out all major Call and Put strike prices on the current option chain with their corresponding Open Interest (OI) numbers.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                <span className="font-extrabold text-sm">2</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Assume Expiration Scenarios</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  For each potential strike price, calculate what the value of Calls and Puts would be if the underlying asset expired exactly at that strike.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal shrink-0">
-                <span className="font-extrabold text-sm">3</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Multiply by Open Interest</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Multiply the theoretical intrinsic values of surviving options at expiration by the total active Open Interest (OI) at each strike to determine the total cash payout required by writing institutions.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                <span className="font-extrabold text-sm">4</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Locate the Minimum Pain Point</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Sum up the combined Call and Put buyer losses for each strike price scenario. The strike price that results in the <strong>lowest overall layout/value</strong> is crowned the Max Pain strike level.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Actionable Strategies: How to Trade Using Max Pain
-          </h2>
-          <p>
-            When utilizing an NSE Option Chain dashboard, watching how the spot price moves relative to the calculated Max Pain point can reveal powerful entry or exit cues:
-          </p>
-          <ul className="list-disc list-inside space-y-3 pl-4 text-slate-650">
-            <li>
-              <strong>Targeting Expiry Closures:</strong> If Nifty is trading at 23,200 on Thursday afternoon, but the Open Interest calculation identifies 23,050 as the Max Pain Strike, there is a strong probability the index will face downward pressure toward 23,050 before the final settlement bell.
-            </li>
-            <li>
-              <strong>Assessing Deviation Outliers:</strong> When the index price deviates significantly from the Max Pain level (e.g., due to sudden international news), it creates an option imbalance that options market-makers must adjust by buying or selling shares of the underlying index. This adjustment process can amplify or damp intraday trends.
-            </li>
-            <li>
-              <strong>Confirming Support & Resistance:</strong> Combining Max Pain with top-tier Open Interest pillars and Put-Call Ratio (PCR) trends provides a multi-axis view of structural market ceilings and floors.
-            </li>
-          </ul>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Limitations of Max Pain Theory
-          </h2>
-          <p>
-            While Max Pain is highly useful, it is not a magical crystal ball. Market sentiment shifts rapidly. During major global news, earnings blowouts, or strong directional breakout trends, the momentum force will easily crush option writers, forcing Max Pain to adjust dynamically to the market price rather than the market price bowing to Max Pain. Always practice sound capital protection and risk management.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Maximize Output with the Option Chain Analyzer
-          </h2>
-          <p>
-            By uploading standard NSE Options Chain CSV exports directly into our offline visual dashboard, you can track real-time open interest columns alongside PCR distributions, IV spreads, and key support & resistance indicators to elevate your retail options analysis.
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'understanding-implied-volatility-iv-on-the-option-chain',
-      title: "Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide",
-      excerpt: "Learn what Implied Volatility (IV) is, why it is crucial for pricing options, how to identify high/low IV on an option chain, and how to use it to optimize your options trading strategies.",
-      category: 'Education',
-      date: 'June 15, 2026',
-      readTime: '6 min read',
-      author: 'Options Education Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Among all the data columns in an options chain, <strong>Implied Volatility (IV)</strong> is arguably one of the most critical. While many beginners focus purely on a stock's price direction and strike premiums, professional option traders spend a tremendous amount of time analyzing the IV column.
-          </p>
-
-          <p>
-            This guide will demystify Implied Volatility, explain why it behaves the way it does, and show you how to read and apply IV metric values directly from your Option Chain to make smarter, more data-driven trading decisions.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            What Is Implied Volatility (IV)?
-          </h2>
-          <p>
-            Unlike historical volatility, which measures how fast stock prices changed in the past, <strong>Implied Volatility (IV)</strong> is a forward-looking metric. It represents the stock market's expectations of a security's future price movement over a specific timeframe.
-          </p>
-          <p>
-            Practically speaking, IV is derived directly from the current market prices of option contracts using option pricing models (like Black-Scholes). If a high volume of buyers rushes to purchase option contracts (due to an upcoming event, market uncertainty, or high demand), option prices rise. Because premium levels rise, the mathematical formula works backward to show a higher <strong>Implied Volatility (IV)</strong>.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-1">EXPECTED SHIFT</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">High Implied Volatility</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Indicates that the market expects a large price swing in either direction. Option contracts become significantly more expensive (demanding a higher premium).
-              </p>
-            </div>
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-1">CALM MARKET</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Low Implied Volatility</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Indicates that the market expects price stability or very minor, quiet movements. Option contracts become cheaper.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why IV Matters for Option Premiums
-          </h2>
-          <p>
-            Option premium pricing consists of two main parameters: <strong>Intrinsic Value</strong> and <strong>Extrinsic Value</strong> (also known as Time Value).
-          </p>
-          <p>
-            While intrinsic value is determined by basic arithmetic (how deep the option is in the money), extrinsic value is highly sensitive to time decay (Theta) and <strong>Implied Volatility</strong>.
-          </p>
-          <p>
-            When Implied Volatility rises, it increases the extrinsic value of all options at every strike price—including both Calls and Puts. This occurs because the mathematical model assumes that a higher volatility increases the statistical probability of the stock reaching further extreme strike prices before expiration.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Traders Spot and Use IV on the Option Chain
-          </h2>
-          <p>
-            On a professional option chain layout, each side (Call columns on the left, Put columns on the right) features an <strong>IV column</strong> adjacent to the strike prices. Here is how active traders interpret this data:
-          </p>
-
-          <div className="space-y-6 my-8">
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal shrink-0">
-                <span className="font-extrabold text-sm">1</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Evaluating Relative Cost (Sellers vs. Buyers)</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  As a general rule, options traders prefer to <strong>sell</strong> options when IV is high (capturing expensive, inflated premiums that likely decay fast) and <strong>buy</strong> options when IV is exceptionally low (purchasing relatively cheap leverage).
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-                <span className="font-extrabold text-sm">2</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Anticipating an 'IV Crush'</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Before major events like binary FDA decisions, earnings announcements, or macroeconomic meetings, IV rises to extremely high levels due to severe uncertainty. Immediately after the news or event is released, the uncertainty is resolved, causing IV to plummet. This is known as an <strong>IV Crush</strong>, which can decimate the option premiums of naked option buyers, regardless of which way the stock moves.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start bg-slate-50/55 rounded-2xl p-6 border border-slate-100">
-              <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal shrink-0">
-                <span className="font-extrabold text-sm">3</span>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-slate-900 text-sm uppercase tracking-wide">Assessing the Volatility Smile</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">
-                  Traders study how IV differs across different strike prices. Often, out-of-the-money puts may demand a higher IV compared to at-the-money options because traders pay higher premiums to protect their equity portfolios from sudden downside crashes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Combining IV with Open Interest Concentrations
-          </h2>
-          <p>
-            An exceptionally powerful method used on our Option Chain Analyzer dashboard involves analyzing where <strong>high IV</strong> and <strong>high Open Interest (OI)</strong> levels intersect.
-          </p>
-          <p>
-            When a specific Call strike displays a massive concentration of Open Interest and a spiked Implied Volatility coefficient, it indicates heavy institutional call writing and hedge-buying boundaries. This reveals a very high-probability zone of structural Resistance. Conversely, heavy Put OI coupled with elevated IV structures points to strong, heavily defended support floors.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            Implied Volatility (IV) tells you whether an option premium is cheap or expensive, regardless of the underlying price direction. By integrating IV analysis with standard support/resistance indicators, Open Interest mapping, and Put Call Ratio analysis, you can significantly improve your risk-reward profile on every option trade you place.
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'how-traders-identify-support-and-resistance-using-option-chain-data',
-      title: "How Traders Identify Support and Resistance Using Option Chain Data",
-      excerpt: "Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.",
-      category: 'Education',
-      date: 'June 10, 2026',
-      readTime: '4 min read',
-      author: 'Options Education Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Support and resistance are key trading concepts. Option chain data provides additional insight into where market participants are positioning themselves, allowing traders to observe these key levels in real-time.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Support and Resistance
-          </h2>
-          <p>
-            In technical analysis, <strong>Support</strong> is an area where buying interest may emerge to stop a falling price. Conversely, <strong>Resistance</strong> is an area where selling pressure may appear to stall rising prices.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-2">Demand Floor</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-3">Support</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                An area where buying interest may emerge. It acts as a potential floor for price declines.
-              </p>
-            </div>
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-2">Supply Ceiling</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-3">Resistance</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                An area where selling pressure may appear. It acts as a potential ceiling for price advances.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Open Interest
-          </h2>
-          <p>
-            Open Interest (OI) represents the total number of outstanding active option contracts in the market. Large Open Interest concentrations often attract attention because they may indicate important strike prices being observed or formatted by major participant writers.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Put Open Interest
-          </h2>
-          <p>
-            Many traders monitor large <strong>Put OI concentrations</strong> of option strike prices as potential support zones. Since put writers take a bullish stance, the highest concentrations often show where institutional money has laid down a solid price floor.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Call Open Interest
-          </h2>
-          <p>
-            Conversely, large <strong>Call OI concentrations</strong> are frequently monitored by options traders as potential resistance zones. Since call writers have a neutral-to-bearish perspective, these key concentrations represent levels where significant supply clusters are placed, functioning as overhead ceilings.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Common Mistakes
-          </h2>
-          <p>
-            Do not rely solely on Open Interest metrics. A common mistake is to ignore general chart contexts or speed. For a comprehensive strategy, always combine Option Chain data and OI with price action, trading volume, and broader market context.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Educational Resource
-          </h2>
-          <p>
-            Learn more about option chain analysis, Put Call Ratio (PCR), and Open Interest (OI) indicators at <a href="https://optionchainanalyzer.in/" className="text-brand-teal hover:underline font-bold">optionchainanalyzer.in</a>. Studying live configurations of option chains helps bridge the gap between financial theory and real market structures.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            Option chain data can help traders identify important market levels, but it should be used alongside broader analysis. By observing put and call clusters with proper charts, option chain analysis becomes an exceptional asset in your daily trading toolkit.
-          </p>
-        </div>
-      )
+      ),
     },
     {
       id: 'what-is-an-option-chain-and-why-do-traders-use-it',
-      title: "What Is an Option Chain and Why Do Traders Use It? A Complete Beginner's Guide",
-      excerpt: "If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.",
-      category: 'Education',
-      date: 'May 22, 2026',
-      readTime: '7 min read',
-      author: 'Options Education Desk',
+      title: 'What Is an Option Chain? Understanding Calls, Puts, and Strike Structure',
+      excerpt: 'A clear, beginner-friendly explanation of how NSE option chains organize strike prices, Calls, Puts, Last Traded Price (LTP), and Open Interest in a single tabular matrix.',
+      category: 'Option Chain Basics',
+      date: 'October 15, 2026',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            If you are learning about options trading, one of the first terms you will encounter is the <strong>option chain</strong>. At first glance, an option chain can appear intimidating. It is usually presented as a large table containing strike prices, premiums, open interest figures, trading volumes, and several other data points.
-          </p>
-          
-          <p>
-            For beginners, these numbers may seem confusing. However, experienced traders rely on option chain data every day because it provides valuable insight into market activity and trader positioning.
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            An <strong>option chain</strong> (or option matrix) is an exchange-published table listing all active Call and Put option contracts available for a given underlying index or stock—such as NIFTY 50 or BANK NIFTY—for a specific expiration date. Learning to read its columns is the first step toward derivatives literacy.
           </p>
 
-          <p>
-            An option chain helps traders understand where market participants are concentrating their positions, which strike prices are attracting attention, and how sentiment may be evolving. While no tool can predict the future with certainty, option chain analysis remains one of the most widely used methods for studying options market behaviour.
-          </p>
-
-          <p>
-            In this guide, we will explore what an option chain is, how it is structured, the meaning of its key components, and why traders use it as part of their market analysis process.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            What Is an Option Chain?
-          </h2>
-          <p>
-            An option chain is a complete listing of all available option contracts for a specific underlying asset.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-6">
-            <div className="border-l-2 border-slate-200 pl-6 py-1">
-              <span className="block text-xs font-black uppercase text-brand-teal tracking-widest mb-3">The underlying asset could be:</span>
-              <ul className="space-y-2 text-sm font-semibold text-slate-600">
-                <li className="flex items-center gap-2">A stock</li>
-                <li className="flex items-center gap-2">An index</li>
-                <li className="flex items-center gap-2">An ETF</li>
-                <li className="flex items-center gap-2">A commodity</li>
-                <li className="flex items-center gap-2">A currency</li>
-              </ul>
-            </div>
-            
-            <div className="border-l-2 border-slate-200 pl-6 py-1">
-              <span className="block text-xs font-black uppercase text-brand-teal tracking-widest mb-3">For Indian traders, common examples:</span>
-              <ul className="space-y-2 text-sm font-semibold text-slate-600">
-                <li className="flex items-center gap-2">NIFTY</li>
-                <li className="flex items-center gap-2">BANK NIFTY</li>
-                <li className="flex items-center gap-2">FINNIFTY</li>
-                <li className="flex items-center gap-2">Reliance Industries</li>
-                <li className="flex items-center gap-2">TCS</li>
-                <li className="flex items-center gap-2">Infosys</li>
-              </ul>
-            </div>
-          </div>
-
-          <p>
-            Each option chain displays all available strike prices and corresponding option contracts for a selected expiry date.
-          </p>
-
-          <div className="py-4 border-y border-slate-100 italic text-slate-600 text-sm">
-            <p className="font-semibold text-slate-800 not-italic mb-2">
-              The information is usually divided into two core sections:
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. Anatomy of the Option Chain Table
+            </h2>
+            <p>
+              Every option chain is organized symmetrically around a central <strong>Strike Price</strong> column:
             </p>
-            <ul className="flex flex-wrap gap-6 text-xs font-black uppercase tracking-widest my-2 not-italic">
-              <li className="flex items-center gap-2 text-brand-teal">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-teal" /> Call Options
-              </li>
-              <li className="flex items-center gap-2 text-amber-600">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-600" /> Put Options
-              </li>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Calls (Left Side)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  A Call contract gives the buyer the right, without obligation, to buy the underlying asset at the specified strike price on or before expiration.
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Puts (Right Side)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  A Put contract gives the buyer the right, without obligation, to sell the underlying asset at the specified strike price on or before expiration.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. ITM, ATM, and OTM Explained
+            </h2>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-700">
+              <li><strong>At-The-Money (ATM):</strong> The strike price closest to the current market spot price. Time decay and volatility shifts are typically most visible here.</li>
+              <li><strong>In-The-Money (ITM):</strong> Contracts that hold positive intrinsic value right now (Calls with strike below spot; Puts with strike above spot).</li>
+              <li><strong>Out-of-The-Money (OTM):</strong> Contracts composed solely of extrinsic time value (Calls with strike above spot; Puts with strike below spot).</li>
             </ul>
-            <p className="text-xs text-slate-400 font-medium">
-              Together, these contracts provide a precise snapshot of activity occurring in the options market.
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              03. Key Columns Included in NSE CSV Exports
+            </h2>
+            <p>
+              Official NSE CSV snapshots record Open Interest (OI), Change in OI, traded Volume, Implied Volatility (IV), Last Traded Price (LTP), Net Price Change, and Bid/Ask quotes for every active strike—allowing analytical tools to compute ratios and structural distributions locally.
             </p>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Understanding Call Options and Put Options
-          </h2>
-          <p>
-            Before analyzing an option chain, it is important to understand the two primary types of options.
-          </p>
-
-          <div className="space-y-12">
-            <div>
-              <h3 className="text-xl font-black text-brand-teal uppercase tracking-wider mb-2">Call Options</h3>
-              <p className="text-slate-600">
-                A call option gives the buyer the right, but not the obligation, to purchase the underlying asset at a predetermined strike price before expiry.
-              </p>
-              <p className="text-xs text-slate-500 italic mt-2 font-medium">
-                Traders often use call options when they expect the market to move higher.
-              </p>
-              
-              <div className="border-l-4 border-brand-teal/30 pl-4 py-1.5 mt-4 space-y-1 text-xs text-slate-500">
-                <span className="font-black uppercase text-[10px] text-brand-teal block tracking-widest">Example Scenario</span>
-                <p>Suppose <strong>NIFTY</strong> is trading at <strong>25,000</strong>. A trader who expects prices to rise may purchase a <strong>25,100 call option</strong>. If NIFTY rises above that level, the option may gain value.</p>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-black text-amber-600 uppercase tracking-wider mb-2">Put Options</h3>
-              <p className="text-slate-600">
-                A put option gives the buyer the right, but not the obligation, to sell the underlying asset at a predetermined strike price before expiry.
-              </p>
-              <p className="text-xs text-slate-500 italic mt-2 font-medium">
-                Put options are often used when traders expect prices to fall or when they want to hedge existing positions.
-              </p>
-              
-              <div className="border-l-4 border-amber-600/30 pl-4 py-1.5 mt-4 space-y-1 text-xs text-slate-500">
-                <span className="font-black uppercase text-[10px] text-amber-600 block tracking-widest">Example Scenario</span>
-                <p>Suppose <strong>NIFTY</strong> is trading at <strong>25,000</strong>. If a trader expects weakness, they may buy a <strong>put option</strong> at a relevant strike price. If prices decline, the value of the put option may increase.</p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How an Option Chain Is Structured
-          </h2>
-          <p>
-            An option chain generally displays multiple columns of information. The exact layout may vary between brokers and analytical platforms, but most option chains contain the following central elements:
-          </p>
-
-          <div className="space-y-12">
-            <div className="space-y-3">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                <span>1. Strike Price</span>
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Reference Core</span>
-              </h3>
-              <p className="text-slate-600">
-                The strike price is the price level associated with an option contract.
-              </p>
-              <div className="border border-slate-100 bg-slate-50/50 rounded-xl p-4 max-w-xs text-xs font-mono space-y-1.5">
-                <div className="text-[9px] uppercase font-black text-slate-400 tracking-widest pb-1.5 border-b border-slate-200">Strike Price Chain</div>
-                <div>24,800</div>
-                <div>24,900</div>
-                <div className="text-brand-teal font-extrabold flex items-center gap-2">25,000 <span className="text-[9px] rounded bg-brand-teal/10 px-1 font-semibold">Spot</span></div>
-                <div>25,100</div>
-                <div>25,200</div>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed font-semibold">
-                Each strike price has corresponding call and put options. The strike price acts as the central reference point around which the option chain layout is strictly organized.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
-                <span>2. Open Interest (OI)</span>
-                <span className="text-[10px] font-black uppercase text-brand-teal tracking-wider">Crucial Metric</span>
-              </h3>
-              <p className="text-slate-600">
-                Open Interest refers to the total number of active contracts that remain open. Unlike trading volume, open interest does not measure how many contracts traded during the day. Instead, it measures how many contracts currently exist in the market.
-              </p>
-              <div className="py-2 pl-4 border-l-2 border-brand-teal/20 space-y-1.5 text-xs font-semibold text-slate-600">
-                <span className="block text-[10px] font-black uppercase text-brand-teal tracking-wider mb-1">High open interest generally indicates:</span>
-                <p>&bull; Greater institutional participation</p>
-                <p>&bull; Higher market liquidity</p>
-                <p>&bull; Increased overall market interest</p>
-              </div>
-              <p className="text-xs text-slate-500 font-medium">
-                Many traders consider open interest one of the most important components of option chain analysis.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider">
-                3. Change in Open Interest
-              </h3>
-              <p className="text-slate-600">
-                This metric measures how open interest changes throughout the trading session. An increase in open interest often suggests that new positions are actively being created, while a decrease in open interest may indicate that traders are finishing or closing positions.
-              </p>
-              <p className="text-xs text-slate-500 italic">
-                When combined with underlying price movement, changes in open interest can provide additional insight into market behaviour.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider">
-                4. Trading Volume
-              </h3>
-              <p className="text-slate-600">
-                Volume measures the absolute number of contracts traded during a given period. High volume often indicates strong active participation and immediate trading interest.
-              </p>
-              <p className="text-xs text-slate-500 font-medium">
-                Many traders closely monitor volume spikes because they highlight specific strike prices that are attracting significant attention at various times of the trading day.
-              </p>
-            </div>
-
-            <div className="space-y-3 pt-4 border-t border-slate-100">
-              <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider">
-                5. Implied Volatility (IV)
-              </h3>
-              <p className="text-slate-600">
-                Implied Volatility represents the market's expectation of future price movement. Higher IV generally suggests that traders expect larger price fluctuations, while lower IV indicates relatively lower expectations for overall volatility.
-              </p>
-              <p className="text-xs text-slate-500 font-medium">
-                Implied volatility plays an important role in determining option premiums as it directly impacts extrinsic value.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Traders Analyze Option Chains
-          </h2>
-          <p>
-            Option chains provide information that goes beyond price alone. They allow traders to observe market participation from a different perspective. Several reasons explain why option chain analysis remains highly popular among retail and professional participants.
-          </p>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider">
-              &bull; Understanding Market Sentiment
-            </h3>
-            <p className="text-sm">
-              By comparing activity in calls and puts, traders attempt to estimate overall market sentiment. For example:
-            </p>
-            <ul className="text-xs font-semibold text-slate-700 pl-6 space-y-2 list-disc">
-              <li><strong>Heavy call activity</strong> may suggest bullish expectations or immediate ceiling resistances.</li>
-              <li><strong>Heavy put activity</strong> may indicate bearish expectations or solid floor support levels acting as capital boundaries.</li>
-              <li><strong>Balanced activity</strong> may suggest neutrality and expected sideways movement.</li>
-            </ul>
-            <p className="text-xs text-slate-500">
-              Although sentiment analysis is not perfect, it can help traders understand broader options market positioning.
-            </p>
-
-            <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider pt-4">
-              &bull; Identifying Potential Support Levels
-            </h3>
-            <p className="text-sm">
-              Many traders examine put-side open interest to identify areas that may act as support. When significant open interest accumulates at a particular strike price, traders often monitor that level closely because it represents zones where substantial market participation exists.
-            </p>
-
-            <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider pt-4">
-              &bull; Identifying Potential Resistance Levels
-            </h3>
-            <p className="text-sm">
-              Similarly, call-side open interest is often studied to identify potential resistance zones. Large concentrations of call positions may indicate price levels that traders are actively monitoring. Resistance identification remains one of the most common applications of option chain analysis.
-            </p>
-
-            <h3 className="text-lg font-black text-slate-900 uppercase tracking-wider pt-4">
-              &bull; Monitoring Positioning Changes
-            </h3>
-            <p className="text-sm">
-              Markets evolve continuously throughout the trading session. Option chain data changes dynamically as traders open positions, close positions, adjust hedges, or shift expectations. Tracking these changes allows traders to monitor evolving market behavior.
-            </p>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Common Mistakes Beginners Make
-          </h2>
-          <p>
-            Many new traders misunderstand option chain data. Some common mistakes include:
-          </p>
-          
-          <div className="space-y-8 mt-6">
-            <div className="flex gap-4 items-start">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-extrabold text-slate-900 uppercase text-xs tracking-wider mb-1">Looking Only at Open Interest</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">Open interest is highly important, but it should never be analyzed in complete isolation. Spot price action, traded volume, and implied volatility must also be considered before reaching decisions.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-extrabold text-slate-900 uppercase text-xs tracking-wider mb-1">Ignoring Market Context</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">Option chain data should always be interpreted within the broader market environment. Economic announcements, earnings reports, global events, and interest rates significantly influence market behaviour.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-extrabold text-slate-900 uppercase text-xs tracking-wider mb-1">Assuming Support and Resistance Are Guaranteed</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">No support or resistance level is guaranteed to hold. Option chain analysis identifies areas of interest and potential congestion, not complete certainty.</p>
-              </div>
-            </div>
-
-            <div className="flex gap-4 items-start">
-              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-extrabold text-slate-900 uppercase text-xs tracking-wider mb-1">Treating One Indicator as a Complete Strategy</h4>
-                <p className="text-xs text-slate-650 leading-relaxed">Successful market analysis typically combines multiple forms of information. Option chain data is just one component of a larger analytical process.</p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Technology Helps Simplify Option Chain Analysis
-          </h2>
-          <p>
-            Modern analytical platforms help traders interpret complex option chain datasets more efficiently. Instead of manually reviewing hundreds of rows and multiple metrics, analytical tools can organize data into structured visual insights.
-          </p>
-          <p>
-            Educational resources and analytical platforms such as <a href="https://optionchainanalyzer.in/" target="_blank" rel="noreferrer" className="text-brand-teal font-extrabold hover:underline">optionchainanalyzer.in</a> help traders understand concepts as:
-          </p>
-          
-          <ul className="text-xs font-bold text-slate-800 uppercase tracking-wider pl-6 space-y-2 list-none">
-            <li className="flex items-center gap-2"><div className="w-2 h-2 bg-brand-teal rounded-full" /> Open interest concentration</li>
-            <li className="flex items-center gap-2"><div className="w-2 h-2 bg-brand-teal rounded-full" /> Support and resistance levels</li>
-            <li className="flex items-center gap-2"><div className="w-2 h-2 bg-brand-teal rounded-full" /> Implied volatility behaviour</li>
-            <li className="flex items-center gap-2"><div className="w-2 h-2 bg-brand-teal rounded-full" /> Market sentiment indicators</li>
-            <li className="flex items-center gap-2"><div className="w-2 h-2 bg-brand-teal rounded-full" /> Option chain structure</li>
-          </ul>
-
-          <p className="text-xs text-slate-500 font-medium">
-            Using educational tools can make it easier for beginners to understand large amounts of market data without replacing the need for independent analysis.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Frequently Asked Questions
-          </h2>
-          
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Is option chain analysis useful for beginners?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Yes. Understanding option chain fundamentals helps beginners learn how market participants position themselves around different strike prices.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Can option chain data predict future prices?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                No. Option chain data reflects current market positioning and activity. It does not guarantee future price movement.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">What is the most important metric in an option chain?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                There is no single most important metric. Open interest, volume, implied volatility, and price action all provide useful information when analyzed together.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Why do traders monitor open interest?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Open interest helps traders understand where participation is concentrated and how positions are evolving over time.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Does high open interest always indicate support or resistance?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Not necessarily. It indicates significant market activity at a particular strike price, but market conditions can change rapidly.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            An option chain is one of the most valuable educational tools available to traders seeking to understand options markets. By displaying strike prices, open interest, trading volume, implied volatility, and market participation data, option chains provide a detailed view of how traders are positioning themselves.
-          </p>
-          <p>
-            While option chain analysis should never be viewed as a standalone prediction tool, understanding its structure and purpose can help traders interpret market activity more effectively. Learning how to read option chain data is often one of the first steps toward developing a deeper understanding of options markets and market behaviour.
-          </p>
+          </section>
         </div>
-      )
-    },
-    {
-      id: 'what-is-put-call-ratio-pcr',
-      title: "What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders",
-      excerpt: "Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.",
-      category: 'Education',
-      date: 'May 25, 2026',
-      readTime: '6 min read',
-      author: 'Options Education Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Put Call Ratio (PCR) is one of the most widely used sentiment indicators in options trading. By comparing put activity with call activity, traders attempt to understand how market participants are positioned. PCR is not a forecasting tool, but it can provide useful context when analysed alongside price action, open interest, volatility, and broader market conditions.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            What Is Put Call Ratio (PCR)?
-          </h2>
-          <p>
-            PCR is a ratio that compares the total number of put options to call options. It can be calculated using open interest or trading volume. The purpose of PCR is to provide a simplified view of sentiment in the options market.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Is Put Call Ratio Calculated?
-          </h2>
-          <p>
-            PCR based on Open Interest is calculated by dividing the total Put Open Interest by the total Call Open Interest. PCR can also be calculated using trading volume.
-          </p>
-          <div className="bg-slate-50 border-l-4 border-brand-teal rounded-r-2xl p-6 my-6">
-            <span className="block text-xs font-black uppercase text-brand-teal tracking-widest mb-1">PCR formula</span>
-            <div className="font-mono text-sm font-bold text-slate-800 bg-white/50 border border-slate-100 rounded-lg p-3 my-2 text-center">
-              PCR (OI) = Total Put Open Interest / Total Call Open Interest
-            </div>
-            <p className="text-xs text-slate-500 mt-2">
-              For example, if put open interest is 15 lakh contracts and call open interest is 10 lakh contracts, the PCR would be 1.5.
-            </p>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Understanding PCR Values
-          </h2>
-          <p>
-            Lower PCR values generally indicate stronger call activity, while higher PCR values indicate stronger put activity. Traders often interpret these zones as guidelines of relative market positioning.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
-            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-emerald-500">
-              <span className="block text-[10px] font-black uppercase text-emerald-600 tracking-wider mb-1">Below 0.7</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Relatively Bullish</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates strong call interest relative to puts. Traders are aggressively buying or writing calls, reflecting positive sentiment.</p>
-            </div>
-            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-slate-400">
-              <span className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">Around 1.0</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Neutral Sentiment</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates a balanced distribution of puts and calls, showing no strong directional bias or dominance in the underlying asset.</p>
-            </div>
-            <div className="border bg-slate-50 border-slate-100 rounded-2xl p-5 border-l-4 border-l-rose-500">
-              <span className="block text-[10px] font-black uppercase text-rose-600 tracking-wider mb-1">Above 1.3</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Relatively Bearish</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates stronger put activity or panic hedging. Put buyers/writers are active, reflecting cautious or negative sentiment.</p>
-            </div>
-          </div>
-
-          <p className="text-xs text-slate-400 italic">
-            Note: These values are guidelines rather than fixed, absolute rules. Each market, index, or equity may have its own natural baseline PCR range.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Do Traders Monitor PCR?
-          </h2>
-          <p>
-            Traders monitor PCR to gain multi-layered insights into general option chain configurations:
-          </p>
-          <ul className="space-y-3 pl-4">
-            <li className="flex gap-2.5 items-start text-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
-              <span><strong>Sentiment Assessment:</strong> To evaluate active momentum and notice where bullish or bearish biases dominate.</span>
-            </li>
-            <li className="flex gap-2.5 items-start text-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
-              <span><strong>Observe Institutional Positioning:</strong> Smart money is often on the writing side of the market; changes in open interest distributions reveal their actions.</span>
-            </li>
-            <li className="flex gap-2.5 items-start text-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
-              <span><strong>Option Chain Support:</strong> Reinforces key support and resistance zones identified through individual strike price concentrations.</span>
-            </li>
-            <li className="flex gap-2.5 items-start text-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-teal mt-2 shrink-0" />
-              <span><strong>Potential Sentiment Extremes:</strong> Spotting overextended levels where momentum might be exhausting.</span>
-            </li>
-          </ul>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Can PCR Be Used as a Contrarian Indicator?
-          </h2>
-          <p>
-            Some traders view extreme PCR readings through a contrarian lens. Very high PCR values can signify that market fear has peaked—representing a potential capitulation bottom. Conversely, extremely low PCR values might suggest euphoria, indicating a market top.
-          </p>
-          <p>
-            However, context is absolutely essential. A high PCR can stay high for a sustained period in a severe downtrend, and PCR should never be used as a standalone entry or exit signal in isolation.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Limitations of Put Call Ratio
-          </h2>
-          <p>
-            Like all technical measurements, the Put Call Ratio has specific bounds:
-          </p>
-          <ul className="space-y-2 list-disc list-inside text-sm pl-2">
-            <li><strong>No predictive guarantee:</strong> PCR is a descriptor of existing contracts and does not forecast future price action.</li>
-            <li><strong>Ignores market context:</strong> It cannot account for critical macroeconomic events, company earnings, or black-swan catalysts.</li>
-            <li><strong>Occasionally misleading:</strong> Spikes in PCR can sometimes be driven by large, institutional hedging transactions rather than direct speculative sentiment.</li>
-          </ul>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            PCR vs Open Interest
-          </h2>
-          <p>
-            It is critical to distinguish these two: PCR is a comparative sentiment indicator assessing the relationship between puts and calls, while Open Interest (OI) is a participation indicator measuring total active contracts. Total OI shows how much interest belongs in a sector, whereas PCR shows its distribution.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Common Mistakes Beginners Make
-          </h2>
-          <p>
-            Avoid these critical pitfalls when integrating PCR into your routines:
-          </p>
-          <ul className="space-y-2.5 text-sm">
-            <li className="flex gap-2 items-center text-slate-650">
-              <span className="text-rose-500 font-bold shrink-0">✕</span>
-              <span>Treating PCR as an automated Buy/Sell buzzer.</span>
-            </li>
-            <li className="flex gap-2 items-center text-slate-650">
-              <span className="text-rose-500 font-bold shrink-0">✕</span>
-              <span>Ignoring the underlying price support/resistance zones.</span>
-            </li>
-            <li className="flex gap-2 items-center text-slate-650">
-              <span className="text-rose-500 font-bold shrink-0">✕</span>
-              <span>Focusing only on the PCR of volume instead of the more robust Open Interest PCR.</span>
-            </li>
-            <li className="flex gap-2 items-center text-slate-650">
-              <span className="text-rose-500 font-bold shrink-0">✕</span>
-              <span>Misinterpreting extreme historical values as permanent rules.</span>
-            </li>
-          </ul>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How to Learn PCR Through Real Option Chain Data
-          </h2>
-          <p>
-            Readers interested in understanding option chain concepts, support and resistance levels, open interest concentrations, and educational market analysis can explore <a href="https://optionchainanalyzer.in/" className="text-brand-teal hover:underline font-bold">OptionChainAnalyzer.in</a> as part of their learning process.
-          </p>
-          <p>
-            Using real-time option analytical systems allows you to trace PCR moves, resistance barriers, and custom IV anomalies dynamically next to actual index levels, transforming static theory into practical trading literacy.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">What is a good PCR value?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                There is no single universally good value. Values vary based on indices and overall macro-hedging patterns.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Is high PCR bullish or bearish?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Usually bearish (indicates more puts), though extremes can act as contrarian bullish indicators suggesting a market bottom.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Can PCR predict direction?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                No. It describes positioning only. It is a sentiment gauges, not a direct predictor.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Should beginners use PCR?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Yes, as a straightforward educational sentiment indicator alongside key support and resistance evaluations.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            Put Call Ratio is an exceptional asset for understanding sentiment in options markets. While it should not be treated as a predictive indicator in of itself, it provides valuable insight into how market participants are positioned. The most effective approach is to use PCR together with broader market analysis rather than in isolation.
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'what-is-open-interest-oi',
-      title: "What Is Open Interest (OI)? A Complete Beginner's Guide",
-      excerpt: "Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.",
-      category: 'Education',
-      date: 'May 31, 2026',
-      readTime: '6 min read',
-      author: 'Options Education Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Open Interest (OI) is one of the most important concepts in derivatives trading, yet it is often misunderstood by beginners. Many traders focus only on price movement and overlook the information hidden within market participation data. Open Interest helps traders understand how many active contracts currently exist in the market and can provide valuable context when analyzed alongside price action, volume, and volatility.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            What Is Open Interest?
-          </h2>
-          <p>
-            Open Interest refers to the total number of active derivative contracts that have not been closed, exercised, or expired. These contracts may belong to futures or options markets. Unlike trading volume, which measures how many contracts were traded during a period, Open Interest measures how many contracts remain active. Because of this, OI is often used as a participation indicator rather than an activity indicator.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Open Interest Is Created
-          </h2>
-          <p>
-            Open Interest increases when a new buyer and a new seller create a fresh contract. It decreases when both parties close existing positions. If one trader transfers a position to another, Open Interest may remain unchanged because the total number of active contracts has not changed. Understanding these mechanics is essential before interpreting OI data.
-          </p>
-
-          <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 my-6 space-y-4">
-            <span className="block text-xs font-black uppercase text-brand-teal tracking-widest">How Open Interest Changes</span>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="bg-white border border-slate-100 rounded-xl p-4">
-                <span className="text-emerald-500 font-bold text-base block mb-1">▲ Increases</span>
-                <p className="text-slate-500 text-xs">When a new buyer and a new seller open a completely new contract, Open Interest increases by 1.</p>
-              </div>
-              <div className="bg-white border border-slate-100 rounded-xl p-4">
-                <span className="text-rose-500 font-bold text-base block mb-1">▼ Decreases</span>
-                <p className="text-slate-500 text-xs">When an existing holder closes their position with an existing writer, Open Interest decreases by 1.</p>
-              </div>
-              <div className="bg-white border border-slate-100 rounded-xl p-4">
-                <span className="text-slate-500 font-bold text-base block mb-1">■ Unchanged</span>
-                <p className="text-slate-500 text-xs">When a trader transfers their position to a new buyer or seller, Open Interest remains identical.</p>
-              </div>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Open Interest vs Volume
-          </h2>
-          <p>
-            Volume and Open Interest are often confused. Volume measures trading activity during a specific period, while Open Interest measures active participation. A contract can contribute to volume multiple times during a day, but it contributes only once to Open Interest while it remains active. Traders frequently analyze both metrics together because they reveal different aspects of market behaviour.
-          </p>
-
-          <div className="overflow-x-auto border border-slate-100 rounded-2xl my-6">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase tracking-wider text-slate-500">
-                  <th className="p-4">Metric</th>
-                  <th className="p-4">Volume</th>
-                  <th className="p-4">Open Interest (OI)</th>
-                </tr>
-              </thead>
-              <tbody className="text-xs divide-y divide-slate-50">
-                <tr>
-                  <td className="p-4 font-bold text-slate-900">Definition</td>
-                  <td className="p-4 text-slate-650">Total trades executed in a given period.</td>
-                  <td className="p-4 text-slate-650">Total outstanding active contracts.</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-bold text-slate-900">Measurement Type</td>
-                  <td className="p-4 text-slate-650">Activity or liquidity indicator.</td>
-                  <td className="p-4 text-slate-650">Participation or capital commitment indicator.</td>
-                </tr>
-                <tr>
-                  <td className="p-4 font-bold text-slate-900">Reset Cycle</td>
-                  <td className="p-4 text-slate-650">Resets to zero at the start of each trading session.</td>
-                  <td className="p-4 text-slate-650">Cumulative; only shifts as positions open or close.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Traders Monitor Open Interest
-          </h2>
-          <p>
-            Open Interest can help traders assess participation, liquidity, and conviction behind market moves. Rising Open Interest may suggest that new positions are entering the market. Stable or falling Open Interest may indicate a lack of fresh participation. In option chain analysis, OI is often monitored to identify strike prices attracting significant market attention.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            How Traders Interpret Changes in Open Interest
-          </h2>
-          <p>
-            A common framework is to analyze OI alongside price movement. Rising prices with rising OI are often interpreted as fresh participation in an uptrend. Falling prices with rising OI may indicate increasing bearish participation. Rising prices with falling OI can suggest short covering, while falling prices with falling OI may indicate long unwinding. These interpretations are guidelines rather than guarantees.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
-            <div className="border border-slate-100 bg-emerald-50/30 rounded-2xl p-5 border-l-4 border-l-emerald-500">
-              <span className="block text-[10px] font-black uppercase text-emerald-600 tracking-wider mb-1">Uptrend Strength</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Price Rising &amp; OI Rising</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates strong bullish conviction and fresh buyers entering the market. Considered an extremely healthy sign of an ongoing uptrend.</p>
-            </div>
-            <div className="border border-slate-100 bg-rose-50/30 rounded-2xl p-5 border-l-4 border-l-rose-500">
-              <span className="block text-[10px] font-black uppercase text-rose-600 tracking-wider mb-1">Bearish Strength</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Price Falling &amp; OI Rising</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates aggressive shorts entering the market, verifying heavy bearish participation and strong downward pressure.</p>
-            </div>
-            <div className="border border-slate-100 bg-amber-50/25 rounded-2xl p-5 border-l-4 border-l-amber-500">
-              <span className="block text-[10px] font-black uppercase text-amber-600 tracking-wider mb-1">Short Covering</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Price Rising &amp; OI Falling</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Usually driven by short sellers actively covering their open positions rather than new buying. Price rise may be fragile.</p>
-            </div>
-            <div className="border border-slate-100 bg-slate-50 rounded-2xl p-5 border-l-4 border-l-slate-400">
-              <span className="block text-[10px] font-black uppercase text-slate-500 tracking-wider mb-1">Long Unwinding</span>
-              <h4 className="font-black text-slate-900 text-sm uppercase">Price Falling &amp; OI Falling</h4>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Indicates existing buyers are exiting their long positions, unwinding open risk. Often flags general exhaustion.</p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Open Interest in Option Chain Analysis
-          </h2>
-          <p>
-            Option chain analysts frequently study Open Interest concentrations to understand where market participants are positioning themselves. Large concentrations of put-side OI are often monitored as potential support zones, while significant call-side OI may be observed as potential resistance zones. However, these levels should never be treated as certainties because market conditions can change quickly.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Open Interest and Market Sentiment
-          </h2>
-          <p>
-            Although Open Interest alone does not measure sentiment, changes in OI can provide clues about how participants are behaving. When combined with option chain metrics such as Put Call Ratio, implied volatility, and volume, OI can contribute to a more comprehensive view of market structure.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Common Misconceptions About Open Interest
-          </h2>
-          <p>
-            One common misconception is that Open Interest predicts future prices. In reality, OI simply measures participation. Another misconception is that high OI guarantees support or resistance. High OI may indicate areas of interest, but prices can still move beyond those levels. OI should always be interpreted alongside broader market context.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Learning Through Real Data
-          </h2>
-          <p>
-            The best way to understand Open Interest is by observing real option chain data over time. Readers interested in learning more about option chain concepts, support and resistance analysis, and educational market resources can explore <a href="https://optionchainanalyzer.in/" className="text-brand-teal hover:underline font-bold">OptionChainAnalyzer.in</a> as part of their learning journey.
-          </p>
-          <p>
-            Tracing real-time metrics helps contextualize how changes in call or put concentrations sync with overall market boundaries, leading to faster trading comprehension.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">What is a good Open Interest value?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                There is no universal answer because OI must be interpreted relative to the underlying asset and prevailing market conditions. A highly liquid index like NIFTY will naturally sustain much higher OI than individual mid-cap equities.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Is high OI bullish?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Not necessarily. High OI indicates strong participation, interest, and risk exposure, but it does not specify direction on its own.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Can OI predict future prices?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                No. It should be viewed as contextual information about market structure rather than a forecasting tool.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 pt-4 border-t border-slate-100">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Is OI more important than volume?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Both are useful and provide entirely different insights. Volume reveals current speed and immediate liquidity, whereas OI indicates sustained risk commitment.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            Open Interest is a foundational concept in options and futures markets. By measuring active participation, it helps traders understand market structure beyond price movement alone. While OI should never be used as a standalone signal, it becomes significantly more valuable when combined with price action, volume, volatility, and broader option chain analysis. Developing a solid understanding of Open Interest is an important step for anyone seeking to learn how derivatives markets function.
-          </p>
-        </div>
-      )
+      ),
     },
     {
       id: 'open-interest-vs-volume',
-      title: "Open Interest vs Volume: Understanding the Key Differences",
-      excerpt: "Learn the difference between Open Interest and Volume, how traders use each metric, and why understanding both is important for option chain analysis.",
-      category: 'Education',
-      date: 'June 3, 2026',
-      readTime: '5 min read',
-      author: 'Options Education Desk',
+      title: 'Open Interest vs. Trading Volume: How Exchange Participation Is Measured',
+      excerpt: 'Understand the fundamental difference between Open Interest (active unsettled contracts) and Volume (daily transaction count), and how both metrics work together in derivatives data.',
+      category: 'Option Chain Basics',
+      date: 'October 12, 2026',
+      readTime: '4 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Open Interest and Volume are two of the most commonly used metrics in options and futures trading. Although both appear in option chains, they measure different aspects of market behaviour.
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            Newcomers to derivatives markets often confuse <strong>Volume</strong> and <strong>Open Interest (OI)</strong>. Although both quantify contract activity on the exchange, they measure two distinct aspects of market participation.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-2">PARTICIPATION</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-3">What Is Open Interest?</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Open Interest represents the total number of active derivative contracts that remain open. It is commonly used as a participation indicator.
-              </p>
-            </div>
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-2">ACTIVITY</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-3">What Is Trading Volume?</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Volume measures the number of contracts traded during a specific period. It reflects trading activity rather than active positions.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Core Difference
-          </h2>
-          <p>
-            Open Interest measures active contracts, while Volume measures traded contracts. Open Interest tracks participation; Volume tracks activity.
-          </p>
-
-          <div className="overflow-x-auto border border-slate-100 rounded-2xl my-6">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase tracking-wider text-slate-500">
-                  <th className="p-4">Aspect</th>
-                  <th className="p-4">Open Interest (OI)</th>
-                  <th className="p-4">Trading Volume</th>
+                <tr className="bg-slate-100 text-slate-800 border-b border-slate-200 font-bold">
+                  <th className="p-3">Characteristic</th>
+                  <th className="p-3">Trading Volume</th>
+                  <th className="p-3">Open Interest (OI)</th>
                 </tr>
               </thead>
-              <tbody className="text-xs divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-100 text-slate-600">
                 <tr>
-                  <td className="p-4 font-bold text-slate-900">What It Tracks</td>
-                  <td className="p-4 text-slate-650">Active, unresolved positions.</td>
-                  <td className="p-4 text-slate-650">Executed trades in a given timeframe.</td>
+                  <td className="p-3 font-semibold text-slate-900">What It Measures</td>
+                  <td className="p-3">Total number of contracts traded during a single session.</td>
+                  <td className="p-3">Total number of active, unsettled contracts currently open.</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-bold text-slate-900">Primary Indicator</td>
-                  <td className="p-4 text-slate-650">Sustained capital commitment (Participation).</td>
-                  <td className="p-4 text-slate-650">Immediate liquidity and trading speed (Activity).</td>
+                  <td className="p-3 font-semibold text-slate-900">Daily Reset Behavior</td>
+                  <td className="p-3">Resets to zero at the start of every trading day.</td>
+                  <td className="p-3">Carries forward day-to-day until contracts are closed or expire.</td>
                 </tr>
                 <tr>
-                  <td className="p-4 font-bold text-slate-900">Weekly Reset</td>
-                  <td className="p-4 text-slate-650">Cumulative; updates dynamically as positions are created/closed.</td>
-                  <td className="p-4 text-slate-650">Resets to zero at the start of every trading session.</td>
+                  <td className="p-3 font-semibold text-slate-900">Intraday Effect</td>
+                  <td className="p-3">Only increases throughout the session.</td>
+                  <td className="p-3">Can increase (new contracts created) or decrease (existing contracts closed).</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Traders Use Open Interest
-          </h2>
-          <p>
-            Traders use Open Interest to study participation levels, trend strength, and option chain positioning. High open interest tells option chain analysts where prominent buyers and writers are allocating capital and establishing key boundaries.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Traders Use Volume
-          </h2>
-          <p>
-            Volume helps traders assess liquidity and identify periods of elevated trading activity. High trading volume indicates rapid trade execution and tight bid-ask spreads, allowing traders to enter and exit positions with minimal slippage.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Using Both Together
-          </h2>
-          <p>
-            Combining Open Interest and Volume often provides a more complete picture of market behaviour than either metric alone. Analyzing how both metrics change in tandem relative to price action helps clarify whether a price move is driven by sustainable new interest or quick short-term speculation.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Learning Through Real Data
-          </h2>
-          <p>
-            Educational resources on option chains and market participation can be explored at <a href="https://optionchainanalyzer.in/" className="text-brand-teal hover:underline font-bold">optionchainanalyzer.in</a>.
-          </p>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            FAQ
-          </h2>
-          <div className="space-y-6">
-            <div className="space-y-1.5">
-              <h4 className="font-extrabold text-slate-900 text-sm uppercase tracking-wide">Do Open Interest or Volume predict future prices?</h4>
-              <p className="text-xs text-slate-650 leading-relaxed">
-                Neither metric predicts future prices. Both provide context and should be analyzed alongside price action and market conditions. They are gauges of participation and liquidity, not price direction forecasts.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Conclusion
-          </h2>
-          <p>
-            Open Interest and Volume serve different purposes. Understanding both helps traders interpret market activity more effectively. By analyzing activity alongside participation, options traders can formulate more informed trading strategies with a complete view of the market structure.
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'option-greeks-explained-delta-gamma-theta-vega',
-      title: "Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices",
-      excerpt: "Master the four fundamental Option Greeks—Delta, Gamma, Theta, and Vega. Understand how Greek sensitivities impact premium decay, directional movement, and strike risk on Nifty and Bank Nifty option chains.",
-      category: 'Education',
-      date: 'October 9, 2026',
-      readTime: '7 min read',
-      author: 'Quantitative Derivatives Desk',
-      content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Every price quoted on the National Stock Exchange (NSE) option chain is governed by mathematical sensitivities known as <strong>Option Greeks</strong>. While spot price movements catch the headlines, Greeks dictate whether your option gains ₹50, loses ₹30, or bleeds premium through silent time decay.
-          </p>
-
-          <p>
-            For retail options traders analyzing Nifty 50, Bank Nifty, or liquid single-stock options, understanding Greeks is not just academic theory—it is essential risk management. Here is a practical, field-tested guide to Delta, Gamma, Theta, and Vega.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-brand-teal tracking-widest block mb-1">DIRECTIONAL EXPOSURE</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">1. Delta (&Delta;)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Delta measures how much an option's premium changes for every 1-point move in the underlying spot index or stock. Call Deltas range from 0 to +1.0, while Put Deltas range from -1.0 to 0. An At-The-Money (ATM) Nifty Call typically has a Delta close to +0.50.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-rose-600 tracking-widest block mb-1">ACCELERATION RISK</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">2. Gamma (&Gamma;)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Gamma represents the rate of change of Delta per 1-point move in the underlying asset. Highest at near-the-money strikes approaching expiry, Gamma causes rapid Delta shifts—fueling explosive expiry-day "hero or zero" moves and sudden margin expansion.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-amber-600 tracking-widest block mb-1">TIME DECAY</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">3. Theta (&Theta;)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Theta represents the monetary decay of an option premium for each passing day, all else being equal. Theta decay is non-linear—it accelerates drastically during the final 48 to 72 hours before weekly and monthly contract expiration.
-              </p>
-            </div>
-
-            <div className="border border-slate-100 bg-slate-50/50 rounded-2xl p-6">
-              <span className="text-xs font-black uppercase text-blue-600 tracking-widest block mb-1">VOLATILITY SENSITIVITY</span>
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">4. Vega (&Nu;)</h3>
-              <p className="text-sm text-slate-650 leading-relaxed">
-                Vega quantifies how much the option price fluctuates for every 1% change in Implied Volatility (IV). When India VIX spikes ahead of major elections or RBI policy decisions, Vega inflates option premiums across the entire chain even if spot prices remain flat.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Why Option Sellers Profit from Theta Decay
-          </h2>
-          <p>
-            SEBI studies repeatedly show that retail option buyers struggle with profitability. A core reason is Theta. When you buy an Out-of-the-Money (OTM) option, time works against you every second the market is open—and over weekends. Institutional option writers position at high Open Interest strikes (PCR/CPR &ge; 6.0x) precisely to harvest this predictable time decay.
-          </p>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Risk Reminder</p>
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              How Change in OI Provides Context
+            </h2>
             <p>
-              Trading options carries significant risk of capital loss. Per SEBI studies, 9 out of 10 retail traders incur net losses in the F&amp;O segment. Never trade without defined stop-loss thresholds and thorough position sizing.
+              Suppose 500 contracts change hands at a strike today (Volume = 500). If both buyer and seller are opening brand-new positions, Open Interest increases by +500. If an existing contract holder simply transfers an open contract to a new participant, Volume rises by 500 while Open Interest remains unchanged. Reviewing both metrics together distinguishes short-term turnover from lasting contractual commitments.
             </p>
-          </div>
+          </section>
         </div>
-      )
+      ),
     },
     {
-      id: 'how-to-spot-long-buildup-and-short-covering-in-oi',
-      title: "Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup",
-      excerpt: "Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.",
-      category: 'Strategy',
+      id: 'what-is-put-call-ratio-pcr',
+      title: 'Put-Call Ratio (PCR) & Max Pain: Analytical Concepts Explained',
+      excerpt: 'Learn how Put-Call Ratio (PCR), Call-Put Ratio (CPR), and Max Pain formulas are calculated from exchange open interest data, along with their mathematical limitations.',
+      category: 'Analytical Metrics',
+      date: 'October 10, 2026',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
+      content: (
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            Analytical ratios help summarize thousands of open interest numbers across an option chain into readable comparisons. Two widely studied metrics are the <strong>Put-Call Ratio (PCR)</strong> and <strong>Max Pain Theory</strong>. Understanding both their math and their limitations prevents over-reliance on any single indicator.
+          </p>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. Put-Call Ratio (PCR) &amp; Call-Put Ratio (CPR) Math
+            </h2>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-800 space-y-1.5">
+              <div>PCR = Put Open Interest ÷ Call Open Interest</div>
+              <div>CPR = Call Open Interest ÷ Put Open Interest</div>
+            </div>
+            <p>
+              When calculated strike-by-strike on an option chain, extreme ratios (such as Put OI exceeding Call OI by 6x or more at a lower strike, or Call OI exceeding Put OI by 6x at an upper strike) show where option writers have concentrated substantial contract volume. Because institutional sellers require significant margin deposits, heavy concentrations often represent notable reference zones—though sudden macro news can always cause writers to unwind positions rapidly.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. Understanding Max Pain Theory
+            </h2>
+            <p>
+              Max Pain calculates, across every listed strike price, the hypothetical expiry settlement point at which the combined intrinsic payout of all outstanding Call and Put contracts would be lowest. While it is a useful mathematical summary of aggregate open interest distribution, expiry settlement is never guaranteed to gravitate toward Max Pain—actual market prices are driven by macroeconomic data, institutional cash flows, and spot market demand.
+            </p>
+          </section>
+        </div>
+      ),
+    },
+    {
+      id: 'understanding-implied-volatility-iv-on-the-option-chain',
+      title: 'Implied Volatility (IV) & Option Greeks: Educational Risk Awareness',
+      excerpt: 'An introduction to Implied Volatility (IV) and the four core Option Greeks—Delta, Gamma, Theta, and Vega—explaining how time decay and volatility impact option pricing risk.',
+      category: 'Volatility & Risk',
       date: 'October 8, 2026',
-      readTime: '6 min read',
-      author: 'Market Structure Analyst',
+      readTime: '5 min read',
+      author: 'OptionChainAnalyzer Helpdesk',
       content: (
-        <div className="space-y-8 text-slate-700 leading-relaxed text-base pt-4">
-          <p className="font-semibold text-lg text-slate-900 border-l-4 border-brand-teal pl-4 leading-relaxed">
-            Price movement alone can be deceiving. A 100-point rally in Nifty could be driven by institutional buyers aggressively accumulating fresh long contracts—or simply trapped short sellers rushing to close positions. The <strong>Price vs. Open Interest (OI) Quadrant</strong> reveals the true institutional intent behind every market swing.
+        <div className="space-y-6 text-slate-700 leading-relaxed text-[15px] md:text-base max-w-[68ch]">
+          <p className="text-base md:text-lg text-slate-800 font-medium leading-relaxed">
+            Option prices do not depend solely on whether the underlying index moves up or down. They are governed continuously by expected volatility and remaining time until expiry—quantified through <strong>Implied Volatility (IV)</strong> and the mathematical sensitivities known as <strong>Option Greeks</strong>.
           </p>
 
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            The 4-Quadrant Price-OI Matrix Explained
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
-            <div className="p-6 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-2">
-              <span className="text-xs font-black uppercase text-emerald-800 tracking-widest block">PRICE ▲ | OI ▲</span>
-              <h3 className="text-lg font-black text-emerald-950 uppercase tracking-tight">1. Long Buildup (Strong Bullish)</h3>
-              <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                Both underlying price and Open Interest are expanding simultaneously. This confirms fresh capital deployment on the long side. Buyers are entering aggressive positions and willing to pay higher prices, indicating sustainable upward momentum.
-              </p>
-            </div>
-
-            <div className="p-6 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-2">
-              <span className="text-xs font-black uppercase text-blue-800 tracking-widest block">PRICE ▲ | OI ▼</span>
-              <h3 className="text-lg font-black text-blue-950 uppercase tracking-tight">2. Short Covering (Transient Bullish)</h3>
-              <p className="text-xs text-blue-900 leading-relaxed font-medium">
-                Price is rising, but Open Interest is decreasing. Traders who previously held short positions are closing them out to stem losses. While this causes sharp upward squeezes, rallies driven purely by short covering often stall once trapped sellers finish squaring off.
-              </p>
-            </div>
-
-            <div className="p-6 bg-rose-50/70 border border-rose-200 rounded-2xl space-y-2">
-              <span className="text-xs font-black uppercase text-rose-800 tracking-widest block">PRICE ▼ | OI ▲</span>
-              <h3 className="text-lg font-black text-rose-950 uppercase tracking-tight">3. Short Buildup (Strong Bearish)</h3>
-              <p className="text-xs text-rose-900 leading-relaxed font-medium">
-                Price is falling while Open Interest is expanding. Aggressive market participants are creating fresh short positions, anticipating further downside. This reflects strong institutional selling pressure and overhead resistance.
-              </p>
-            </div>
-
-            <div className="p-6 bg-amber-50/70 border border-amber-200 rounded-2xl space-y-2">
-              <span className="text-xs font-black uppercase text-amber-800 tracking-widest block">PRICE ▼ | OI ▼</span>
-              <h3 className="text-lg font-black text-amber-950 uppercase tracking-tight">4. Long Unwinding (Mild Bearish)</h3>
-              <p className="text-xs text-amber-900 leading-relaxed font-medium">
-                Price is dropping and Open Interest is declining. Existing long position holders are booking profits or closing losing trades. There is no major aggressive new short selling, meaning selling pressure may abate once profit booking ends.
-              </p>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight pt-6 border-b border-slate-100 pb-2">
-            Applying Buildup Analysis to the Option Chain
-          </h2>
-          <p>
-            When inspecting an NSE Option Chain CSV on our dashboard:
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-sm">
-            <li><strong>Strike-by-Strike "Change in OI":</strong> Positive change in OI on Call strikes during an intraday rise indicates Call writers are reinforcing overhead resistance (Short Buildup in Calls).</li>
-            <li><strong>Negative Change in OI:</strong> Sudden sharp drops in Put OI at lower strikes indicates panic unwinding by put sellers, frequently preceding sharp downside breaks.</li>
-          </ul>
-
-          <div className="p-6 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 mt-8 text-xs text-slate-600 leading-relaxed font-medium">
-            <p className="font-black uppercase text-slate-500 tracking-wider text-[10px]">Statutory Risk Disclaimer</p>
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              01. What Implied Volatility (IV) Represents
+            </h2>
             <p>
-              Derivatives trading involves severe financial risk. 9 out of 10 retail traders incur net financial losses per SEBI research. OI metrics are analytical tools for study and should never replace disciplined risk controls and stop-losses.
+              Implied Volatility represents the market&apos;s annualized expectation of price fluctuation derived backward from current option market prices. Elevated IV indicates higher option premiums (more uncertainty priced in), whereas low IV reflects calmer expected movement. High-IV spikes at isolated strikes can signal sudden hedging demand or thin order-book liquidity.
             </p>
-          </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              02. The Four Primary Option Greeks
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Delta (Spot Sensitivity)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Estimates how much an option&apos;s price changes for a 1-point move in the underlying spot price.
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Gamma (Acceleration)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Measures how rapidly Delta changes as the spot price moves, peaking near At-The-Money strikes close to expiry.
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Theta (Time Decay)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Represents the daily erosion of an option&apos;s extrinsic value as expiration approaches, accelerating sharply in expiry week.
+                </p>
+              </div>
+              <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-brand-teal">Vega (Volatility Sensitivity)</h4>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Estimates how much an option&apos;s premium changes for each 1% shift in Implied Volatility.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-xl font-bold text-slate-900">
+              03. Why Greeks Matter for Retail Risk Awareness
+            </h2>
+            <p>
+              Understanding Theta and Vega clarifies why retail option buyers can incur losses even when the underlying index moves modestly in their anticipated direction—if time decay (Theta) or a post-event IV drop (Vega) outweighs small spot gains. According to SEBI research, 9 out of 10 individual retail traders in equity derivatives experience net financial losses.
+            </p>
+          </section>
         </div>
-      )
+      ),
     }
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), []);
+  ], []);
 
   const handleShare = (id: string) => {
     const url = `${window.location.origin}/blog/${id}`;
-    navigator.clipboard.writeText(url).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+      }).catch(() => {});
+    }
   };
+
+  const categories = [
+    'All',
+    'Global Macro',
+    'Option Chain Basics',
+    'Analytical Metrics',
+    'Volatility & Risk',
+    ...(bookmarkedIds.length > 0 ? ['Saved'] : [])
+  ];
 
   const filteredPosts = useMemo(() => {
     return posts.filter(post => {
-      const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = activeCategory === 'All' || post.category === activeCategory;
+      const matchesSearch =
+        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        activeCategory === 'All'
+          ? true
+          : activeCategory === 'Saved'
+          ? bookmarkedIds.includes(post.id)
+          : post.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [posts, searchQuery, activeCategory]);
+  }, [posts, searchQuery, activeCategory, bookmarkedIds]);
 
   const currentPost = useMemo(() => {
     if (!openArticleId) return null;
     return posts.find(p => p.id === openArticleId) || null;
   }, [posts, openArticleId]);
 
-  const categories = ['All', 'Education', 'Strategy', 'Compliance'];
+  const isBookmarked = currentPost ? bookmarkedIds.includes(currentPost.id) : false;
 
   return (
     <div className="flex-1 flex flex-col bg-white overflow-y-auto scrollbar-thin">
-      <div className="max-w-4xl w-full mx-auto px-6 py-12 md:py-16 space-y-10">
-        
-        {/* Navigation / Header Area */}
-        <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-          <a 
+      <div className="max-w-4xl w-full mx-auto px-4 sm:px-6 py-10 md:py-14 space-y-10">
+
+        {/* Top Bar inside Blog */}
+        <div className="flex items-center justify-between border-b border-slate-200 pb-5 gap-4">
+          <a
             href={currentPost ? '/blog' : '/'}
             onClick={(e) => {
               if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
@@ -2177,152 +545,177 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
                 }
               }
             }}
-            className="flex items-center gap-2.5 text-xs font-black uppercase tracking-wider text-slate-500 hover:text-brand-teal transition-all active:scale-95 group cursor-pointer"
+            className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-brand-teal transition-colors cursor-pointer min-h-[40px]"
           >
-            <ArrowLeft size={16} className="transition-transform group-hover:-translate-x-1" />
-            {currentPost ? 'Back to Articles' : 'Exit Blog'}
+            <ArrowLeft size={16} />
+            <span>{currentPost ? 'All Articles' : 'Back to Analyzer'}</span>
           </a>
 
-          <a 
+          <a
             href="/"
             onClick={(e) => {
               if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
                 e.preventDefault();
                 onBackToApp();
               }
-            }} 
-            className="px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] bg-brand-teal/5 text-brand-teal hover:bg-brand-teal hover:text-white transition-all rounded-full border border-brand-teal/10 cursor-pointer block text-center"
+            }}
+            className="px-4 py-2 text-xs font-bold bg-brand-teal text-white hover:bg-brand-teal/90 transition-colors rounded-lg cursor-pointer whitespace-nowrap shrink-0"
           >
-            Go to Dashboard
+            Open Analyzer
           </a>
         </div>
 
         <AnimatePresence mode="wait">
           {currentPost ? (
-            /* =======================================
-               ARTICLE DETAIL PAGES IN-WEBSITE
-               ======================================= */
-            <motion.article 
+            <motion.article
               key={currentPost.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
               className="space-y-8"
             >
               <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-brand-teal/10 text-brand-teal px-3 py-1 rounded">
-                    {currentPost.category}
-                  </span>
-                  <div className="flex items-center gap-3 text-xs text-slate-400 font-bold ml-1">
-                    <span className="flex items-center gap-1">
-                      <Calendar size={12} />
-                      {currentPost.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock size={12} />
-                      {currentPost.readTime}
-                    </span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
+                  <span className="font-semibold text-brand-teal">{currentPost.category}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{currentPost.date}</span>
+                  <span aria-hidden="true">·</span>
+                  <span>{currentPost.readTime}</span>
                 </div>
 
-                <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1] uppercase">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight text-balance">
                   {currentPost.title}
                 </h1>
 
-                <div className="flex items-center justify-between pt-4 border-y border-slate-100 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal">
-                      <Award size={14} className="stroke-[2.5]" />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-700">{currentPost.author}</span>
+                <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-y border-slate-200">
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600">
+                    <UserCheck size={16} className="text-brand-teal shrink-0" />
+                    <span>
+                      Published by <strong className="text-slate-900">{currentPost.author}</strong> · Educational Review
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
+                      type="button"
                       onClick={() => handleShare(currentPost.id)}
-                      className="p-2 border border-slate-100 rounded-lg hover:border-brand-teal hover:text-brand-teal transition-all flex items-center gap-1.5 text-xs font-bold text-slate-500 cursor-pointer active:scale-95"
-                      title="Copy sharing link"
+                      className="px-3 py-1.5 border border-slate-200 rounded-lg hover:border-brand-teal hover:text-brand-teal transition-colors flex items-center gap-1.5 text-xs font-semibold text-slate-600 cursor-pointer min-h-[36px]"
+                      aria-label="Copy article link"
                     >
-                      <Share2 size={13} />
-                      <span>{copiedId === currentPost.id ? 'Copied' : 'Share'}</span>
+                      {copiedId === currentPost.id ? <Check size={14} className="text-emerald-600" /> : <Share2 size={14} />}
+                      <span>{copiedId === currentPost.id ? 'Link Copied' : 'Share'}</span>
                     </button>
-                    <button 
-                      className="p-2 border border-slate-100 rounded-lg hover:border-brand-teal hover:text-brand-teal transition-all text-slate-500"
-                      title="Bookmark Article"
+                    <button
+                      type="button"
+                      onClick={() => toggleBookmark(currentPost.id)}
+                      aria-pressed={isBookmarked}
+                      className={`px-3 py-1.5 border rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold cursor-pointer min-h-[36px] ${
+                        isBookmarked
+                          ? 'border-brand-teal bg-teal-50 text-brand-teal'
+                          : 'border-slate-200 text-slate-600 hover:border-brand-teal hover:text-brand-teal'
+                      }`}
+                      aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark article'}
                     >
-                      <Bookmark size={13} />
+                      <Bookmark size={14} className={isBookmarked ? 'fill-current' : ''} />
+                      <span>{isBookmarked ? 'Saved' : 'Save'}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Dynamic full styled content */}
-              <div>
-                {currentPost.content}
+              <div>{currentPost.content}</div>
+
+              {/* Educational SEBI Compliance Notice */}
+              <div className="p-5 bg-amber-50/70 border border-amber-200 rounded-xl space-y-2 max-w-[68ch]">
+                <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wider">
+                  <AlertCircle size={15} />
+                  <span>SEBI Educational Disclosure</span>
+                </div>
+                <p className="text-xs text-amber-950 leading-relaxed">
+                  OptionChainAnalyzer.in publishes strictly educational material for financial literacy. We are not a SEBI-registered investment advisor and do not provide trading tips, stock calls, or investment advice. According to SEBI studies, 9 out of 10 individual retail traders in equity F&amp;O incur net losses.
+                </p>
               </div>
 
-              {/* Internal Related Resource Callout / Ad space */}
-              <div className="bg-[#fafafa] border border-slate-100 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 mt-16 shadow-inner">
-                <div className="space-y-2">
-                  <h4 className="text-sm font-black uppercase tracking-wider text-brand-teal flex items-center gap-2">
-                    <Sparkles size={16} /> Ready to test your strategy?
+              {/* Educational Tool Link */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-900">
+                    Explore Option Chain Data Yourself
                   </h4>
-                  <p className="text-xs text-slate-500 leading-relaxed max-w-lg">
-                    Export option chain CSV data from the NSE website, upload it to our dashboard, and analyze the option chain in real-time.
+                  <p className="text-xs text-slate-600 leading-relaxed max-w-lg">
+                    Inspect sample Nifty 50 strike tables or upload an official NSE CSV file directly in your browser with zero server storage.
                   </p>
                 </div>
-                <button 
+                <button
+                  type="button"
                   onClick={onBackToApp}
-                  className="px-6 py-3 bg-brand-teal text-white rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:shadow-lg hover:shadow-brand-teal/20 active:scale-95 text-center shrink-0 cursor-pointer"
+                  className="px-5 py-2.5 bg-brand-teal text-white rounded-lg text-xs font-bold hover:bg-brand-teal/90 transition-colors shrink-0 cursor-pointer whitespace-nowrap"
                 >
-                  Start Analyzing
+                  Open Analyzer
                 </button>
               </div>
-
             </motion.article>
           ) : (
-            /* =======================================
-               BLOG DIRECTORY PAGES (GRID FEED VIEW)
-               ======================================= */
-            <motion.div 
+            <motion.div
               key="blog-feed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-10 animate-in fade-in duration-300"
+              className="space-y-8"
             >
               {/* Heading */}
-              <div className="space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-teal block">The Knowledge Base</span>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-                  Blog Articles
+              <div className="space-y-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-teal block">
+                  Educational Knowledge Base
+                </span>
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight text-balance">
+                  Derivatives &amp; Global Macro Guides
                 </h1>
-                <p className="text-slate-500 text-sm md:text-base leading-relaxed max-w-2xl font-medium">
-                  Educational documentation on NSE option chains, advanced Volume-OI metrics, high probability boundaries, and structural risk control mechanisms.
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed max-w-2xl">
+                  Concise, non-advisory guides explaining NSE option chain structure, global macro transmission, and derivatives risk literacy.
                 </p>
               </div>
 
-              {/* Search bar */}
-              <div className="bg-slate-50/80 p-4 border border-slate-200/50 rounded-3xl shadow-inner backdrop-blur-md">
-                <div className="relative">
-                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black" />
-                  <input 
-                    type="text" 
-                    placeholder="Search articles..." 
+              {/* Search & Category Filter Controls */}
+              <div className="space-y-4">
+                <div className="relative max-w-md">
+                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Search educational guides..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 text-xs font-bold text-slate-700 placeholder-slate-400 bg-white border border-slate-200/85 rounded-2xl focus:outline-none focus:border-brand-teal focus:ring-4 focus:ring-brand-teal/5 transition-all outline-none md:max-w-md shadow-sm"
+                    aria-label="Search educational guides"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-teal focus:ring-2 focus:ring-brand-teal/15"
                   />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Filter guides by topic">
+                  {categories.map(category => (
+                    <button
+                      key={category}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeCategory === category}
+                      onClick={() => setActiveCategory(category)}
+                      className={`px-3.5 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                        activeCategory === category
+                          ? 'bg-brand-teal text-white'
+                          : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Articles Grid list */}
+              {/* Curated Articles List */}
               {filteredPosts.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 text-left">
+                <div className="divide-y divide-slate-200 border-t border-slate-200">
                   {filteredPosts.map((post) => (
-                    <a 
+                    <a
                       key={post.id}
                       href={`/blog/${post.id}`}
                       onClick={(e) => {
@@ -2331,56 +724,41 @@ export default function BlogSection({ onBackToApp, openArticleId, onSelectArticl
                           onSelectArticle(post.id);
                         }
                       }}
-                      className="group border border-slate-100 bg-white hover:bg-slate-50/40 p-6 md:p-8 rounded-[2rem] transition-all hover:border-brand-teal/40 hover:shadow-xl hover:shadow-brand-teal/[0.02] cursor-pointer flex flex-col md:flex-row items-stretch gap-6 relative block no-underline premium-shadow-hover"
+                      className="group py-6 flex flex-col gap-2.5 transition-colors hover:bg-slate-50/70 px-3 -mx-3 rounded-xl no-underline"
                     >
-                      <div className="flex-1 space-y-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-black uppercase tracking-widest bg-brand-teal/10 text-brand-teal px-2.5 py-1 rounded">
-                            {post.category}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1 ml-1">
-                            <Calendar size={10} />
-                            {post.date}
-                          </span>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <h3 className="text-xl md:text-2xl font-black text-slate-800 group-hover:text-brand-teal transition-colors tracking-tight uppercase leading-tight">
-                            {post.title}
-                          </h3>
-                          <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                            {post.excerpt}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-4 pt-3 border-t border-slate-100 flex-wrap">
-                          <span className="text-[10px] font-black text-slate-500 uppercase flex items-center gap-1">
-                            <Clock size={11} className="text-slate-400" />
-                            {post.readTime}
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">
-                            By {post.author}
-                          </span>
-                          
-                          <span className="text-xs font-black uppercase tracking-wider text-brand-teal hover:underline ml-auto flex items-center gap-1 group-hover:translate-x-1.5 transition-transform">
-                            Read Article 
-                            <ChevronRight size={13} className="stroke-[2.5]" />
-                          </span>
-                        </div>
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
+                        <span className="font-semibold text-brand-teal">{post.category}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{post.date}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{post.readTime}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>By {post.author}</span>
                       </div>
+
+                      <h3 className="text-lg md:text-xl font-bold text-slate-900 group-hover:text-brand-teal transition-colors leading-snug">
+                        {post.title}
+                      </h3>
+
+                      <p className="text-sm text-slate-600 leading-relaxed max-w-2xl">
+                        {post.excerpt}
+                      </p>
+
+                      <span className="text-xs font-bold text-brand-teal inline-flex items-center gap-1 pt-1">
+                        Read Guide
+                        <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                      </span>
                     </a>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 text-slate-400 font-medium text-xs">
-                  Articles will be published here soon.
+                <div className="text-center py-12 text-slate-500 text-sm border-t border-slate-200">
+                  No educational guides match your current filter.
                 </div>
               )}
-
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </div>
   );

@@ -1,9 +1,8 @@
 import { useState, useCallback, DragEvent, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info, X, Sparkles, ShieldCheck, Mail } from 'lucide-react';
+import { Upload, AlertCircle, TrendingUp, Clock, Twitter, Facebook, Instagram, ChevronUp, ChevronDown, Info, X, Menu, X as CloseIcon, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import BlogSection from './components/BlogSection';
-import { SAMPLE_NIFTY_CSV } from './data/sampleNiftyData';
 import { ContactPage, DisclaimerPage, AboutPage, PrivacyPage, TermsPage } from './components/StaticPages';
 
 export interface OptionChainRow {
@@ -39,7 +38,7 @@ export default function App() {
   const [anomalyStrikes, setAnomalyStrikes] = useState<number[]>([]);
   const [liveSpotMap, setLiveSpotMap] = useState<Record<string, number>>({});
   const [lastLiveUpdate, setLastLiveUpdate] = useState<Date | null>(null);
-  const [timeAgo, setTimeAgo] = useState<string>('');
+  const [isSyncingSpot, setIsSyncingSpot] = useState(false);
 
   const getLiveSpot = useCallback((sym: string | null): number | null => {
     if (!sym) return null;
@@ -49,27 +48,13 @@ export default function App() {
     return null;
   }, [liveSpotMap]);
 
-  const updateTimeAgo = useCallback(() => {
-    if (!lastLiveUpdate) return;
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - lastLiveUpdate.getTime()) / 1000);
-    
-    if (diffInSeconds < 60) {
-      setTimeAgo(`Updated ${diffInSeconds}s ago`);
-    } else {
-      const mins = Math.floor(diffInSeconds / 60);
-      setTimeAgo(`Updated ${mins} min${mins > 1 ? 's' : ''} ago`);
-    }
-  }, [lastLiveUpdate]);
-
-  useEffect(() => {
-    const timer = setInterval(updateTimeAgo, 5000); // Update every 5 seconds
-    updateTimeAgo();
-    return () => clearInterval(timer);
-  }, [updateTimeAgo]);
+  const formattedLastSync = lastLiveUpdate
+    ? `Synced ${lastLiveUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    : '';
 
   const [isHovering, setIsHovering] = useState(false);
   const [isGuideExpanded, setIsGuideExpanded] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const homeContainerRef = useRef<HTMLDivElement>(null);
@@ -103,6 +88,7 @@ export default function App() {
   const selectPage = useCallback((page: AppPage) => {
     setActivePage(page);
     setActiveModal(null);
+    setIsMobileMenuOpen(false);
     if (page === 'tool') {
       setOpenArticleId(null);
       window.history.pushState(null, '', '/');
@@ -117,6 +103,7 @@ export default function App() {
 
   const selectArticle = useCallback((id: string | null) => {
     setOpenArticleId(id);
+    setIsMobileMenuOpen(false);
     if (id) {
       window.history.pushState(null, '', `/blog/${id}`);
     } else {
@@ -141,6 +128,8 @@ export default function App() {
   const [hasShownPopupThisSession, setHasShownPopupThisSession] = useState(false);
   const [hasScrolledToSpot, setHasScrolledToSpot] = useState(false);
   const spotRowRef = useRef<HTMLTableRowElement>(null);
+  const spotStrikeCellRef = useRef<HTMLTableCellElement>(null);
+  const lastScrolledStrikeRef = useRef<number | null>(null);
 
   const handleReset = useCallback(() => {
     setData([]);
@@ -151,12 +140,14 @@ export default function App() {
     setAnomalyStrikes([]);
     setError(null);
     setIsHovering(false);
+    setHasScrolledToSpot(false);
+    lastScrolledStrikeRef.current = null;
   }, []);
 
   const handleLogoClick = useCallback(() => {
     selectPage('tool');
-    handleReset();
-  }, [selectPage, handleReset]);
+    setIsMobileMenuOpen(false);
+  }, [selectPage]);
 
   const fetchLiveData = useCallback(async () => {
     let csvText = "";
@@ -329,74 +320,42 @@ export default function App() {
   }, [syncRouteFromUrl]);
 
   useEffect(() => {
-    let title = "Option Chain Analyzer - NSE Nifty & Bank Nifty Support/Resistance Tool";
-    let desc = "Free NSE Option Chain Analyzer for Nifty and Bank Nifty. Instantly identify resistance and support levels using Open Interest (OI), Volume clusters, PCR, and CPR OI mapping for intraday trading.";
+    let title = "Option Chain Analyzer - NSE Nifty & Bank Nifty Educational Tool";
+    let desc = "Free NSE Option Chain Analyzer for Nifty and Bank Nifty. Visualize Put-Call Ratio (PCR), Call-Put Ratio (CPR), Open Interest clusters, and Implied Volatility locally in your browser.";
     let canonicalUrl = "https://optionchainanalyzer.in/";
 
     if (activePage === 'blog') {
       if (openArticleId === 'global-central-bank-liquidity-shifts-nse-derivatives') {
         title = "Global Central Bank Liquidity Cycles: How Macro Shocks Transmit to NSE Option Chain";
-        desc = "Educational overview of how global central bank interest rate decisions and cross-border capital flows shape open interest concentration and implied volatility on the NSE.";
+        desc = "An educational overview of how policy rate decisions by major central banks alter cross-border capital flows and Implied Volatility on Indian benchmark indices.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/global-central-bank-liquidity-shifts-nse-derivatives";
       } else if (openArticleId === 'geopolitical-trade-corridor-disruptions-market-volatility') {
         title = "Geopolitical Developments & Global Trade Disruptions: Reading Derivatives Sentiment on the NSE";
-        desc = "Learn how geopolitical events, global supply chain bottlenecks, and trade policy updates impact commodity inputs, India VIX, and option chain open interest structures.";
+        desc = "An educational guide on how geopolitical events, global supply chain bottlenecks, and trade policy updates impact energy inputs, India VIX, and option chain structures.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/geopolitical-trade-corridor-disruptions-market-volatility";
-      } else if (openArticleId === 'fed-rate-policy-us-dollar-dxy-nifty-option-chain') {
-        title = "Fed Interest Rate Trajectory & US Dollar Surge: Reading FII Shifts on Nifty Option Chain";
-        desc = "Understand how Federal Reserve interest rate projections, US Treasury yields, and Dollar Index (DXY) surges trigger FII repositioning and heavy Call writing across Nifty 50 strikes.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/fed-rate-policy-us-dollar-dxy-nifty-option-chain";
-      } else if (openArticleId === 'crude-oil-shocks-geopolitical-risk-iv-skew-nse') {
-        title = "Crude Oil Price Shocks & Geopolitical Risk: Spotting Implied Volatility (IV) Skew on NSE Options";
-        desc = "Learn how sudden spikes in Brent crude and geopolitical supply tensions reprice Indian equity risk—triggering India VIX spikes, Put-side IV anomalies, and defensive strike adjustments.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/crude-oil-shocks-geopolitical-risk-iv-skew-nse";
       } else if (openArticleId === 'nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps') {
-        title = "Nasdaq Tech Earnings & Overnight Wall Street Cues: Navigating Opening Gaps on the NSE Option Chain";
-        desc = "Master how overnight US tech earnings and Nasdaq volatility dictate Gift Nifty opening gaps, and how early 9:15–9:45 AM OI addition distinguishes sustainable trend days from trap reversals.";
+        title = "Overnight Wall Street & Global Cues: Understanding Opening Price Adjustments on the NSE";
+        desc = "How overnight US index moves, global technology earnings, and Gift Nifty pricing shape domestic opening gaps and early-session open interest updates on the NSE.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/nasdaq-tech-earnings-wall-street-cues-nifty-opening-gaps";
-      } else if (openArticleId === 'how-global-market-cues-impact-the-nse-option-chain') {
-        title = "Taking Cues from Global Markets: How Overnight Sentiment Shapes the NSE Option Chain";
-        desc = "Discover how overnight cues from Gift Nifty, US indices, crude oil, and the Dollar Index impact early-morning option chain data and institutional positioning.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/how-global-market-cues-impact-the-nse-option-chain";
-      } else if (openArticleId === 'option-greeks-explained-delta-gamma-theta-vega') {
-        title = "Option Greeks Explained: How Delta, Gamma, Theta, and Vega Drive NSE Option Prices";
-        desc = "Master the four fundamental Option Greeks—Delta, Gamma, Theta, and Vega. Understand how Greek sensitivities impact premium decay, directional movement, and strike risk on Nifty and Bank Nifty option chains.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/option-greeks-explained-delta-gamma-theta-vega";
-      } else if (openArticleId === 'how-to-spot-long-buildup-and-short-covering-in-oi') {
-        title = "Decoding Open Interest Buildup: Identifying Long Buildup, Short Covering, Long Unwinding & Short Buildup";
-        desc = "Learn the four quadrant price-OI matrix used by institutional desks to decode whether price moves are backed by fresh long positions, panic short covering, profit booking, or aggressive short additions.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/how-to-spot-long-buildup-and-short-covering-in-oi";
-      } else if (openArticleId === 'understanding-max-pain-theory-on-the-option-chain') {
-        title = "Understanding Max Pain Theory on the Option Chain: How Option Sellers Position for Expiry";
-        desc = "Explore the Max Pain Theory: a derivatives analysis model showing how index/stock prices gravitate towards the strike price where option buyers face the greatest maximum financial loss on expiry day.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/understanding-max-pain-theory-on-the-option-chain";
-      } else if (openArticleId === 'understanding-implied-volatility-iv-on-the-option-chain') {
-        title = "Understanding Implied Volatility (IV) on the Option Chain: A Practical Guide";
-        desc = "Learn what Implied Volatility (IV) is, why it is crucial for pricing options, how to identify high/low IV on an option chain, and how to use it to optimize your options trading strategies.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/understanding-implied-volatility-iv-on-the-option-chain";
-      } else if (openArticleId === 'how-traders-identify-support-and-resistance-using-option-chain-data') {
-        title = "How Traders Identify Support and Resistance Using Option Chain Data";
-        desc = "Learn how traders identify support and resistance levels using option chain data and Open Interest concentrations.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/how-traders-identify-support-and-resistance-using-option-chain-data";
       } else if (openArticleId === 'what-is-an-option-chain-and-why-do-traders-use-it') {
-        title = "What Is an Option Chain and Why Do Traders Use It? A complete beginner's guide";
-        desc = "If you are learning about options trading, one of the first terms you will encounter is the option chain. Learn how option chains are structured, how to read them, and how experienced traders analyze market sentiment, support levels, and open interest.";
+        title = "What Is an Option Chain? Understanding Calls, Puts, and Strike Structure";
+        desc = "A clear beginner guide explaining how NSE option chains organize strike prices, Calls, Puts, Last Traded Price (LTP), and Open Interest in a single tabular matrix.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-an-option-chain-and-why-do-traders-use-it";
-      } else if (openArticleId === 'what-is-put-call-ratio-pcr') {
-        title = "What Is Put Call Ratio (PCR)? Complete Beginner Guide for Option Traders";
-        desc = "Learn what Put Call Ratio (PCR) is, how it is calculated, how traders interpret PCR values, common misconceptions, limitations, and how PCR is used in option chain analysis.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-put-call-ratio-pcr";
-      } else if (openArticleId === 'what-is-open-interest-oi') {
-        title = "What Is Open Interest (OI)? A Complete Beginner's Guide";
-        desc = "Learn what Open Interest (OI) is, how it works, how traders interpret OI changes, the difference between OI and volume, and why Open Interest is important in option chain analysis.";
-        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-open-interest-oi";
       } else if (openArticleId === 'open-interest-vs-volume') {
-        title = "Open Interest vs Volume: Understanding the Key Differences";
-        desc = "Learn the difference between Open Interest and Volume, how traders use each metric, and why understanding both is important for option chain analysis.";
+        title = "Open Interest vs. Trading Volume: How Exchange Participation Is Measured";
+        desc = "Understand the difference between Open Interest (active unsettled contracts) and Volume (daily transaction count), and how both metrics work together in derivatives data.";
         canonicalUrl = "https://optionchainanalyzer.in/blog/open-interest-vs-volume";
+      } else if (openArticleId === 'what-is-put-call-ratio-pcr') {
+        title = "Put-Call Ratio (PCR) & Max Pain: Analytical Concepts Explained";
+        desc = "Learn how Put-Call Ratio (PCR), Call-Put Ratio (CPR), and Max Pain formulas are calculated from exchange open interest data, along with their mathematical limitations.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/what-is-put-call-ratio-pcr";
+      } else if (openArticleId === 'understanding-implied-volatility-iv-on-the-option-chain') {
+        title = "Implied Volatility (IV) & Option Greeks: Educational Risk Awareness";
+        desc = "An introduction to Implied Volatility (IV) and the four core Option Greeks—Delta, Gamma, Theta, and Vega—explaining how time decay and volatility impact option pricing risk.";
+        canonicalUrl = "https://optionchainanalyzer.in/blog/understanding-implied-volatility-iv-on-the-option-chain";
       } else {
-        title = "Market Research & Derivatives Education Blog - Option Chain Analyzer";
-        desc = "Learn option chain analysis, Put Call Ratio (PCR), Open Interest (OI) clustering, and other essential derivatives trading metrics with our expert-crafted guides.";
+        title = "Educational Derivatives & Global Macro Blog - Option Chain Analyzer";
+        desc = "Concise, non-advisory guides explaining NSE option chain structure, global macro transmission, Put-Call Ratios, and derivatives risk literacy.";
         canonicalUrl = "https://optionchainanalyzer.in/blog";
       }
     } else if (activePage === 'about') {
@@ -404,8 +363,8 @@ export default function App() {
       desc = "Discover the mission and background of Option Chain Analyzer, our visual support and resistance methodology, and how we help retail traders interpret live NSE option chain data.";
       canonicalUrl = "https://optionchainanalyzer.in/about";
     } else if (activePage === 'contact') {
-      title = "Contact Us - Option Chain Analyzer Support Desk";
-      desc = "Get in touch with the Option Chain Analyzer support and editorial team for feedback, CSV parsing questions, or research queries.";
+      title = "Contact Us - Option Chain Analyzer Help & Support";
+      desc = "Get in touch with the Option Chain Analyzer Helpdesk for feedback, CSV parsing questions, or technical support.";
       canonicalUrl = "https://optionchainanalyzer.in/contact";
     } else if (activePage === 'disclaimer') {
       title = "SEBI Compliance & Financial Risk Disclaimer - Option Chain Analyzer";
@@ -472,24 +431,67 @@ export default function App() {
     if (twUrlProp) twUrlProp.setAttribute('content', canonicalUrl);
   }, [activePage, openArticleId, activeModal]);
 
-  useEffect(() => {
-    fetchLiveData();
-    const interval = setInterval(fetchLiveData, 60000); // Update every minute
-    return () => clearInterval(interval);
+  const handleManualSpotSync = useCallback(async () => {
+    setIsSyncingSpot(true);
+    try {
+      await fetchLiveData();
+    } finally {
+      setIsSyncingSpot(false);
+    }
   }, [fetchLiveData]);
 
   useEffect(() => {
-    if (data.length > 0 && !hasScrolledToSpot) {
-      // Small delay to ensure table is rendered
-      const timer = setTimeout(() => {
-        if (spotRowRef.current) {
-          spotRowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setHasScrolledToSpot(true);
-        }
-      }, 600);
-      return () => clearTimeout(timer);
+    if (activePage !== 'tool') {
+      setHasScrolledToSpot(false);
+      lastScrolledStrikeRef.current = null;
+      return;
     }
-  }, [data.length, hasScrolledToSpot, symbolName, liveSpotMap]);
+
+    if (data.length === 0) return;
+
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        const container = tableContainerRef.current;
+        const row = spotRowRef.current;
+        const strikeCell = spotStrikeCellRef.current;
+        if (!container || !row) return;
+
+        const currentStrike = row.dataset.strike ? Number(row.dataset.strike) : null;
+        if (hasScrolledToSpot && currentStrike !== null && lastScrolledStrikeRef.current === currentStrike) {
+          return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const rowRect = row.getBoundingClientRect();
+        const stickyHeaderHeight = 80; // Two sticky header rows (h-10 + h-10)
+        const visibleHeight = Math.max(100, container.clientHeight - stickyHeaderHeight);
+        const targetTop = Math.max(
+          0,
+          container.scrollTop + (rowRect.top - containerRect.top) - stickyHeaderHeight - (visibleHeight - rowRect.height) / 2
+        );
+
+        let targetLeft = container.scrollLeft;
+        if (strikeCell) {
+          const cellRect = strikeCell.getBoundingClientRect();
+          targetLeft = Math.max(
+            0,
+            container.scrollLeft + (cellRect.left - containerRect.left) - (container.clientWidth - cellRect.width) / 2
+          );
+        }
+
+        container.scrollTo({
+          top: targetTop,
+          left: targetLeft,
+          behavior: 'smooth',
+        });
+
+        setHasScrolledToSpot(true);
+        lastScrolledStrikeRef.current = currentStrike;
+      });
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [activePage, data, hasScrolledToSpot, symbolName, spotPrice, liveSpotMap]);
 
   useEffect(() => {
     if (showScrollPopup) {
@@ -806,6 +808,7 @@ export default function App() {
             setIvSentiment({ skew, mood });
           }
 
+          fetchLiveData();
           setError(null);
 
           // Google Analytics Event
@@ -821,21 +824,7 @@ export default function App() {
       },
       error: (err) => setError(`CSV Parsing Error: ${err.message}`)
     });
-  }, [hasShownPopupThisSession]);
-
-  const handleLoadSampleData = useCallback(() => {
-    selectPage('tool');
-    processCSV(SAMPLE_NIFTY_CSV, 'sample_data');
-  }, [selectPage, processCSV]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('demo') === '1' || params.get('sample') === '1') {
-        handleLoadSampleData();
-      }
-    }
-  }, [handleLoadSampleData]);
+  }, [hasShownPopupThisSession, fetchLiveData]);
 
   const handleDragOver = (e: DragEvent) => {
     e.preventDefault();
@@ -901,7 +890,7 @@ export default function App() {
             <div className="flex flex-col gap-10 p-6 md:p-10 pt-8">
               {/* Section 1: Quick Start Workflow */}
               <section className="space-y-4">
-                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide pb-2 border-b border-slate-100">
                   1. Quick Start Workflow
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-medium">
@@ -911,21 +900,21 @@ export default function App() {
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
                     <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">1</div>
                     <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Download Official CSV</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
                       Visit <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-blue-600 underline font-semibold">nseindia.com/option-chain</a>, select your index or stock, and download the CSV snapshot.
                     </p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
                     <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">2</div>
                     <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Upload or Drop File</h4>
-                    <p className="text-xs text-slate-500 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
                       Drag and drop the CSV into the upload area above, or click "Upload CSV File". The parser automatically extracts spot prices and contract strikes.
                     </p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
                     <div className="w-7 h-7 rounded-lg bg-brand-teal text-white flex items-center justify-center text-xs font-black">3</div>
                     <h4 className="text-xs font-bold uppercase text-slate-900 tracking-wider">Analyze Key Levels</h4>
-                    <p className="text-xs text-slate-550 leading-relaxed font-medium">
+                    <p className="text-xs text-slate-600 leading-relaxed font-medium">
                       Examine the At-The-Money (ATM) strike, automated Support (PCR ≥ 6.0x) and Resistance (CPR ≥ 6.0x) zones, and IV anomaly tags.
                     </p>
                   </div>
@@ -934,7 +923,7 @@ export default function App() {
 
               {/* Section 2: Key Indicators Explained */}
               <section className="space-y-4 pt-2 border-t border-slate-100">
-                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide pb-2 border-b border-slate-100">
                   2. Key Derivatives Indicators Explained
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -967,27 +956,21 @@ export default function App() {
 
               {/* Section 3: Interpreting Support & Resistance Multipliers */}
               <section className="space-y-4 pt-2 border-t border-slate-100">
-                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide pb-2 border-b border-slate-100">
                   3. Automated Support &amp; Resistance Highlights (6.0x Rule)
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                  Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as defense barriers defended by institutional writers:
+                  Writing options requires substantial margin capital under exchange guidelines. Consequently, strikes with massive open interest concentrations often act as reference boundaries defended by institutional writers:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                      <h4 className="text-xs font-bold uppercase text-emerald-900 tracking-wider">High-Probability Support (PCR ≥ 6.0x)</h4>
-                    </div>
+                    <h4 className="text-xs font-bold uppercase text-emerald-900 tracking-wider">Support Concentration (PCR ≥ 6.0x)</h4>
                     <p className="text-xs text-emerald-950 leading-relaxed font-medium">
                       Highlighted in <strong>Green</strong>. Indicates Put Open Interest is at least 6 times greater than Call Open Interest at that strike, identifying an institutional put-writing floor.
                     </p>
                   </div>
                   <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-xl space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                      <h4 className="text-xs font-bold uppercase text-rose-900 tracking-wider">High-Probability Resistance (CPR ≥ 6.0x)</h4>
-                    </div>
+                    <h4 className="text-xs font-bold uppercase text-rose-900 tracking-wider">Resistance Concentration (CPR ≥ 6.0x)</h4>
                     <p className="text-xs text-rose-950 leading-relaxed font-medium">
                       Highlighted in <strong>Red</strong>. Indicates Call Open Interest is at least 6 times greater than Put Open Interest at that strike, identifying a heavy call-writing ceiling.
                     </p>
@@ -997,7 +980,7 @@ export default function App() {
 
               {/* Section 4: Risk Management & Compliance */}
               <section className="space-y-4 pt-2 border-t border-slate-100">
-                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide border-l-4 border-brand-teal pl-3">
+                <h3 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-wide pb-2 border-b border-slate-100">
                   4. Risk Management &amp; SEBI Compliance
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed font-medium">
@@ -1005,7 +988,7 @@ export default function App() {
                 </p>
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs text-slate-600 leading-relaxed font-medium">
                   <p>
-                    <strong>Confluence Only:</strong> Option chain open interest distribution should always be used as a secondary confirmation tool alongside primary price action and technical charts.
+                    <strong>Educational Study Only:</strong> Option chain open interest distribution should always be studied alongside official exchange records and primary price data rather than treated as standalone forecasts.
                   </p>
                   <p>
                     <strong>No Investment Advice:</strong> Option Chain Analyzer is an independent analytical tool built strictly for educational and informational purposes. We do not provide trading recommendations, buy/sell calls, or financial advice.
@@ -1045,96 +1028,85 @@ export default function App() {
   };
 
   const FooterContent = () => (
-    <footer className="w-full bg-slate-50/80 border-t border-slate-200/60 py-16 px-8 mt-16 rounded-t-[3rem] relative overflow-hidden backdrop-blur-md z-1">
-      {/* Decorative ambient elements in footer */}
-      <div className="absolute inset-0 dot-grid pointer-events-none z-0 opacity-60" />
-      <div className="absolute top-0 right-1/4 w-80 h-80 bg-brand-teal/[0.025] blur-[100px] rounded-full pointer-events-none z-0" />
-      
-      <div className="max-w-7xl mx-auto relative z-10 font-sans">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-          <div className="col-span-1 md:col-span-1 flex flex-col items-start gap-6">
-            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center p-2 shadow-xl shadow-brand-teal/5 border border-slate-150">
+    <footer className="w-full bg-slate-50/90 border-t border-slate-200 py-14 px-6 md:px-8 mt-14 relative z-10">
+      <div className="max-w-7xl mx-auto font-sans">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+          <div className="col-span-1 flex flex-col items-start gap-5">
+            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center p-2 shadow-sm border border-slate-200">
               <Logo />
             </div>
             <div className="space-y-2">
-              <h3 className="text-sm font-black uppercase tracking-tighter text-brand-teal">Option Chain Analyzer</h3>
-              <p className="text-[12px] text-slate-500 font-medium leading-relaxed max-w-[200px]">High-probability NSE data mapping and OI visualization tool.</p>
+              <h3 className="text-sm font-black uppercase tracking-tight text-brand-teal">Option Chain Analyzer</h3>
+              <p className="text-xs text-slate-600 font-medium leading-relaxed max-w-[240px]">
+                Independent NSE derivatives data visualization and educational open interest reference utility operated from Bengaluru, India.
+              </p>
             </div>
-            <div className="flex gap-4 pt-4 border-t border-slate-150 w-full">
-              <a href="https://x.com/opchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-teal transition-all hover:scale-110" aria-label="Follow us on X">
+            <div className="flex gap-4 pt-3 border-t border-slate-200 w-full">
+              <a href="https://x.com/opchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-brand-teal transition-colors p-1" aria-label="Follow us on X">
                 <Twitter size={18} />
               </a>
-              <a href="https://www.facebook.com/optionchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Follow us on Facebook">
+              <a href="https://www.facebook.com/optionchainanalyzer" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-[#1877F2] transition-colors p-1" aria-label="Follow us on Facebook">
                 <Facebook size={18} />
               </a>
-              <a href="https://www.instagram.com/optionchainanalyzer/" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow us on Instagram">
+              <a href="https://www.instagram.com/optionchainanalyzer/" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-[#E4405F] transition-colors p-1" aria-label="Follow us on Instagram">
                 <Instagram size={18} />
               </a>
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Resources</h4>
-            <div className="flex flex-col gap-3">
-              <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); handleReset(); } }} className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer">Analyzer Platform</a>
-              <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-650 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
-              <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-all text-left uppercase tracking-wider active:scale-95 cursor-pointer flex items-center gap-1.5 w-fit">
-                <span>Blog</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-teal animate-pulse" />
-              </a>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Security & Legal</h4>
-            <div className="flex flex-col gap-3">
-              <a href="/about" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('about'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">About Us</a>
-              <a href="/contact" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('contact'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Contact Us</a>
-              <a href="/disclaimer" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('disclaimer'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">SEBI Disclaimer</a>
-              <a href="/privacy" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('privacy'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Privacy Protocol</a>
-              <a href="/terms" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('terms'); } }} className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Usage Terms</a>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Support Desk</h4>
+          <div className="flex flex-col gap-3.5">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Resources</h4>
             <div className="flex flex-col gap-2.5">
-              <a href="mailto:reachraghuhere14@gmail.com" className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors lowercase tracking-normal">reachraghuhere14@gmail.com</a>
-              <a href="mailto:support@optionchainanalyzer.in" className="text-xs font-bold text-slate-655 hover:text-brand-teal transition-colors lowercase tracking-normal">support@optionchainanalyzer.in</a>
-              <span className="text-[11px] text-brand-teal/50 font-black uppercase tracking-widest leading-none mt-1">v1.2.0 Production Build</span>
+              <a href="/" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Analyzer Platform</a>
+              <a href="https://www.nseindia.com/option-chain" target="_blank" rel="noreferrer" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors uppercase tracking-wider">NSE Official Source</a>
+              <a href="/blog" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Blog</a>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3.5">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Legal &amp; Publisher</h4>
+            <div className="flex flex-col gap-2.5">
+              <a href="/about" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('about'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">About Us</a>
+              <a href="/contact" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('contact'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Contact Us</a>
+              <a href="/disclaimer" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('disclaimer'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">SEBI Disclaimer</a>
+              <a href="/privacy" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('privacy'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Privacy Policy</a>
+              <a href="/terms" onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('terms'); } }} className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors text-left uppercase tracking-wider cursor-pointer">Terms of Use</a>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3.5">
+            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">Help &amp; Support</h4>
+            <div className="flex flex-col gap-2">
+              <a href="mailto:opchainanalyzer@gmail.com" className="text-xs font-bold text-slate-600 hover:text-brand-teal transition-colors lowercase">opchainanalyzer@gmail.com</a>
+              <p className="text-[11px] text-slate-500 font-medium pt-1">
+                Helpdesk · Bengaluru, India
+              </p>
             </div>
           </div>
         </div>
 
         {/* Professional Regulatory Footer Disclaimer */}
-        <div className="mt-12 pt-8 border-t border-slate-200/50 text-slate-400 space-y-3 font-medium text-[11px] leading-relaxed">
-          <p className="uppercase font-black text-slate-500 tracking-wider text-[10px]">
-            REGULATORY RISK WARNING &amp; FINANCIAL DISCLAIMER (SEBI COMPLIANT)
+        <div className="pt-8 border-t border-slate-200 text-slate-500 space-y-3 font-medium text-[11px] leading-relaxed">
+          <p className="uppercase font-black text-slate-600 tracking-wider text-[10px]">
+            Regulatory Risk Warning &amp; Financial Disclaimer (SEBI Compliant)
           </p>
           <p>
-            Derivatives trading (Futures and Options - F&amp;O) in the equity, commodity, or currency segments involves substantial speculative leverage and carries extreme risk of capital loss. Per reports released by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail F&amp;O traders incurred net losses</strong>, with the average loss of loss-makers averaging around <strong>₹50,000 per year</strong>. Over and above these net trading losses, loss-makers spent an additional 28% of their trading losses on transaction costs, brokerage fees, and exchange taxes.
+            Derivatives trading (Futures and Options - F&amp;O) in equity, commodity, or currency segments carries substantial risk of capital loss. According to research published by the Securities and Exchange Board of India (SEBI), <strong>9 out of 10 individual retail F&amp;O traders incurred net losses</strong>, with loss-makers spending significant additional capital on brokerage and statutory taxes.
           </p>
           <p>
-            <strong>OptionChainAnalyzer.in</strong> is an offline-first, browser-local analytical software utility designed strictly for personal, educational, and research purposes. All calculations, highlights (including PCR and CPR multiplier filters of 6.0x or higher), anomaly alerts, or data visualizations are computed automatically based on user-supplied CSV datasets. This tool <strong>does not</strong> provide buy, sell, or hold recommendations, nor does it offer investment, financial, tax, or legal advice. We are not a SEBI-registered advisory entity, broker, or asset management firm. 
-          </p>
-          <p>
-            Users are solely responsible for verifying all parsed metrics, contract details, and strike calculations against official live stock exchange feeds before committing capital. Under no circumstances shall OptionChainAnalyzer.in, its authors, or affiliates be held liable for any financial losses or damages resulting from the use of this tool.
+            <strong>OptionChainAnalyzer.in</strong> is a browser-local analytical utility designed strictly for personal, educational, and informational purposes. Calculations, ratio highlights (PCR/CPR ≥ 6.0x), and IV outlier tags are derived purely from CSV datasets and public exchange feeds. This platform <strong>does not</strong> provide buy, sell, or hold recommendations, nor financial, tax, or legal advice.
           </p>
         </div>
         
-        <div className="pt-8 border-t border-slate-200/50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[11px] text-slate-450 font-black tracking-[0.4em] uppercase">
-            © 2026 OptionChainAnalyzer.in • All Rights Reserved
+        <div className="pt-6 mt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-[11px] text-slate-500 font-bold tracking-wider uppercase text-center sm:text-left">
+            © 2026 OptionChainAnalyzer.in · Educational Use Only
           </p>
-          <div className="flex gap-8 items-center">
-            <div className="flex gap-4 text-[9px] font-black uppercase tracking-[0.2em] text-brand-teal/40">
-              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" /> System Active</span>
-              <span className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.5)]" /> Data Isolated</span>
-            </div>
-          </div>
+          <p className="text-[11px] text-slate-500 font-semibold">
+            Not a SEBI-Registered Advisory Entity
+          </p>
         </div>
       </div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-brand-teal/[0.015] blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none" />
     </footer>
   );
 
@@ -1198,77 +1170,156 @@ export default function App() {
         </div>
       )}
 
-      {/* Header */}
-      <header className="h-20 border-b border-slate-200/60 bg-white/75 backdrop-blur-md px-8 flex items-center justify-between shrink-0 z-50 relative shadow-sm">
-        <div className="flex items-center gap-6">
+      {/* Header — Strict 3-zone navigation with accessible mobile drawer */}
+      <header className="h-16 md:h-20 border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 shrink-0 z-50 relative">
+        <div className="flex items-center gap-3 min-w-0 shrink-0">
           <a 
             href="/"
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); handleLogoClick(); } }}
-            className="w-12 h-12 bg-white rounded-2xl shadow-xl shadow-brand-teal/5 flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-all hover:scale-105 active:scale-95 group cursor-pointer"
+            className="w-10 h-10 bg-white rounded-xl shadow-xs flex items-center justify-center overflow-hidden border border-slate-200 p-1.5 transition-colors hover:border-brand-teal/50 shrink-0 cursor-pointer"
             aria-label="Back to home"
           >
             <Logo className="w-full h-full object-contain" />
           </a>
-          <div className="flex flex-col items-start">
-            <h1 className="text-xl font-black tracking-tighter uppercase text-brand-teal leading-none text-left">
-              Option Chain Analyzer
-            </h1>
-            {asOfTime && <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">Data: {asOfTime}</span>}
-          </div>
+          <h1 className="text-base sm:text-lg font-black tracking-tight uppercase text-brand-teal leading-none whitespace-nowrap">
+            Option Chain Analyzer
+          </h1>
         </div>
 
-        <nav className="hidden md:flex items-center gap-5 ml-auto">
+        <nav aria-label="Primary navigation" className="hidden md:flex items-center gap-5 lg:gap-6">
           <a 
             href="/" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('tool'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'tool' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-extrabold uppercase tracking-wider whitespace-nowrap py-1 border-b-2 transition-colors ${activePage === 'tool' ? 'text-brand-teal border-brand-teal' : 'text-slate-600 border-transparent hover:text-brand-teal'}`}
           >
             Analyzer
           </a>
           <a 
             href="/blog" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('blog'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'blog' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-extrabold uppercase tracking-wider whitespace-nowrap py-1 border-b-2 transition-colors ${activePage === 'blog' ? 'text-brand-teal border-brand-teal' : 'text-slate-600 border-transparent hover:text-brand-teal'}`}
           >
             Blog
           </a>
           <a 
             href="/about" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('about'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'about' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-extrabold uppercase tracking-wider whitespace-nowrap py-1 border-b-2 transition-colors ${activePage === 'about' ? 'text-brand-teal border-brand-teal' : 'text-slate-600 border-transparent hover:text-brand-teal'}`}
           >
             About Us
           </a>
           <a 
             href="/contact" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('contact'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'contact' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-extrabold uppercase tracking-wider whitespace-nowrap py-1 border-b-2 transition-colors ${activePage === 'contact' ? 'text-brand-teal border-brand-teal' : 'text-slate-600 border-transparent hover:text-brand-teal'}`}
           >
             Contact
           </a>
           <a 
             href="/disclaimer" 
             onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('disclaimer'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'disclaimer' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
+            className={`text-xs font-extrabold uppercase tracking-wider whitespace-nowrap py-1 border-b-2 transition-colors ${activePage === 'disclaimer' ? 'text-brand-teal border-brand-teal' : 'text-slate-600 border-transparent hover:text-brand-teal'}`}
           >
             Disclaimer
           </a>
-          <a 
-            href="/privacy" 
-            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('privacy'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'privacy' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
-          >
-            Privacy
-          </a>
-          <a 
-            href="/terms" 
-            onClick={(e) => { if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) { e.preventDefault(); selectPage('terms'); } }} 
-            className={`text-xs font-black uppercase tracking-wider transition-all ${activePage === 'terms' ? 'text-brand-teal font-extrabold scale-105' : 'text-slate-600 hover:text-brand-teal'}`}
-          >
-            Terms
-          </a>
         </nav>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <label 
+            className="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-brand-teal text-white rounded-xl text-[11px] font-black uppercase tracking-wider cursor-pointer hover:bg-brand-teal/90 transition-colors shrink-0 whitespace-nowrap"
+            aria-label="Upload NSE Option Chain CSV"
+          >
+            <Upload size={14} />
+            <span>Upload CSV</span>
+            <input 
+              type="file" 
+              className="hidden" 
+              accept=".csv" 
+              onChange={(e) => { 
+                if (e.target.files?.[0]) { 
+                  processCSV(e.target.files[0], 'file_upload'); 
+                  selectPage('tool');
+                  e.target.value = '';
+                } 
+              }} 
+            />
+          </label>
+
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(prev => !prev)}
+            className="md:hidden w-11 h-11 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-700 hover:text-brand-teal hover:bg-slate-50 transition-colors cursor-pointer"
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <CloseIcon size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </header>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.nav
+            aria-label="Mobile navigation"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="md:hidden bg-white border-b border-slate-200 shadow-lg z-40 overflow-hidden shrink-0"
+          >
+            <div className="px-4 py-3 flex flex-col gap-1">
+              {[
+                { page: 'tool' as AppPage, href: '/', label: 'Analyzer' },
+                { page: 'blog' as AppPage, href: '/blog', label: 'Blog' },
+                { page: 'about' as AppPage, href: '/about', label: 'About Us' },
+                { page: 'contact' as AppPage, href: '/contact', label: 'Contact Us' },
+                { page: 'disclaimer' as AppPage, href: '/disclaimer', label: 'SEBI Disclaimer' },
+                { page: 'privacy' as AppPage, href: '/privacy', label: 'Privacy Policy' },
+                { page: 'terms' as AppPage, href: '/terms', label: 'Terms of Use' },
+              ].map((item) => (
+                <a
+                  key={item.page}
+                  href={item.href}
+                  onClick={(e) => {
+                    if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+                      e.preventDefault();
+                      selectPage(item.page);
+                    }
+                  }}
+                  className={`min-h-[44px] px-3 rounded-xl flex items-center justify-between text-xs font-black uppercase tracking-wider transition-colors ${
+                    activePage === item.page
+                      ? 'bg-brand-teal/10 text-brand-teal'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-brand-teal'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {activePage === item.page && <span className="text-[10px] text-brand-teal">Active</span>}
+                </a>
+              ))}
+              <label 
+                className="min-h-[44px] mt-2 px-4 py-2.5 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+                aria-label="Upload NSE Option Chain CSV"
+              >
+                <Upload size={15} />
+                <span>Upload NSE CSV</span>
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  accept=".csv" 
+                  onChange={(e) => { 
+                    if (e.target.files?.[0]) { 
+                      processCSV(e.target.files[0], 'file_upload'); 
+                      selectPage('tool');
+                      e.target.value = '';
+                    } 
+                  }} 
+                />
+              </label>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       {/* Main Layout */}
       <main className="flex-1 flex flex-col overflow-hidden bg-white shadow-inner">
@@ -1353,17 +1404,17 @@ export default function App() {
               
               <div className="flex justify-center mb-3 w-full max-w-md">
                 <label 
-                  className="w-full py-4 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] transition-all cursor-pointer hover:shadow-lg hover:shadow-brand-teal/20 group active:scale-[0.98] border border-white/10 text-center flex items-center justify-center gap-2"
+                  className="w-full py-4 px-5 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-[0.18em] transition-all cursor-pointer hover:bg-brand-teal/90 active:scale-[0.98] text-center flex items-center justify-center gap-2 min-h-[48px]"
                   aria-label="Upload NSE Option Chain CSV File"
                 >
                   <Upload size={16} />
                   <span>Upload CSV File</span>
-                  <input type="file" className="hidden" accept=".csv" onChange={(e) => e.target.files?.[0] && processCSV(e.target.files[0], 'file_upload')} />
+                  <input type="file" className="hidden" accept=".csv" onChange={(e) => { if (e.target.files?.[0]) { processCSV(e.target.files[0], 'file_upload'); e.target.value = ''; } }} />
                 </label>
               </div>
 
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center mb-8">
-                Or Drop CSV Anywhere on the Screen
+              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center mb-8">
+                Or Drop Any Official NSE CSV Anywhere on the Screen
               </p>
 
               <div className="w-full max-w-4xl mx-auto px-4 mt-2">
@@ -1375,127 +1426,127 @@ export default function App() {
           </div>
         ) : (
           <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
-            {/* Fixed Instrument Bar - Stays on top under page header */}
-            <div className="bg-white border-b border-slate-200 z-50">
-                <div className="max-w-[1400px] mx-auto px-4 md:px-12 py-2 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-6">
+            {/* Fixed Instrument Bar - Wraps cleanly on mobile viewports */}
+            <div className="bg-white border-b border-slate-200 z-30">
+                <div className="max-w-[1400px] mx-auto px-4 md:px-12 py-2.5 flex flex-wrap items-center justify-between gap-3 md:gap-6">
+                  <div className="flex flex-wrap items-center gap-4 md:gap-6">
                     <div className="flex flex-col">
-                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Instrument</span>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-black uppercase tracking-tighter text-brand-teal leading-none">
-                          {symbolName || "Market Index"}
-                        </h3>
-                      </div>
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">Instrument</span>
+                      <h3 className="text-base md:text-lg font-black uppercase tracking-tighter text-brand-teal leading-none">
+                        {symbolName || "Market Index"}
+                      </h3>
                     </div>
 
-                    {/* Live Spot Price Display */}
+                    {/* Spot Price Display (Static CSV or Manual On-Demand Sync) */}
                     {(symbolName && getLiveSpot(symbolName) !== null) ? (
-                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
-                        <div className="flex items-center gap-1.5 mb-0.5 group relative">
-                          <span className="text-[7px] font-black text-amber-600 uppercase tracking-[0.3em]">Spot Price</span>
+                      <div className="flex flex-col border-l border-slate-200 pl-4 md:pl-5">
+                        <div className="flex items-center gap-1.5 mb-0.5 relative">
+                          <span className="text-[9px] font-black text-amber-700 uppercase tracking-[0.2em]">Spot Price</span>
                           <div className="relative group">
-                            <Info className="w-2 h-2 text-slate-300 cursor-help hover:text-indigo-500 transition-colors" />
-                            <div className="absolute left-0 top-full mt-1 w-40 p-2 bg-slate-900 border border-slate-800 rounded shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] pointer-events-none">
-                              <p className="text-[8px] leading-relaxed text-slate-300 font-medium normal-case tracking-normal">
-                                Spot prices refresh periodically. Continuous real-time streaming is currently limited by API provider restrictions to ensure stability.
+                            <Info className="w-3 h-3 text-slate-400 cursor-help hover:text-brand-teal transition-colors" />
+                            <div className="absolute left-0 top-full mt-1 w-48 p-2.5 bg-slate-900 border border-slate-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-[100] pointer-events-none">
+                              <p className="text-[10px] leading-relaxed text-slate-200 font-medium normal-case tracking-normal">
+                                Spot prices sync manually on demand via "Sync Spot" or upon custom CSV upload.
                               </p>
-                              <div className="absolute -top-1 left-3 w-2 h-2 bg-slate-900 border-t border-l border-slate-800 rotate-45"></div>
                             </div>
                           </div>
                         </div>
                         <div className="flex items-baseline gap-1.5">
-                          <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
+                          <span className="text-base md:text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
                             {getLiveSpot(symbolName)?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                           {spotPrice && (
-                            <span className={`text-[10px] font-bold tabular-nums ${(getLiveSpot(symbolName) || 0) >= spotPrice ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            <span className={`text-[10px] font-bold tabular-nums ${(getLiveSpot(symbolName) || 0) >= spotPrice ? 'text-emerald-600' : 'text-rose-600'}`}>
                               {(getLiveSpot(symbolName) || 0) >= spotPrice ? '▲' : '▼'} 
                               {Math.abs((((getLiveSpot(symbolName) || 0) - spotPrice) / spotPrice) * 100).toFixed(2)}%
                             </span>
                           )}
                         </div>
-                        <span className="text-[6px] font-bold text-slate-400 mt-0.5 uppercase tracking-wider">{timeAgo}</span>
+                        <span className="text-[9px] font-bold text-slate-500 mt-0.5 uppercase tracking-wider">{formattedLastSync || 'Synced Spot'}</span>
                       </div>
                     ) : spotPrice && (
-                      <div className="flex flex-col border-l border-slate-200 pl-6 ml-2">
-                        <span className="text-[7px] font-black text-slate-400 uppercase tracking-[0.3em] mb-0.5">Static Spot Price</span>
-                        <span className="text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
+                      <div className="flex flex-col border-l border-slate-200 pl-4 md:pl-5">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">CSV Spot Price</span>
+                        <span className="text-base md:text-lg font-black tabular-nums text-slate-900 leading-none tracking-tighter">
                           {spotPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
+                        <span className="text-[9px] font-bold text-slate-500 mt-0.5 uppercase tracking-wider">{formattedLastSync || 'Snapshot Value'}</span>
                       </div>
                     )}
 
                     {/* Probable Zones Legend */}
-                    <div className="hidden sm:flex flex-col border-l border-slate-200 pl-6 ml-2">
-                      <span className="text-[7px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-0.5">Probability Zones</span>
+                    <div className="hidden sm:flex flex-col border-l border-slate-200 pl-4 md:pl-5">
+                      <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-0.5">Zone Reference</span>
                       <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_4px_rgba(244,63,94,0.3)]"></div>
-                          <span className="text-[10px] font-black text-rose-700 tracking-tight uppercase">Resistance: CPR ≥ 6</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_4px_rgba(16,185,129,0.3)]"></div>
-                          <span className="text-[10px] font-black text-emerald-700 tracking-tight uppercase">SUPPORT: PCR ≥ 6</span>
-                        </div>
+                        <span className="text-[10px] font-black text-rose-700 tracking-tight uppercase">Resistance: CPR ≥ 6</span>
+                        <span className="text-[10px] font-black text-emerald-700 tracking-tight uppercase">Support: PCR ≥ 6</span>
                       </div>
                     </div>
 
-                    <div className="flex flex-col border-l border-slate-200 pl-6 ml-4">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[7px] font-black text-amber-500 uppercase tracking-[0.3em]">IV Anomaly Status</span>
-                      </div>
+                    <div className="flex flex-col border-l border-slate-200 pl-4 md:pl-5">
+                      <span className="text-[9px] font-black text-amber-700 uppercase tracking-[0.2em] mb-0.5">IV Outlier Strikes</span>
                       {anomalyStrikes.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {anomalyStrikes.slice(0, 4).map(strike => (
-                            <span key={strike} className="text-[9px] font-black text-amber-700 bg-amber-50 px-1 border border-amber-100 rounded tabular-nums">
+                            <span key={strike} className="text-[10px] font-black text-amber-800 bg-amber-50 px-1.5 py-0.5 border border-amber-200 rounded tabular-nums">
                               {strike}
                             </span>
                           ))}
                           {anomalyStrikes.length > 4 && (
-                            <span className="text-[7px] font-black text-slate-400">+{anomalyStrikes.length - 4}</span>
+                            <span className="text-[9px] font-black text-slate-500 self-center">+{anomalyStrikes.length - 4}</span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">IV Anomaly not found</span>
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">No IV Outlier Detected</span>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 ml-auto">
+                  <div className="flex flex-wrap items-center gap-2 ml-auto">
                     {ivSentiment && (
-                       <div className="hidden lg:flex items-center gap-2.5 bg-white px-2.5 py-1 rounded-lg border border-slate-100 shadow-sm mr-1">
+                       <div className="hidden lg:flex items-center gap-2.5 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 mr-1">
                           <div className="flex flex-col items-end">
-                            <span className="text-[6px] font-black text-slate-400 uppercase leading-none mb-0.5">Sentiment</span>
-                            <span className={`text-[9px] font-black uppercase tracking-tight ${ivSentiment.mood === 'Bearish' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                            <span className="text-[8px] font-black text-slate-500 uppercase leading-none mb-0.5">IV Skew Mood</span>
+                            <span className={`text-[10px] font-black uppercase tracking-tight ${ivSentiment.mood.includes('Bearish') ? 'text-rose-700' : ivSentiment.mood.includes('Bullish') ? 'text-emerald-700' : 'text-slate-700'}`}>
                               {ivSentiment.mood}
                             </span>
                           </div>
-                          <div className="w-[1px] h-3.5 bg-slate-100" />
+                          <div className="w-[1px] h-4 bg-slate-200" />
                           <div className="flex flex-col items-end">
-                            <span className="text-[6px] font-black text-slate-400 uppercase leading-none mb-0.5">Skew</span>
-                            <span className="text-[9px] font-black text-slate-900 tabular-nums">
+                            <span className="text-[8px] font-black text-slate-500 uppercase leading-none mb-0.5">Put/Call IV</span>
+                            <span className="text-[10px] font-black text-slate-900 tabular-nums">
                               {ivSentiment.skew}
                             </span>
                           </div>
                        </div>
                     )}
-                    
-
 
                     {asOfTime && (
-                      <div className="hidden xl:flex items-center gap-1.5 px-2 py-1 bg-slate-100/50 rounded-lg border border-slate-100 text-[7px] font-bold text-slate-400">
-                        <Clock size={8} className="text-slate-300" />
-                        <span>Snap: {asOfTime}</span>
+                      <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg border border-slate-200 text-[10px] font-bold text-slate-600">
+                        <Clock size={11} className="text-slate-500" />
+                        <span>CSV: {asOfTime}</span>
                       </div>
                     )}
 
-                    <button 
-                      onClick={handleReset}
-                      aria-label="Reset Analysis"
-                      className="px-3 py-1.5 bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-wider transition-all hover:bg-rose-100 active:scale-95 rounded-lg shadow-sm flex items-center gap-1 border border-rose-200 cursor-pointer"
+                    <button
+                      type="button"
+                      onClick={handleManualSpotSync}
+                      disabled={isSyncingSpot}
+                      aria-label="Sync Live Spot Price on Demand"
+                      className="px-3 py-1.5 bg-white text-slate-700 text-[10px] font-black uppercase tracking-wider transition-colors hover:bg-slate-50 hover:text-brand-teal active:scale-95 rounded-lg border border-slate-200 flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
                     >
-                      <AlertCircle size={11} className="text-rose-500" />
-                      Reset
+                      <RefreshCw size={11} className={isSyncingSpot ? 'animate-spin text-brand-teal' : 'text-slate-500'} />
+                      <span>{isSyncingSpot ? 'Syncing...' : 'Sync Spot'}</span>
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={handleReset}
+                      aria-label="Clear Table and Return to CSV Uploader"
+                      className="px-3 py-1.5 bg-rose-50 text-rose-700 text-[10px] font-black uppercase tracking-wider transition-colors hover:bg-rose-100 active:scale-95 rounded-lg flex items-center gap-1.5 border border-rose-200 cursor-pointer"
+                    >
+                      <AlertCircle size={11} className="text-rose-600" />
+                      <span>Reset</span>
                     </button>
                   </div>
                 </div>
@@ -1504,9 +1555,9 @@ export default function App() {
               {/* Scrollable Content Container */}
               <div 
                 ref={tableContainerRef}
-                className="flex-1 overflow-auto flex flex-col items-center scrollbar-thin scrollbar-thumb-slate-300 scroll-smooth bg-slate-50"
+                className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 bg-slate-50"
               >
-                <div className="max-w-[1400px] w-full px-4 md:px-12 py-6">
+                <div className="max-w-[1400px] mx-auto w-full px-4 md:px-12 py-6">
                   <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/40 relative text-slate-900 rounded-lg overflow-visible">
                     <div className="absolute top-0 right-1/4 w-96 h-96 bg-brand-teal/5 blur-[100px] -mr-48 -mt-48 pointer-events-none" />
                     <table className="border-separate border-spacing-0 table-fixed min-w-max w-full">
@@ -1541,7 +1592,7 @@ export default function App() {
                       <th className="w-16 text-slate-600 sticky top-10 z-30 bg-slate-200 italic">CHG</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono text-[10px]">
+                  <tbody className="divide-y divide-slate-100 font-mono text-[10px] tabular-nums">
                     {(() => {
                       // Use live price if available
                       const livePrice = getLiveSpot(symbolName);
@@ -1617,31 +1668,32 @@ export default function App() {
                                   : 'hover:bg-slate-100/50 border-slate-100'
                               }`}
                             >
-                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.callChng}</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 font-medium">{row.callOI.toLocaleString()}</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 italic font-bold">{(row.callVolume / 1000).toFixed(1)}k</td>
-                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.callChngOI.toLocaleString()}</td>
-                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
-                              {row.isCallIVAnomaly && <div className="absolute inset-y-0 right-0 w-0.5 bg-amber-400/50" />}
-                              <span className={row.isCallIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.callIV.toFixed(2)}</span>
+                            <td className={`text-center border-r border-slate-100 italic font-black ${row.callChng >= 0 ? 'text-emerald-600/80' : 'text-rose-600/80'}`}>{row.callChng}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-600 font-medium">{row.callOI.toLocaleString()}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold">{(row.callVolume / 1000).toFixed(1)}k</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.callChngOI >= 0 ? 'text-emerald-600/80' : 'text-rose-600/80'}`}>{row.callChngOI.toLocaleString()}</td>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isCallIVAnomaly ? 'bg-amber-100/70' : 'text-amber-700/70 font-semibold'}`}>
+                              <span className={row.isCallIVAnomaly ? 'text-amber-900 font-extrabold inline-block' : ''}>{row.callIV.toFixed(2)}</span>
                             </td>
                             <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.cprOI >= 6 && isCallOTM)
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_4px_12px_-2px_rgba(225,29,72,0.15)] ring-1 ring-rose-200 relative z-10' 
-                                : 'font-bold text-slate-400'
+                                : 'font-bold text-slate-500'
                             }`}>{row.cprOI}</td>
                             <td className={`text-center border-r-2 border-slate-200 transition-all duration-300 ${
                               (row.cprVol >= 6 && isCallOTM) 
                                 ? 'font-black text-[13px] text-rose-700 bg-rose-50 shadow-[0_4px_12px_-2px_rgba(225,29,72,0.15)] ring-1 ring-rose-200 relative z-10' 
-                                : 'font-bold text-slate-400'
+                                : 'font-bold text-slate-500'
                             }`}>{row.cprVol}</td>
                             
-                            <td className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
+                            <td 
+                              ref={isAtTheMoney ? spotStrikeCellRef : null}
+                              className={`text-center font-black border-x border-slate-200 text-[11px] py-2 tracking-tight relative transition-all duration-300 ${
                               isAtTheMoney 
                                 ? 'bg-brand-teal text-white ring-1 ring-white/10 z-20 shadow-lg scale-[1.005]' 
                                 : strikeHighlightClass
                                   ? strikeHighlightClass
-                                  : 'bg-slate-50/80 text-brand-teal/80 group-hover:text-brand-teal transition-colors'
+                                  : 'bg-slate-50/80 text-brand-teal group-hover:text-brand-teal transition-colors'
                             }`}>
                                {row.strikePrice.toLocaleString()}
                             </td>
@@ -1649,21 +1701,20 @@ export default function App() {
                             <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.pcrVol >= 6 && isPutOTM) 
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200 relative z-10' 
-                                : 'font-bold text-slate-400'
+                                : 'font-bold text-slate-500'
                             }`}>{row.pcrVol}</td>
                             <td className={`text-center border-r border-slate-100 transition-all duration-300 ${
                               (row.pcrOI >= 6 && isPutOTM)
                                 ? 'font-black text-[13px] text-emerald-700 bg-emerald-50 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.2)] ring-1 ring-emerald-200 relative z-10' 
-                                : 'font-bold text-slate-400'
+                                : 'font-bold text-slate-500'
                             }`}>{row.pcrOI}</td>
-                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/30' : 'text-amber-400/60 font-black'}`}>
-                              {row.isPutIVAnomaly && <div className="absolute inset-y-0 left-0 w-0.5 bg-amber-400/50" />}
-                              <span className={row.isPutIVAnomaly ? 'text-amber-800 animate-slow-blink inline-block' : ''}>{row.putIV.toFixed(2)}</span>
+                            <td className={`text-center border-r border-slate-100 font-black relative ${row.isPutIVAnomaly ? 'bg-amber-100/70' : 'text-amber-700/70 font-semibold'}`}>
+                              <span className={row.isPutIVAnomaly ? 'text-amber-900 font-extrabold inline-block' : ''}>{row.putIV.toFixed(2)}</span>
                             </td>
-                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.putChngOI.toLocaleString()}</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 italic font-bold">{(row.putVolume / 1000).toFixed(1)}k</td>
-                            <td className="text-right px-2 border-r border-slate-100 text-slate-400 font-medium">{row.putOI.toLocaleString()}</td>
-                            <td className={`text-center italic font-black ${row.putChng >= 0 ? 'text-emerald-400/70' : 'text-rose-400/70'}`}>{row.putChng}</td>
+                            <td className={`text-right px-2 border-r border-slate-100 ${row.putChngOI >= 0 ? 'text-emerald-600/80' : 'text-rose-600/80'}`}>{row.putChngOI.toLocaleString()}</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-500 italic font-bold">{(row.putVolume / 1000).toFixed(1)}k</td>
+                            <td className="text-right px-2 border-r border-slate-100 text-slate-600 font-medium">{row.putOI.toLocaleString()}</td>
+                            <td className={`text-center italic font-black ${row.putChng >= 0 ? 'text-emerald-600/80' : 'text-rose-600/80'}`}>{row.putChng}</td>
                           </tr>
                         );
                       });
@@ -1674,42 +1725,35 @@ export default function App() {
           </div>
 
           {/* SEBI Compliance Professional Disclaimer */}
-          <div className="w-full max-w-[1400px] bg-white rounded-3xl border border-slate-200 p-8 my-8 relative overflow-hidden group shadow-sm">
+          <div className="w-full max-w-[1400px] bg-white rounded-3xl border border-slate-200 p-6 md:p-8 my-8 relative overflow-hidden shadow-xs">
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-1.5 h-6 bg-rose-500 rounded-full" />
-                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-800">Compliance & Regulatory Notice</h3>
+              <div className="mb-5 pb-3 border-b border-slate-100">
+                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-800">Compliance &amp; Regulatory Notice</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <p className="text-[12px] font-bold text-slate-600 leading-relaxed uppercase tracking-tight">
-                    Standard Disclaimer: Investment in securities market are subject to market risks. Read all the related documents carefully before investing. 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-slate-700 leading-relaxed uppercase tracking-tight">
+                    Standard Disclaimer: Investments in the securities market are subject to market risks. Read all related documents carefully before investing. 
                   </p>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">
-                    This application is an <span className="font-bold text-brand-teal">Analytical Utility</span> provided for educational and data visualization purposes only. It retrieves and processes public domain data from the National Stock Exchange of India (NSE). 
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    This application is an <span className="font-bold text-brand-teal">Analytical Utility</span> provided strictly for educational and data visualization purposes. It computes ratios directly from NSE-formatted CSV snapshots in your browser. 
                   </p>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200/60 shadow-sm">
-                    <AlertCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-                      <strong className="text-slate-800 uppercase text-[9px] mb-1 block tracking-widest">No Investment Advice</strong>
-                      The support/resistance levels and IV anomalies identified by this tool are mathematical derivations based on Open Interest trends. These are NOT buy/sell signals. The platform owner is NOT a SEBI Registered Investment Advisor.
+                <div>
+                  <div className="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                      <strong className="text-slate-900 uppercase text-[10px] mb-1 block tracking-wider">No Investment Advice</strong>
+                      The Put-Call ratios and IV anomalies displayed by this utility are purely mathematical derivations. They are NOT buy/sell trading signals. OptionChainAnalyzer.in is NOT a SEBI Registered Investment Advisor.
                     </p>
                   </div>
                 </div>
               </div>
-              <div className="mt-8 pt-6 border-t border-slate-200/60 flex items-center justify-between">
-                 <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Calculated from NSE CSV Export (As of {asOfTime || 'N/A'})</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                   <span className="text-[9px] font-black uppercase text-slate-400 tracking-[0.2em]">Verified Analytical Framework</span>
-                 </div>
+              <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+                 <span>Dataset Snapshot: {asOfTime || 'Uploaded CSV'}</span>
+                 <span>OptionChainAnalyzer.in · Educational Derivatives Utility</span>
               </div>
             </div>
-            <AlertCircle size={120} className="absolute -bottom-8 -right-8 text-slate-200/30 group-hover:scale-105 transition-transform duration-700 pointer-events-none" />
           </div>
 
           <FooterContent />

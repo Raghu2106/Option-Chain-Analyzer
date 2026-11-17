@@ -37,19 +37,22 @@ export function ContactPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitted(true);
-    }, 600);
+    setIsSubmitting(false);
+    setSubmitted(true);
   };
+
+  const mailtoHref = `mailto:opchainanalyzer@gmail.com?subject=${encodeURIComponent(
+    `[${formState.subject}] ${formState.name}`
+  )}&body=${encodeURIComponent(
+    `Name: ${formState.name}\nReply Email: ${formState.email}\nTopic: ${formState.subject}\n\n${formState.message}`
+  )}`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 md:py-12 space-y-10">
       {/* Header */}
       <div className="border-b border-slate-200 pb-6">
         <span className="text-xs font-black uppercase tracking-widest text-brand-teal block mb-1">
-          Support & Editorial Desk
+          Help &amp; Support
         </span>
         <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase">
           Contact Us
@@ -73,21 +76,9 @@ export function ContactPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
                   <Mail size={16} />
                 </div>
                 <div>
-                  <span className="font-bold text-slate-800 block text-xs uppercase tracking-wider">Primary Inquiries</span>
-                  <a href="mailto:reachraghuhere14@gmail.com" className="text-blue-600 hover:underline break-all">
-                    reachraghuhere14@gmail.com
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center text-brand-teal shrink-0">
-                  <Mail size={16} />
-                </div>
-                <div>
-                  <span className="font-bold text-slate-800 block text-xs uppercase tracking-wider">Technical & Support Desk</span>
-                  <a href="mailto:support@optionchainanalyzer.in" className="text-blue-600 hover:underline break-all">
-                    support@optionchainanalyzer.in
+                  <span className="font-bold text-slate-800 block text-xs uppercase tracking-wider">Support &amp; Inquiries</span>
+                  <a href="mailto:opchainanalyzer@gmail.com" className="text-blue-600 hover:underline break-all">
+                    opchainanalyzer@gmail.com
                   </a>
                 </div>
               </div>
@@ -132,21 +123,30 @@ export function ContactPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
                 <CheckCircle2 size={36} />
               </div>
               <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
-                Message Received Successfully
+                Inquiry Prepared
               </h2>
               <p className="text-sm text-slate-600 max-w-md font-medium leading-relaxed">
-                Thank you for contacting OptionChainAnalyzer.in. Our team will review your query and respond to <strong>{formState.email}</strong> as soon as possible.
+                Click below to send your message directly from your email client to our helpdesk, or email us anytime at <strong>opchainanalyzer@gmail.com</strong>.
               </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSubmitted(false);
-                  setFormState({ name: '', email: '', subject: 'General Inquiry', message: '' });
-                }}
-                className="mt-4 px-6 py-2.5 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-brand-teal/90 transition-all cursor-pointer"
-              >
-                Send Another Note
-              </button>
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+                <a
+                  href={mailtoHref}
+                  className="px-6 py-2.5 bg-brand-teal text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-brand-teal/90 transition-all cursor-pointer inline-flex items-center gap-2"
+                >
+                  <Mail size={14} />
+                  <span>Open Email Client</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFormState({ name: '', email: '', subject: 'General Inquiry', message: '' });
+                  }}
+                  className="px-6 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-slate-200 transition-all cursor-pointer"
+                >
+                  Edit Message
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -248,7 +248,7 @@ export function ContactPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           onClick={onNavigateBlog} 
           className="text-slate-600 hover:text-brand-teal transition-colors flex items-center gap-1 cursor-pointer"
         >
-          Explore Market Research Blog &rarr;
+          Explore Educational Blog &rarr;
         </button>
       </div>
     </div>
@@ -356,7 +356,7 @@ export function DisclaimerPage({ onBackToApp, onNavigateBlog }: StaticPageProps)
           onClick={onNavigateBlog} 
           className="text-slate-600 hover:text-brand-teal transition-colors flex items-center gap-1 cursor-pointer"
         >
-          Explore Market Research Blog &rarr;
+          Explore Educational Blog &rarr;
         </button>
       </div>
     </div>
@@ -451,13 +451,42 @@ export function AboutPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
         </div>
       </section>
 
+      <section className="space-y-4">
+        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+          Publisher &amp; Helpdesk Identity
+        </h2>
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+          <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-brand-teal shrink-0">
+            <UserCheck size={22} />
+          </div>
+          <div className="space-y-2">
+            <div>
+              <h3 className="text-base font-black text-slate-900 tracking-tight">
+                Option Chain Analyzer — Helpdesk
+              </h3>
+              <p className="text-xs font-semibold text-brand-teal mt-0.5">
+                Bengaluru, India · opchainanalyzer@gmail.com
+              </p>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              OptionChainAnalyzer.in is an independent financial literacy publication and browser-local analytics utility based in Bengaluru, India. Built to solve a recurring practical challenge for derivatives students, it renders raw NSE option chain CSV exports cleanly without paywalls, server-side data collection, or speculative advisory claims.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="space-y-3">
         <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-          Editorial &amp; Research Standards
+          Content &amp; Mathematical Accuracy Standards
         </h2>
         <p className="text-sm leading-relaxed">
-          Our Market Research &amp; Derivatives Education blog is crafted by experienced market analysts committed to genuine education rather than get-rich-quick marketing. Every guide includes mathematical definitions, real-world scenario breakdowns, structural market mechanics, and SEBI regulatory disclosures.
+          All educational guides on OptionChainAnalyzer.in follow strict financial literacy principles:
         </p>
+        <ul className="list-disc pl-6 space-y-1.5 text-xs md:text-sm">
+          <li><strong>Verifiable Exchange Formulas:</strong> Every metric—Put-Call Ratio (PCR), Call-Put Ratio (CPR), Implied Volatility (IV) Skew, and Max Pain—is derived strictly from standard exchange-published formulas.</li>
+          <li><strong>Zero Trading Tips or Calls:</strong> We do not publish buy/sell recommendations, intraday stock calls, or directional trade setups. All content focuses solely on analytical mechanics and risk awareness.</li>
+          <li><strong>Regular Fact Review:</strong> Guides are reviewed periodically against current National Stock Exchange (NSE) contract conventions and SEBI risk disclosures.</li>
+        </ul>
       </section>
 
       {/* Quick Navigation Footer */}
@@ -472,7 +501,7 @@ export function AboutPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           onClick={onNavigateBlog} 
           className="text-slate-600 hover:text-brand-teal transition-colors flex items-center gap-1 cursor-pointer"
         >
-          Explore Market Research Blog &rarr;
+          Explore Educational Blog &rarr;
         </button>
       </div>
     </div>
@@ -512,9 +541,10 @@ export function PrivacyPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           The core differentiator of OptionChainAnalyzer.in is our <strong>browser-local computation model</strong>. When you upload, select, or drag-and-drop an NSE Option Chain CSV file:
         </p>
         <ul className="list-disc pl-6 space-y-1.5 text-xs md:text-sm">
-          <li>The file is parsed in your device's browser memory (via Web Workers / JavaScript engine).</li>
+          <li>The file is parsed in your device's browser memory (via JavaScript engine).</li>
           <li><strong>No CSV file, ticker symbol, spot price, or trade parameter is ever transmitted to our servers or stored in any remote database.</strong></li>
-          <li>Closing or refreshing the browser tab immediately clears the dataset from memory.</li>
+          <li>Browser <code className="font-mono text-xs bg-slate-100 px-1 py-0.5 rounded">localStorage</code> is used solely to remember articles you intentionally bookmark for reading later.</li>
+          <li>Closing or refreshing the browser tab immediately clears uploaded CSV data from memory.</li>
         </ul>
       </section>
 
@@ -559,7 +589,7 @@ export function PrivacyPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           For any questions concerning our privacy practices or cookie policies, reach out to our team at:
         </p>
         <p className="font-mono text-sm text-brand-teal font-extrabold">
-          reachraghuhere14@gmail.com / support@optionchainanalyzer.in
+          <a href="mailto:opchainanalyzer@gmail.com" className="hover:underline">opchainanalyzer@gmail.com</a>
         </p>
       </section>
 
@@ -575,7 +605,7 @@ export function PrivacyPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           onClick={onNavigateBlog} 
           className="text-slate-600 hover:text-brand-teal transition-colors flex items-center gap-1 cursor-pointer"
         >
-          Explore Market Research Blog &rarr;
+          Explore Educational Blog &rarr;
         </button>
       </div>
     </div>
@@ -651,7 +681,7 @@ export function TermsPage({ onBackToApp, onNavigateBlog }: StaticPageProps) {
           onClick={onNavigateBlog} 
           className="text-slate-600 hover:text-brand-teal transition-colors flex items-center gap-1 cursor-pointer"
         >
-          Explore Market Research Blog &rarr;
+          Explore Educational Blog &rarr;
         </button>
       </div>
     </div>
